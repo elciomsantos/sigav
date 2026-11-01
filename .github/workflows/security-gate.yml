@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@94196ee1d15439c1b6651cd87ef14e88ec435966 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -332,7 +332,7 @@ jobs:
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@94196ee1d15439c1b6651cd87ef14e88ec435966 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
