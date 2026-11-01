@@ -283,7 +283,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run Trivy scanner (backend)
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:test
           format: 'sarif'
@@ -294,7 +294,7 @@ jobs:
           vuln-type: 'os,library'
 
       - name: Run Trivy scanner (frontend)
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@8f28faec26515256b6d22074d1d2a8986f4cbd87 # master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:test
           format: 'sarif'
