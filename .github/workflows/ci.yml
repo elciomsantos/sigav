@@ -373,7 +373,7 @@ jobs:
           skip-dirs: '/usr/local/lib/node_modules/npm'
 
       - name: Secret scanning (truffleHog)
-        uses: trufflesecurity/trufflehog@0c952ace0f842f11c75775922d7400335cf60bc6 # main
+        uses: trufflesecurity/trufflehog@421026a6540c63cf143ef53a5859389d473e88da # main
         with:
           path: ./
           extra_args: --json
