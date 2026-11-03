@@ -123,7 +123,7 @@
     "jest": "^30.4.2",
     "prettier": "^3.5.3",
     "prisma": "^7.9.0",
-    "supertest": "^7.2.2",
+    "supertest": "^7.3.1",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2"
