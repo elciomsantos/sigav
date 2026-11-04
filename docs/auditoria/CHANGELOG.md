@@ -7,6 +7,29 @@
 
 ---
 
+## v1.2.21 — R01/P0-01 (auth) + hardening de dependências (2026-11-03/04)
+
+### Resumo
+Rodada de correções da reavaliação do checklist (`docs/auditoria/PLANO-CORRECOES-2026-11-03.md`): fechamento do **P0-01** (login tokens sem persistência plaintext), correções de dependências com CVEs e sincronização do ambiente local com a topologia de produção.
+
+### Implementado
+- **P0-01 — Login tokens como SHA-256** (`8d06e6e`): `LoginToken` persiste apenas `tokenHash` (SHA-256, PK via `hashShareableToken()`); token plaintext existe só na resposta da API e expira em 5 min. Migration `20261103000000_login_token_hash` recria a tabela (efeito colateral aceito no plano: enroll TOTP em andamento precisa ser refeito e login tokens pendentes são invalidados). Fonte: `backend/src/auth/service/token.service.ts`, `backend/src/auth/authTotp.service.ts`. Specs de `token.service` atualizadas.
+- **R01 — AuthService decomposto** (`5b17339`, validado na topologia local): `LoginService`/`TokenService`/`RefreshService`/`VerificationService` via DI no `AuthModule`; admin sem TOTP recebe `requiresTotpSetup: true` (nenhuma sessão antes do 2º fator — SEC-1.2/14.6).
+- **Dependências** (`2ebf48b`): `next` 16.4.0 → **16.4.5** no frontend — fecha a RCE crítica GHSA-2464-fhr4-w9xw (image optimization, SVG), o DoS de Server Actions (GHSA-p3m5-59mp-jv5r) e o RCE em `use cache` (GHSA-673q-mjm6-r5xr); bumps transitivos safe-fix no backend; `@parcel/watcher@2.6.0` aprovado no `allowScripts` do backend (script nativo dev-only). Sem fixes non-breaking (recentes por flag de risco): `zod` (pinned por `@serwist/next@9`; exigiria downgrade para v8) e `minimatch` (transitivo de plugins eslint, dev-only).
+- **@nestjs/swagger** regredido ^12 → ^11.4.6 (compatibilidade com Nest 11 em produção).
+- **Lockfiles sincronizados** (`f1ffa4f`): bumps do dependabot em `@mantine/form`, `@uiw/react-md-editor`, `eslint-config-next`, `@next/eslint-plugin-next` sem atualização da lockfile haviam quebrado o `npm ci` do build Docker.
+- **Docs**: `README.md` atualizado para a topologia do compose local atual (3 containers, porta única `:3000`, volume nomeado do SQLite, enrolment TOTP no primeiro acesso); P1-01 do plano marcado como concluído.
+
+### Validado
+- `docker compose --env-file .env.local -f docker-compose.local.yml up --build`: backend/frontend healthy, `/api/health` 200, login admin + redirecionamento para enrolment TOTP funcionando em topologia separada (paridade com prod).
+- `npm ci --dry-run` em sync nos workspaces frontend e backend.
+
+### Notas operacionais
+- `npm audit fix` respeita o `save=false` do `.npmrc` (atualiza apenas `node_modules`); para persistir na lockfile usar `npm audit fix --save`.
+- O volume nomeado `controle-videos-local-backend-data` persiste o admin com TOTP já configurado entre execuções — o QR de enrolment só aparece em `down -v` (reset) ou após limpar `totpVerified`/`totpSecret` do usuário.
+
+---
+
 ## v1.2.20 — Fase 4 (Low Gaps): API Versioning, CI hardening, forense, postmortem, DR drill e pentest (2026-08-21)
 
 ### Resumo

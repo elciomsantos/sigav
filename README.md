@@ -147,25 +147,28 @@ Sistema de compartilhamento seguro de arquivos para uso interno restrito, em PT-
    openssl rand -base64 32   # copie a saída para ADMIN_PASSWORD no .env.local
    ```
 
-2. Suba o container único (backend + frontend + Caddy integrado):
+2. Suba a stack local (topologia de produção: backend, frontend e Caddy em containers separados na rede `controle-videos-local`):
 
    ```bash
-   docker compose -f docker-compose.local.yml up -d --build
+   docker compose --env-file .env.local -f docker-compose.local.yml up --build
    ```
 
 3. Acesse **http://localhost:3000** (entrada unificada pelo Caddy).
 
-   Portas expostas: `8090` (backend/api), `3333` (frontend Next.js) e `3000` (Caddy).
+   Apenas a porta `3000` é exposta ao host (bind `0.0.0.0`). Backend (`8080`) e frontend (`3333`) ficam na rede interna do compose.
 
-   Login inicial: `admin` / `admin@empresa.local` / senha definida em `ADMIN_PASSWORD`.
+   Login inicial: `admin@empresa.local` / senha definida em `ADMIN_PASSWORD`. No primeiro acesso, admin cai na tela de enrolment TOTP (`/auth/totp/enroll/...`) para cadastrar o 2FA com QRCode.
+
+   Swagger disponível em `http://localhost:3000/api/docs` (`SWAGGER_ENABLED=true`).
 
 Recriar o ambiente do zero (apaga o banco SQLite):
 
 ```bash
-docker compose -f docker-compose.local.yml down
-rm data/controle-videos.db
-docker compose -f docker-compose.local.yml up -d --build
+docker compose --env-file .env.local -f docker-compose.local.yml down -v
+docker compose --env-file .env.local -f docker-compose.local.yml up --build
 ```
+
+> O banco fica no volume nomeado `controle-videos-local-backend-data` (não em `data/controle-videos.db`); `-v` remove também os volumes de imagens e do Caddy.
 
 #### Produção
 
@@ -436,7 +439,7 @@ docker compose up -d --build
 | Arquivo | Uso |
 |---|---|
 | `docker-compose.yml` | Produção padrão (backend, frontend, caddy; admin e TLS via variáveis de ambiente — `DOMAIN`, `ACME_EMAIL`, `ADMIN_*`, `JWT_SECRET`) |
-| `docker-compose.local.yml` | Ambiente de teste local — container único (backend + frontend + Caddy) com `.env.local` |
+| `docker-compose.local.yml` | Ambiente de teste local — topologia de produção (backend, frontend e caddy em containers separados), sem TLS, entrada única `:3000`, com `.env.local` |
 | `docker-compose.prod.yml` | Produção com secrets externos (Docker Swarm), TLS via Caddy 2.9 e dados em RAID6 (`/srv/controle-share-videos`) |
 | `docker-compose.monitoring.yml` | Observabilidade (prometheus, alertmanager, grafana, loki, promtail, node-exporter) |
 

@@ -58,10 +58,11 @@ Cada item tem: problema → evidência → ação → critério de aceite → es
 
 ## P1 — Antes do hard freeze / deploy
 
-### P1-01 · Sincronizar repositório e commitar doc pendente
+### P1-01 · Sincronizar repositório e commitar doc pendente — **✅ CONCLUÍDO 2026-11-04**
 - **Problema:** local main 30 commits atrás de origin; `docs/PLANO-STORAGE-EXTERNO.md` untracked.
 - **Ação:** `git pull --ff-only`; revisar diff desde o checklist; commitar o doc pendente.
 - **Esforço:** S
+- **Execução:** repo sincronizado (inclusive após a renomeação para `controle-share-videos`, remote atualizado); `docs/PLANO-STORAGE-EXTERNO.md` e este plano commitados em `8d06e6e`; correções de deps em `2ebf48b`.
 
 ### P1-02 · Enforcement real do `npm audit` no security-gate — Item 10
 - **Problema:** em `.github/workflows/security-gate.yml:84,88` o npm audit roda com `|| true` (só publica artefato). Enforcement existe apenas no `ci.yml` (root/shared) e no osv-scanner.
