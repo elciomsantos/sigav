@@ -1,4 +1,5 @@
 # Incident Response Runbook
+
 **Versão:** 1.0  
 **Última atualização:** 2026-08-21  
 **Próxima revisão:** 2026-11-21 (trimestral)
@@ -10,13 +11,16 @@
 Este runbook define o processo de resposta a incidentes de segurança para o sistema **controle-share-videos**. Baseado no framework NIST SP 800-61 Rev. 2.
 
 ### 1.1 Objetivos
+
 - Minimizar impacto de incidentes de segurança
 - Garantir resposta consistente e documentada
 - Preservar evidências para análise forense
 - Cumprir requisitos LGPD (notificação em 48h)
 
 ### 1.2 Escopo
+
 Aplica-se a todos os componentes:
+
 - Backend API (NestJS + SQLite)
 - Frontend (Next.js)
 - Reverse Proxy (Caddy)
@@ -46,7 +50,8 @@ Aplica-se a todos os componentes:
 | **Executive Sponsor** | CTO/CEO | - | Email: cto@empresa.com |
 
 ### 3.1 Matriz de Escalação
-```
+
+```text
 SEV-1: IC → TL + CL (paralelo) → Executive Sponsor (em 30 min)
 SEV-2: IC → TL → CL (se impacto externo)
 SEV-3: IC → TL (next business day)
@@ -67,7 +72,8 @@ SEV-4: TL (backlog)
 ### 4.1 Templates de Comunicação
 
 #### Alerta Inicial (SEV-1/2) - Slack #sec-incidents
-```
+
+```text
 🚨 INCIDENTE SEV-[1/2] - [Título breve]
 **Horário:** [ISO 8601]
 **Componente:** [API/Frontend/Caddy/Infra]
@@ -79,7 +85,8 @@ SEV-4: TL (backlog)
 ```
 
 #### Atualização Periódica
-```
+
+```text
 🔄 UPDATE SEV-[1/2] - [Título]
 **Horário:** [ISO 8601]
 **Status:** INVESTIGATING | CONTAINING | ERADICATING | RECOVERING | POSTMORTEM
@@ -89,7 +96,8 @@ SEV-4: TL (backlog)
 ```
 
 #### Resolução
-```
+
+```text
 ✅ RESOLVIDO SEV-[1/2] - [Título]
 **Horário início:** [ISO 8601]
 **Horário resolução:** [ISO 8601]
@@ -106,6 +114,7 @@ SEV-4: TL (backlog)
 ### FASE 1: DETECÇÃO E ANÁLISE (T+0 a T+15min SEV-1)
 
 #### 5.1 Fontes de Detecção
+
 - Alertas Prometheus/Alertmanager (auth failures, 5xx, disk, cert)
 - Logs de auditoria (audit_log table)
 - Relato de usuário / suporte
@@ -113,6 +122,7 @@ SEV-4: TL (backlog)
 - Threat intel feeds
 
 #### 5.2 Triagem Inicial (IC)
+
 ```bash
 # Checklist rápido (executar em < 5 min)
 □ Confirmar se é falso positivo
@@ -124,6 +134,7 @@ SEV-4: TL (backlog)
 ```
 
 #### 5.3 Evidências Iniciais (Forensics)
+
 ```bash
 # CAPTURA PADRONIZADA (SEC-4.6) — executar ANTES da contenção.
 # O script captura estado volátil, DB consistente, volumes e gera
@@ -141,6 +152,7 @@ Procedimento completo de custódia: **`docs/forensics.md`** (coleta → transfer
 armazenamento imutável → análise sobre cópias). Registrar coleta no Custody Log.
 
 Complementos manuais, quando necessário:
+
 ```bash
 # Exportar auditoria recente (sobre a cópia do snapshot, não no original!)
 sqlite3 /var/evidence/INC-2026-001_*/database/controle-videos-snapshot.db \
@@ -153,6 +165,7 @@ sqlite3 /var/evidence/INC-2026-001_*/database/controle-videos-snapshot.db \
 ### FASE 2: CONTEMÇÃO (T+15min a T+1h SEV-1)
 
 #### 5.4 Contenção de Curto Prazo (Imediata)
+
 | Incidente | Ação de Contenção |
 |-----------|-------------------|
 | Credencial AWS comprometida | `aws iam delete-access-key`, rotacionar keys, revogar sessões |
@@ -162,6 +175,7 @@ sqlite3 /var/evidence/INC-2026-001_*/database/controle-videos-snapshot.db \
 | Certificado expirado | Renovar via Caddy (force) ou emitir manual |
 
 #### 5.5 Comandos de Contenção Rápida
+
 ```bash
 # Revogar TODAS as sessões de um usuário
 sqlite3 /opt/app/backend/data/controle-videos.db \
@@ -178,6 +192,7 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "IR-isolation-$(date +
 ```
 
 #### 5.6 Contenção de Longo Prazo (Pós-estabilização)
+
 - Aplicar patches / config fixes
 - Rotacionar segredos expostos
 - Atualizar regras de firewall/WAF
@@ -188,12 +203,14 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "IR-isolation-$(date +
 ### FASE 3: ERRADICAÇÃO (T+1h a T+4h SEV-1)
 
 #### 5.7 Identificar Causa Raiz
+
 - Análise de logs (audit_log, access logs, error logs)
 - Revisão de código (commit recente, dependências)
 - Análise de configuração (env vars, Caddyfile, Docker)
 - Entrevista com equipe (o que mudou recentemente?)
 
 #### 5.8 Remoção da Ameaça
+
 | Vetor | Erradicação |
 |-------|-------------|
 | Código vulnerável | Deploy fix + rollback se necessário |
@@ -203,6 +220,7 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "IR-isolation-$(date +
 | Dependência vulnerável | Upgrade + patch ou substituição |
 
 #### 5.9 Validação da Erradicação
+
 - [ ] Vulnerabilidade não mais explorável (teste manual)
 - [ ] Scan de vulnerabilidade passa
 - [ ] Testes de segurança (security.e2e-spec.ts) passam
@@ -213,6 +231,7 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "IR-isolation-$(date +
 ### FASE 4: RECUPERAÇÃO (T+4h a T+24h SEV-1)
 
 #### 5.10 Restauração de Serviços
+
 ```bash
 # 1. Verificar integridade do banco (se restaurado)
 sqlite3 /opt/app/backend/data/controle-videos.db "PRAGMA integrity_check;"
@@ -232,6 +251,7 @@ docker compose up -d --force-recreate backend
 ```
 
 #### 5.11 Monitoramento Pós-Recuperação
+
 - [ ] Alertas silenciosos por 2 horas
 - [ ] Métricas normais (latency, error rate, throughput)
 - [ ] Logs de auditoria sem anomalias
@@ -242,11 +262,13 @@ docker compose up -d --force-recreate backend
 ### FASE 5: LIÇÕES APRENDIDAS (T+24h a T+5 dias)
 
 #### 5.12 Postmortem Obrigatório (SEV-1/2)
+
 **Prazo:** 5 dias úteis após resolução  
 **Template:** `docs/runbooks/postmortem-template.md`  
 **Participantes:** IC, TL, CL, Forensics, Stakeholders
 
 #### 5.13 Itens de Ação
+
 - Cada item → Issue no GitHub com label `postmortem-action`
 - Owner + Due date obrigatórios
 - Revisão semanal até fechamento
@@ -256,6 +278,7 @@ docker compose up -d --force-recreate backend
 ## 6. Procedimentos Específicos por Cenário
 
 ### 6.1 Vazamento de Credencial (AWS, SMTP, JWT, DB)
+
 ```bash
 # 1. Identificar escopo (qual credencial, onde usada)
 # 2. Rotacionar IMEDIATAMENTE
@@ -277,6 +300,7 @@ sqlite3 $DB "DELETE FROM refresh_token; DELETE FROM session;"
 ```
 
 ### 6.2 Acesso Não Autorizado a Dados (IDOR, BOLA)
+
 ```bash
 # 1. Identificar dados expostos (query audit_log)
 sqlite3 $DB "SELECT * FROM audit_log WHERE eventType='SHARE_ACCESS' AND result='success' AND userId != ownerId;"
@@ -288,6 +312,7 @@ sqlite3 $DB "SELECT * FROM audit_log WHERE eventType='SHARE_ACCESS' AND result='
 ```
 
 ### 6.3 Ransomware / Criptografia de Volumes
+
 ```bash
 # 1. ISOLAR IMEDIATAMENTE (rede + parar containers)
 docker compose down
@@ -301,6 +326,7 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "FORENSIC-RANSOMWARE-$
 ```
 
 ### 6.4 Certificado TLS Expirado / Comprometido
+
 ```bash
 # Caddy auto-renova, mas se falhar:
 # 1. Verificar logs Caddy
@@ -321,24 +347,28 @@ docker exec controle-share-videos-caddy caddy run --config /etc/caddy/Caddyfile 
 ## 7. Checklists de Prontidão
 
 ### 7.1 Diário (Automatizado via Cron)
+
 - [ ] Backup offsite completou com sucesso (verificar logs)
 - [ ] Alertas Prometheus ativos (nenhum "firing" não resolvido > 1h)
 - [ ] Certificados válidos > 30 dias
 - [ ] Espaço em disco < 80%
 
 ### 7.2 Semanal
+
 - [ ] Revisar logs de auditoria (anomalias)
 - [ ] Verificar restore de backup (sample mensal)
 - [ ] Atualizar dependências (npm audit)
 - [ ] Revisar access logs (top IPs, 4xx/5xx)
 
 ### 7.3 Mensal
+
 - [ ] Tabletop exercise (15 min)
 - [ ] Revisar runbook (atualizar contatos, comandos)
 - [ ] Testar rotação de segredos
 - [ ] Verificar MFA Delete no bucket backup
 
 ### 7.4 Trimestral
+
 - [ ] DR Drill completo (restore em env limpo)
 - [ ] Pen test interno (OWASP ZAP)
 - [ ] Revisar matriz de classificação de incidentes
@@ -349,6 +379,7 @@ docker exec controle-share-videos-caddy caddy run --config /etc/caddy/Caddyfile 
 ## 8. Anexos
 
 ### 8.1 Contatos de Emergência
+
 | Serviço | Contato | SLA |
 |---------|---------|-----|
 | AWS Support | Enterprise: 15min / Business: 1h | Per contract |
@@ -357,6 +388,7 @@ docker exec controle-share-videos-caddy caddy run --config /etc/caddy/Caddyfile 
 | Autoridade LGPD (ANPD) | https://www.gov.br/anpd | 48h para notificação |
 
 ### 8.2 Ferramentas de Investigação
+
 ```bash
 # Análise de logs SQLite
 sqlite3 $DB "SELECT * FROM audit_log WHERE eventType='LOGIN_FAILURE' GROUP BY ipAddress HAVING COUNT(*) > 10;"
@@ -370,6 +402,7 @@ diff baseline_hashes.txt current_hashes.txt
 ```
 
 ### 8.3 Referências
+
 - NIST SP 800-61 Rev. 2 - Computer Security Incident Handling Guide
 - LGPD Lei 13.709/2018 - Art. 48 (Notificação de incidente)
 - OWASP Incident Response Playbook
@@ -386,6 +419,7 @@ diff baseline_hashes.txt current_hashes.txt
 ---
 
 **APROVAÇÃO:**
-- Security Lead: _________________ Data: ____/____/____
-- Tech Lead: _____________________ Data: ____/____/____
-- CTO: ___________________________ Data: ____/____/____
+
+- Security Lead: _________________ Data: ****/****/____
+- Tech Lead: _____________________ Data: ****/****/____
+- CTO: ___________________________ Data: ****/****/____

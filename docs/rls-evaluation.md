@@ -1,4 +1,5 @@
 # RLS Evaluation - Row Level Security (Future PostgreSQL Migration)
+
 **Versao:** 1.0
 **Data:** 2026-08-21
 **Status:** Avaliacao Preliminar - Decisao: Manter SQLite por enquanto
@@ -84,6 +85,7 @@ O sistema usa **SQLite** (arquivo local) com controle de acesso **apenas no nive
 ## Proposta de RLS Policies (PostgreSQL)
 
 ### 1. Share Policy
+
 ```sql
 -- Habilita RLS
 ALTER TABLE "Share" ENABLE ROW LEVEL SECURITY;
@@ -107,6 +109,7 @@ CREATE POLICY share_update_policy ON "Share"
 ```
 
 ### 2. File Policy
+
 ```sql
 ALTER TABLE "File" ENABLE ROW LEVEL SECURITY;
 
@@ -121,6 +124,7 @@ CREATE POLICY file_owner_policy ON "File"
 ```
 
 ### 3. Funcoes Auxiliares (PostgreSQL)
+
 ```sql
 -- Funcao para obter user_id do contexto (definida pelo app via SET LOCAL)
 CREATE OR REPLACE FUNCTION current_user_id() RETURNS uuid AS $$
@@ -133,6 +137,7 @@ $$ LANGUAGE sql SECURITY DEFINER;
 ```
 
 ### 4. Middleware NestJS para Setar Contexto
+
 ```typescript
 // rls-context.middleware.ts
 @Injectable()
@@ -165,21 +170,27 @@ export class RlsContextMiddleware implements NestMiddleware {
 **Decisores:** Security Lead, Backend Lead, Tech Lead
 
 #### Contexto
+
 Sistema em producao com SQLite, guards NestJS bem testados, zero incidentes de autorizacao.
 
 #### Decisao
+
 **Manter SQLite + App-Level Guards** por enquanto. Reavaliar quando:
+
 - Crescer para multi-tenancy real
 - Requisito de compliance exigir RLS (ex: cliente enterprise)
 - Time >= 5 devs (capacidade para manter PG)
 - Incidente de autorizacao ocorrer
 
 #### Consequencias
+
 - **Positivo:** Zero custo de migracao agora, foco em features
 - **Negativo:** Risco teorico de bug em guard expor dados (mitigado por testes + CodeQL)
 
 #### Plano de Contingencia
+
 Se decisao mudar:
+
 1. Sprint dedicado (2 semanas) para migracao PG + RLS parcial
 2. Feature flag para alternar SQLite/PG
 3. Testes de regressao completos

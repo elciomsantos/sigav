@@ -1,4 +1,5 @@
 # LGPD Lawful Basis Mapping
+
 **Versão:** 1.0  
 **Data:** 2026-08-21  
 **Responsável:** Legal/DPO + Security Lead  
@@ -55,6 +56,7 @@
 ## Testes de Proporcionalidade e Necessidade (LIA - Legitimate Interest Assessment)
 
 ### Atividade 2: Autenticação (Base: Legítimo Interesse)
+
 | Critério | Avaliação |
 |----------|-----------|
 | **Finalidade Legítima** | Segurança da conta, prevenção acesso não autorizado |
@@ -65,6 +67,7 @@
 | **Direitos Titular** | Acesso, retificação, eliminação, oposição (Art. 18) |
 
 ### Atividade 3: MFA TOTP (Base: Obrigação Legal + Legítimo Interesse)
+
 | Critério | Avaliação |
 |----------|-----------|
 | **Finalidade Legítima** | Segundo fator - segurança reforçada, prevenção account takeover |
@@ -75,6 +78,7 @@
 | **Direitos Titular** | Pode desabilitar (exceto admin), exportar secret, eliminação |
 
 ### Atividade 7: Auditoria (Base: Obrigação Legal + Legítimo Interesse)
+
 | Critério | Avaliação |
 |----------|-----------|
 | **Finalidade Legítima** | Compliance LGPD Art. 16, segurança, forense, accountability |
@@ -110,12 +114,14 @@
 ### Para CADA atividade acima, validar:
 
 #### Base Legal
+
 - [ ] Base legal Art. 7 identificada e documentada
 - [ ] Se dado sensível: base Art. 11 identificada
 - [ ] Consentimento: livre, informado, inequívoco, específico (se aplicável)
 - [ ] Legítimo Interesse: LIA documentado (finalidade, necessidade, proporcionalidade, salvaguardas)
 
 #### Princípios (Art. 6)
+
 - [ ] **Finalidade:** Específica, legítima, explícita
 - [ ] **Adequação:** Compatível com finalidade informada
 - [ ] **Necessidade:** Mínimo necessário para finalidade
@@ -128,6 +134,7 @@
 - [ ] **Responsabilização:** Documentação, DPIA, ROP, Encarregado
 
 #### Direitos do Titular (Art. 18)
+
 - [ ] **Confirmação/Existe:** DSR endpoint retorna se trata dados
 - [ ] **Acesso:** DSR export retorna todos dados do titular
 - [ ] **Retificação:** Admin pode corrigir / Titular pode solicitar

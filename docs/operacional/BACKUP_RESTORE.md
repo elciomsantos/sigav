@@ -12,7 +12,7 @@ O banco de dados é **SQLite** (arquivo único `controle-videos.db`). O backup �
 feito com o `.backup` do sqlite3 (snapshot consistente via WAL), comprimido com
 gzip e, em produção, criptografado e assinado com GPG.
 
-```
+```text
 controle-videos_YYYYMMDD_HHMMSS.db        (snapshot sqlite3)
 controle-videos_YYYYMMDD_HHMMSS.db.gz     (gzip)
 controle-videos_YYYYMMDD_HHMMSS.db.gz.gpg (gpg --encrypt --sign — produção)
@@ -46,7 +46,7 @@ CI). Se o backup falhar, **o deploy é abortado**.
 
 Backup diário no host (root crontab):
 
-```
+```bash
 0 3 * * * cd /opt/controle-share-videos-v1.0 && \
   NODE_ENV=production GPG_RECIPIENT=<chave> \
   ./scripts/backup.sh >> /var/log/controle-share-videos-backup.log 2>&1
@@ -78,7 +78,7 @@ BACKUP_DIR=/opt/app/backups GPG_RECIPIENT=<chave> ./scripts/restore-test.sh
 
 ### 3.2 Agendamento (cron) — semanal
 
-```
+```bash
 30 4 * * 1 /opt/controle-share-videos-v1.0/scripts/restore-test.sh \
   >> /var/log/controle-share-videos-restore-test.log 2>&1
 ```
@@ -171,7 +171,7 @@ AWS_PROFILE=prod BACKUP_BUCKET_NAME=controle-share-videos-backups \
 Se a deleção sem MFA conseguir destruir a versão, o script sai com **1**
 (alerta imediato). Agendar mensalmente no cron:
 
-```
+```bash
 0 6 1 * * /opt/controle-share-videos-v1.0/scripts/backup/test-deletion-protection.sh \
   >> /var/log/controle-share-videos-backup-protection-test.log 2>&1
 ```

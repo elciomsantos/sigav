@@ -168,7 +168,7 @@ audit=true
 
 #### Caddy Security Headers (from `reverse-proxy/Caddyfile.prod`)
 
-```
+```http
 Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
@@ -349,7 +349,7 @@ The CI pipeline (`.github/workflows/ci.yml`) runs:
 | `build` | Multi-stage Docker (verifies non-root, no secrets) | ✅ |
 | `deploy` | Depends on `security-scan` | ✅ (new) |
 
-#### CI Security Checks (2026-08-18)
+### CI Security Checks (2026-08-18)
 
 ```yaml
 # npm security checks

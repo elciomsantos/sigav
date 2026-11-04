@@ -1,4 +1,5 @@
 # Rollback Procedure Runbook
+
 **Versao:** 1.0
 **Data:** 2026-08-21
 **Responsavel:** DevOps
@@ -61,6 +62,7 @@ git checkout main
 ```
 
 ### Verificacao Pos-Rollback
+
 - [ ] /api/health retorna 200
 - [ ] Login funciona
 - [ ] API endpoints principais respondem
@@ -82,6 +84,7 @@ curl -f https://seu-dominio.com
 ```
 
 ### Verificacao Pos-Rollback
+
 - [ ] Pagina carrega sem erros JS
 - [ ] Login/Logout funciona
 - [ ] Navegacao principal OK
@@ -135,6 +138,7 @@ docker compose restart backend
 ```
 
 ### Verificacao Pos-Rollback DB
+
 - [ ] PRAGMA integrity_check retorna ok
 - [ ] Contagem de registros principal (users, shares) condiz
 - [ ] Aplicacao conecta e query basica funciona
@@ -145,6 +149,7 @@ docker compose restart backend
 ## 5. Config/Secrets Rollback
 
 ### Via Git (Config YAML)
+
 ```bash
 # 1. Ver historico
 git log --oneline -10 config.yaml
@@ -157,6 +162,7 @@ docker compose up -d --force-recreate backend
 ```
 
 ### Secrets (KMS/Vault)
+
 ```bash
 # Rotacionar segredo comprometido
 /opt/scripts/security/rotate-jwt-secret.sh
@@ -211,6 +217,7 @@ curl -I https://seu-dominio.com
 **RTO Alvo Total: < 10 minutos**
 
 #### Metricas de Sucesso
+
 - RTO backend < 2 min
 - RTO DB < 5 min
 - Zero perda de dados (RPO respeitado)

@@ -1,4 +1,5 @@
 # HSTS Preload Submission
+
 **Versao:** 1.0
 **Data:** 2026-08-21
 **Status:** Configuracao verificada - Pronto para submissao
@@ -14,6 +15,7 @@ Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ```
 
 ### Verificacao no Caddyfile
+
 ```caddyfile
 {
     # HSTS automatico com preload
@@ -45,6 +47,7 @@ Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 ## Submissao para hstspreload.org
 
 ### 1. Verificar Headers Atuais
+
 ```bash
 # Verificar header HSTS atual
 curl -I https://seu-dominio.com | grep -i strict-transport-security
@@ -54,12 +57,14 @@ curl -I https://seu-dominio.com | grep -i strict-transport-security
 ```
 
 ### 2. Submeter no Site
+
 1. Acesse: https://hstspreload.org/
 2. Digite o dominio: seu-dominio.com
 3. Clique em "Check HSTS Status"
 4. Se todos checks passarem, clique em "Submit to Preload List"
 
 ### 3. Confirmacao
+
 - O dominio entra na lista de preload do Chrome/Firefox/Safari/Edge
 - Navegadores forcarão HTTPS desde a primeira visita (sem TOFU)
 - Processo pode levar dias/semanas para propagar aos navegadores
@@ -69,6 +74,7 @@ curl -I https://seu-dominio.com | grep -i strict-transport-security
 ## Monitoramento Pos-Submissao
 
 ### Verificacao Trimestral (Automatizada via Prometheus)
+
 ```yaml
 # Alert: HSTS Preload Status
 - alert: HSTSPreloadStatusChanged
@@ -83,6 +89,7 @@ curl -I https://seu-dominio.com | grep -i strict-transport-security
 ```
 
 ### Verificacao Manual (Trimestral)
+
 ```bash
 # 1. Verificar se ainda na lista
 curl -s "https://hstspreload.org/api/v2/status?domain=seu-dominio.com" | jq .
@@ -102,11 +109,13 @@ Se precisar remover (ex: migracao de dominio, problema critico):
 
 1. Remover preload do Caddyfile
 2. Reduzir max-age para 0 (desabilita HSTS):
+
    ```caddyfile
    strict_transport_security {
        max_age 0
    }
    ```
+
 3. Aguardar expiracao do max-age atual (ate 2 anos!)
 4. Solicitar remocao em: https://hstspreload.org/removal/
 

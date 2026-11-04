@@ -19,6 +19,7 @@ Este documento reúne os comandos principais para desenvolvimento, teste de hard
 ## 2. Desenvolvimento Local (sem hardening)
 
 ### Pré-requisitos
+
 ```bash
 # 1. Copiar e editar variáveis
 cp .env.local.example .env.local
@@ -30,22 +31,26 @@ cp .env.local.example .env.local
 ```
 
 ### Subir ambiente
+
 ```bash
 docker compose --env-file .env.local -f docker-compose.local.yml up -d --build
 ```
 
 Ou em duas etapas (build e depois subir):
+
 ```bash
 docker compose -f docker-compose.local.yml --env-file .env.local build
 docker compose -f docker-compose.local.yml --env-file .env.local up -d
 ```
 
 ### Acessar
+
 - **Frontend + API unificada:** http://localhost:3000
 - **Backend direto (Swagger):** http://localhost:8080/api/swagger (se `SWAGGER_ENABLED=true`)
 - **Frontend direto:** http://localhost:3333
 
 ### Parar e limpar
+
 ```bash
 docker compose --env-file .env.local -f docker-compose.local.yml down
 # Para apagar banco de dados (reset total):
@@ -57,6 +62,7 @@ docker compose --env-file .env.local -f docker-compose.local.yml down -v
 ## 3. Testar Hardening Localmente (valida config de produção)
 
 O `docker-compose.staging.yml` é um **overlay** — sobe **em cima** do `docker-compose.local.yml`, aplicando:
+
 - `read_only: true` + `tmpfs` nos 3 serviços
 - `cap_drop: ALL` (+ `NET_BIND_SERVICE` no Caddy)
 - `security_opt: [no-new-privileges:true, seccomp=./docker/seccomp/default.json]`
@@ -65,6 +71,7 @@ O `docker-compose.staging.yml` é um **overlay** — sobe **em cima** do `docker
 - Rede `internal: true` (sem internet nos containers)
 
 ### Subir com hardening
+
 ```bash
 docker compose --env-file .env.local \
   -f docker-compose.local.yml \
@@ -73,9 +80,11 @@ docker compose --env-file .env.local \
 ```
 
 ### Acessar
+
 - **Frontend + API unificada:** http://localhost:3000
 
 ### Validar hardening aplicado
+
 ```bash
 # Verificar read_only, capabilities, seccomp, pids_limit
 docker inspect controle-videos-local-backend | grep -A5 '"ReadOnly\|CapDrop\|CapAdd\|SecurityOpt\|PidsLimit"'
@@ -88,6 +97,7 @@ docker logs controle-videos-local-backend 2>&1 | head -5
 ```
 
 ### Parar
+
 ```bash
 docker compose --env-file .env.local \
   -f docker-compose.local.yml \
@@ -100,6 +110,7 @@ docker compose --env-file .env.local \
 ## 4. Produção (domínio real + Let's Encrypt)
 
 ### Variáveis obrigatórias
+
 ```bash
 export DOMAIN=seu-dominio.com
 export ACME_EMAIL=voce@email.com
@@ -112,15 +123,18 @@ export API_URL=https://${DOMAIN}/api
 ```
 
 ### Subir
+
 ```bash
 docker compose up -d --build
 ```
 
 ### Acessar
+
 - **HTTPS:** https://${DOMAIN}
 - **Healthcheck:** https://${DOMAIN}/api/health
 
 ### Modo acesso por IP (sem domínio / homologação)
+
 ```bash
 export CADDYFILE=ip
 export ADMIN_EMAIL=admin@empresa.local
@@ -139,6 +153,7 @@ Ver guia completo em `docs/operacional/DEPLOY.md` e `docs/PLANO-DOMINIO.md`.
 ## 5. Produção com Docker Swarm / RAID6 (`/srv`)
 
 Usa `docker-compose.prod.yml` com:
+
 - **Secrets externos** (Docker Swarm): `domain`, `acme_email`, `admin_email`, `admin_username`, `admin_password`, `smtp_password`
 - **Bind mounts** para `/srv/controle-share-videos/data` (RAID6)
 - **UID/GID 1002:1002** consistente host↔container
@@ -196,11 +211,13 @@ docker exec controle-videos-local-backend env | grep -E 'JWT_SECRET|DATABASE_URL
 > **Atenção:** Muitos comandos removem dados permanentemente. Certifique-se de que não há contêineres, imagens ou volumes importantes antes de executá-los.
 
 ### Verificar uso de espaço
+
 ```bash
 docker system df
 ```
 
 ### Limpeza seletiva (segura)
+
 ```bash
 # Remover containers parados
 docker container prune -f
@@ -222,11 +239,13 @@ docker builder prune -a -f
 ```
 
 ### Limpeza completa (apaga tudo não usado)
+
 ```bash
 docker system prune -a --volumes -f
 ```
 
 ### Limpeza específica do projeto
+
 ```bash
 # Parar e remover containers, redes, volumes do projeto local
 docker compose --env-file .env.local -f docker-compose.local.yml down -v --remove-orphans
@@ -333,11 +352,9 @@ Notas operacionais:
 - Para testar: crie um share com `maxViews` baixo (ex.: 2) e abra o link público
   em navegadores/sessões anônimas diferentes.
 
-
   Para editar os slides, altere o .md e regenere:
 CHROME_PATH=~/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome \
   npx @marp-team/marp-cli docs/APRESENTACAO-ANALISTA-TI.md --pdf -o docs/APRESENTACAO-ANALISTA-TI.pdf
-
 
   docker compose --env-file .env.local \
   -f docker-compose.local.yml \

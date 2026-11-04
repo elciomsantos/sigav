@@ -53,10 +53,12 @@
 
 1. Alterar thresholds/`for:` em `scripts/monitoring/alerts.yml`.
 2. Validar sintaxe:
+
    ```bash
    docker run --rm -v "$PWD/scripts/monitoring:/mnt" \
      prom/prometheus:latest promtool check rules /mnt/alerts.yml
    ```
+
 3. Aplicar: `docker compose -f docker-compose.monitoring.yml restart prometheus`
 4. Ajustes de rota/receivers: editar
    `scripts/monitoring/alertmanager.template.yml`, validar com

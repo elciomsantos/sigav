@@ -17,6 +17,7 @@ style: |
 <!-- _paginate: false -->
 
 # Controle Share Videos v2.7.0
+
 ## Compartilhamento seguro de arquivos para uso interno restrito
 
 **Apresentação técnica para o Analista de TI**
@@ -126,12 +127,14 @@ Dificuldades eliminadas:
 ## 5. Funcionalidades — Upload e Certificado
 
 ### Upload
+
 - Somente pelo **dono autenticado** (reverse shares removidos intencionalmente)
 - Upload **chunked multipart** com progresso e retomada
 - Tamanho ilimitado (restrito só pelo disco) — limite editável no painel (`share.maxSize` + override por usuário)
 - Validação: extensão + **magic bytes** + tamanho
 
 ### Certificado de Autenticidade (automático)
+
 - **1 PDF por vídeo** ao concluir o share: hash **SHA-256** (+ QR Code), metadados do arquivo/share/sistema, linha de eventos
 - Datas em horário de Brasília (UTC-3), independente do fuso do servidor
 - Vários vídeos → entrega em **zip único** preservando pastas/subpastas
@@ -150,6 +153,7 @@ Dificuldades eliminadas:
 | **auditor** | **Somente leitura**: logs de download completos, auditoria de acessos |
 
 ### Recursos administrativos
+
 - Usuários criados apenas pelo admin — **senha temporária forte (12 chars)** exibida uma única vez
 - **Troca obrigatória de senha no primeiro login** (`passwordMustChange` + Guard)
 - Dashboards: `/admin/download-logs`, `/admin/audit-logs`, `/admin/sessions`
@@ -198,12 +202,14 @@ Destinatário                Backend                         Persistência
 ## 9. Segurança — Perímetro e headers
 
 ### Caddy (Edge)
+
 - **TLS automático** Let's Encrypt (renovação nativa); alternativa `tls internal` por IP
 - **CSP estrito**: `default-src 'self'; script-src 'self'` (self-only)
 - Filtro `pwd=` em query strings e logs
 - Rate limit na borda: **dynamic 100 req/10s** geral, **10 req/60s** endpoints de auth
 
 ### Headers aplicados
+
 | Header | Valor |
 |---|---|
 | Strict-Transport-Security | HSTS **preload** |
@@ -232,6 +238,7 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 ## 11. Segurança — Hardening Docker e host
 
 ### Containers (100% itens críticos/altos implementados)
+
 - **Non-root** (UID 1002) · `cap_drop: ALL` · `no-new-privileges:true`
 - `read_only: true` + tmpfs para escrita · `pids_limit: 512`
 - Backend em rede `internal: true` (sem saída)
@@ -239,6 +246,7 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 - **Docker Secrets** em todos os serviços (backend, frontend, caddy, grafana)
 
 ### Host Linux (spec dedicada `ESPECIFICACAO_SEGURANCA_DOCKER_HOST_v1.0.md`)
+
 - UFW default-deny: libera **80/443**; SSH com `limit`; **SMB 445 só RFC1918**
 - **fail2ban** para SSH + Samba
 - seccomp custom **fail-closed** (428 syscalls bloqueadas)
@@ -249,12 +257,14 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 ## 12. Segurança — Auditoria à prova de adulteração
 
 ### Trilha WORM tamper-evident
+
 - Append-only NDJSON com **hash chain SHA-256**
 - Verificação automática **diária** da integridade da cadeia
 - Alerta crítico `AuditLogHashChainBroken` se a cadeia quebrar
 - Endpoint de verificação: `/api/admin/audit-logs/chain-status`
 
 ### Eventos registrados
+
 - **DownloadLog**: view/download com IP, User-Agent, timestamp, sucesso/falha — inclui tentativas falhas
 - **AuditLog**: 17 eventos mínimos — login, MFA, sessões, senha, permissões, shares (com IP/UA/requestId)
 - **Revisão de acesso trimestral**: nível de risco por usuário + atestação assinada (HMAC) gravada no WORM
@@ -291,6 +301,7 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 | `docker-compose.monitoring.yml` | Observabilidade completa |
 
 ### Perfis do Caddyfile
+
 | `CADDYFILE` | Modo de acesso |
 |---|---|
 | `prod` (default) | Domínio + TLS Let's Encrypt |
@@ -324,6 +335,7 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 | SQL Injection | Acesso 100% via Prisma parametrizado — zero `$queryRawUnsafe` (auditado 2026-08-22) |
 
 ### Pentest interno executado
+
 - Black-box de links de compartilhamento (`PENTEST-SHARE-LINK-2026-08-22.md`)
 - 1 achado HIGH corrigido (#40) · **11 controles aprovados**
 
@@ -332,13 +344,16 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 ## 17. CI/CD e supply chain
 
 ### Security Gate (todo push)
+
 Secret scanning (gitleaks) · hadolint · `npm audit` · **CodeQL** (JS+TS) · semgrep · Trivy · SBOM · production readiness check
 
 ### Artefatos assinados
+
 - **SBOM CycloneDX** assinado (cosign keyless)
 - **Provenance SLSA Level 3** na release
 
 ### Outros
+
 - **OWASP ZAP baseline semanal** contra imagem de produção (falha em HIGH)
 - Dependabot: npm dos 5 projetos + pins de actions (semanal)
 - Todas as GitHub Actions **pinadas por SHA** (Node 24)
@@ -349,17 +364,20 @@ Secret scanning (gitleaks) · hadolint · `npm audit` · **CodeQL** (JS+TS) · s
 ## 18. Operação — Backup e resposta a incidentes
 
 ### Backup
+
 - Diário: SQLite + uploads → 2º servidor/NAS, **cifrado**
 - Bucket protegido: Object Versioning + MFA Delete + transição Glacier 90d + teste anti-deleção
 - **Restore testado** periodicamente + drill de DR trimestral
 
 ### Incidentes
+
 - Runbooks de resposta a incidentes (`docs/operacional/RUNBOOKS.md`)
 - Snapshot forense automatizado SEV-1 + chain of custody (`docs/forensics.md`)
 - Postmortem sem culpa com template
 - Rollback documentado (`docs/rollback-runbook.md`)
 
 ### Atualização
+
 ```bash
 git pull --ff-only origin main && docker compose up -d --build
 # Migrações Prisma aplicadas automaticamente no boot
@@ -379,6 +397,7 @@ git pull --ff-only origin main && docker compose up -d --build
 | Checklist final | `docs/auditoria/CHECKLIST-SEGURANCA-FINAL.md` |
 
 ### Limitações conhecidas (monitoradas)
+
 - SQLite: adequado até ~500 usuários simultâneos → migração PostgreSQL planejada se necessário
 - Redis cache e storage S3/MinIO: prontos como interfaces, ativáveis sob demanda
 

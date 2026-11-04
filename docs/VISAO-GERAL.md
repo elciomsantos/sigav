@@ -50,6 +50,7 @@ O sistema garante:
 * **Hardening Docker completo**: non-root (UID 1002), `cap_drop: ALL`, `no-new-privileges:true`, `read_only: true` + tmpfs, `pids_limit: 512`, rede `internal: true` para backend, seccomp custom (fail-closed 428 syscalls), imagem pinada por digest (SHA-256), Trivy no CI/CD (CRITICAL/HIGH bloqueia), Docker Bench Security semanal, live-restore, Docker Secrets em todos os serviços
 * **Rate limiting**: global (100 req/60s), login por conta+IP (5/60s), endpoints share/admin com limites específicos, edge no Caddy (dynamic 100/10s, auth 10/60s)
 * **CSP estrito + Security Headers**: HSTS preload, X-Frame-Options DENY, X-Content-Type-Options nosniff, COOP/COEP/CORP, Permissions-Policy, filtro `pwd=` em query string/logs no Caddy
+
 ---
 
 # 3. Problema a Ser Resolvido
@@ -390,7 +391,7 @@ Ao **concluir um compartilhamento** (`POST /api/shares/:id/complete`), o sistema
 
 ### 9.5.2 Fluxo de geração
 
-```
+```text
 [Usuário] ── POST /api/shares/:shareId/complete ──► ShareService.complete()
     │  valida: share existe, uploadLocked, tem ≥1 arquivo
     │
@@ -587,6 +588,7 @@ A stack tecnológica consolidada é:
 | Observabilidade | Prometheus + Grafana + Loki + Promtail + node-exporter |
 
 Os próximos documentos detalham:
+
 * Regras de negócio e matriz de permissões
 * Modelo de dados (Prisma schema) e migrações
 * API endpoints (OpenAPI/Swagger em `/api/swagger`)

@@ -12,7 +12,7 @@ This API uses **URL-prefix versioning** with `Accept` header negotiation as a se
 
 ### URL Prefix
 
-```
+```text
 /api/v1/shares
 /api/v1/auth/login
 /api/v1/users
@@ -24,7 +24,7 @@ This API uses **URL-prefix versioning** with `Accept` header negotiation as a se
 
 ### Accept Header (Secondary)
 
-```
+```http
 Accept: application/vnd.cs.v1+json
 ```
 

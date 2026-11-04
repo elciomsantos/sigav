@@ -10,6 +10,7 @@
 ---
 
 ## 1. Resumo Executivo (TL;DR)
+>
 > **Máximo 3 frases.** O que aconteceu, impacto no usuário/negócio, causa raiz, ação principal.
 
 ---
@@ -19,8 +20,8 @@
 | Horário (UTC) | Evento | Ação Tomada | Responsável | Fonte |
 |---------------|--------|-------------|-------------|-------|
 | 2026-08-21T10:15:00Z | Alert Prometheus: auth failures > 10/min | IC notificado via PagerDuty | - | Alertmanager |
-| 2026-08-21T10:17:00Z | IC assume comando, cria issue #XXX | IC | Slack #sec-incidents |
-| 2026-08-21T10:20:00Z | TL inicia investigação logs | TL | Audit logs |
+| 2026-08-21T10:17:00Z | IC assume comando, cria issue #XXX | - | IC | Slack #sec-incidents |
+| 2026-08-21T10:20:00Z | TL inicia investigação logs | - | TL | Audit logs |
 | ... | ... | ... | ... | ... |
 
 ---
@@ -28,12 +29,14 @@
 ## 3. Impacto
 
 ### 3.1 Impacto no Usuário
+
 - **Usuários afetados:** [Número/%]
 - **Funcionalidades indisponíveis:** [Lista]
 - **Dados expostos/comprometidos:** [Sim/Não - detalhar se sim]
 - **Duração da indisponibilidade:** [Xh Ym]
 
 ### 3.2 Impacto no Negócio
+
 - **Receita perdida:** [Se aplicável]
 - **SLA violado:** [Quais]
 - **Reputação:** [Baixa/Média/Alta]
@@ -44,13 +47,15 @@
 ## 4. Causa Raiz (Root Cause Analysis)
 
 ### 4.1 Método Utilizado
+
 - [ ] 5 Whys
 - [ ] Fishbone / Ishikawa
 - [ ] Fault Tree Analysis
 - [ ] Outro: __________
 
 ### 4.2 Cadeia Causal
-```
+
+```text
 Causa Raiz (Por que?)
   ↓
 Causa Contribuinte 1
@@ -63,11 +68,13 @@ Sintoma Observado (Alert/Report)
 ```
 
 ### 4.3 Descrição da Causa Raiz
+>
 > **Exemplo:** "A rotação automática do segredo JWT falhou silenciosamente porque o cron job não tinha permissão de escrita no volume do Kubernetes. O segredo expirou sem que um novo fosse gerado, causando falha de autenticação em cascata."
 
 ---
 
 ## 5. O que Funcionou Bem
+
 - [ ] Detecção rápida via alerta
 - [ ] Runbook seguido corretamente
 - [ ] Comunicação clara entre IC/TL/CL
@@ -78,6 +85,7 @@ Sintoma Observado (Alert/Report)
 ---
 
 ## 6. O que NÃO Funcionou / Gaps
+
 - [ ] Alerta não disparou / atrasou
 - [ ] Runbook desatualizado / incompleto
 - [ ] Falta de runbook para este cenário
@@ -127,6 +135,7 @@ Sintoma Observado (Alert/Report)
 ---
 
 ## 10. Anexos
+
 - [ ] Logs relevantes (anexar ou link S3)
 - [ ] Screenshots de dashboards/alertas
 - [ ] Commits/PRs relacionados
@@ -145,6 +154,7 @@ Sintoma Observado (Alert/Report)
 ---
 
 **APROVAÇÃO DO POSTMORTEM:**
-- IC: _________________ Data: ____/____/____
-- TL: _________________ Data: ____/____/____
-- Security Lead: _______ Data: ____/____/____
+
+- IC: _________________ Data: ****/****/____
+- TL: _________________ Data: ****/****/____
+- Security Lead: _______ Data: ****/****/____

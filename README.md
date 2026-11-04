@@ -245,6 +245,7 @@ npm run test:unit      # vitest run (mesma coisa)
 - **SQL injection** — acesso ao banco 100% via Prisma parametrizado; zero uso de `$queryRawUnsafe`/`$executeRawUnsafe` (auditado em 2026-08-22)
 
 **Auditoria de segurança (reproduzível localmente):**
+
 ```bash
 # Backend
 cd backend && npm audit --audit-level=high

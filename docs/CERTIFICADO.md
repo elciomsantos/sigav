@@ -21,7 +21,7 @@ Ao **concluir um compartilhamento** (endpoint `POST /api/shares/:id/complete`), 
 
 ## 2. Fluxo de Geração
 
-```
+```text
 [Usuário] ── upload (chunks) ──► POST /api/shares/:shareId/files
     │
     ▼
@@ -162,13 +162,13 @@ const nowLabel = dayjs().tz(BRASILIA_TIMEZONE).locale("pt-br")
 
 O certificado de um arquivo com id `FILE_ID` no share `SHARE_ID` é salvo como:
 
-```
+```text
 data/uploads/shares/{SHARE_ID}/{FILE_ID}.certificado.pdf
 ```
 
 Exemplo real:
 
-```
+```text
 data/uploads/shares/3lp4lvAtJs1EjWTynqGF/cea364a1-f505-4623-b660-31798aefd81b.certificado.pdf
 ```
 
@@ -205,11 +205,12 @@ Ao baixar um **vídeo original** (`GET /api/shares/:shareId/files/:fileId` com `
 
 O certificado é servido pelo **mesmo endpoint** dos demais arquivos:
 
-```
+```http
 GET /api/shares/:shareId/files/:fileId
 ```
 
 Portanto herda a **mesma proteção** (`SharePublicAccess`):
+
 - Requer senha/token do share quando o share é protegido por senha.
 
 > **Exceção (regra de negócio)**: o certificado (`*.certificado.pdf`) **não passa pelo `DownloadLimitGuard`** — após liberar o acesso com a senha, o certificado fica sempre baixável, **não conta para o limite de downloads** e **não incrementa `share.downloads`**. Apenas o vídeo/arquivo original conta para `maxDownloads`.
@@ -218,7 +219,7 @@ Portanto herda a **mesma proteção** (`SharePublicAccess`):
 
 Quando o dono envia uma pasta (via seletor de pasta ou File System API), os arquivos chegam com caminho relativo no nome (`pasta/sub/video-b.mp4`). No `complete()`, o loop de geração itera **todos** os `File` do share — a estrutura de pastas não interfere: **cada vídeo recebe seu próprio certificado**, e o nome registrado preserva o caminho original:
 
-```
+```text
 pasta/video-a.mp4                    → pasta/video-a.mp4.certificado.pdf
 pasta/sub/video-b.mp4                → pasta/sub/video-b.mp4.certificado.pdf
 ```
@@ -237,7 +238,7 @@ O modal também exibe o total gerado ("Certificados de autenticidade gerados: N"
 
 #### Endpoint do zip de certificados
 
-```
+```http
 GET /api/shares/:shareId/files/certificates-zip
 ```
 
@@ -366,7 +367,7 @@ ffprobe -v error -show_entries format_tags=title,comment -of default=noprint_wra
 
 A saída do `comment` tem este formato:
 
-```
+```text
 Certificado de autenticidade | Código: 953f6d90-366d-30b8-97e6-3009d573cc20 | Hash SHA-256 (original): <hash> | Share: <shareId> | Proprietário: <nome> | E-mail: <email>
 ```
 
@@ -384,7 +385,7 @@ Se todos baterem, o vídeo é **autêntico** — foi certado por este sistema, p
 
 A verificação mais rápida, sem calcular hash, é conferir apenas o **código de verificação** — ele é derivado deterministicamente de `sha256(share.id + ":" + fileId)` e formado como UUID:
 
-```
+```text
 verificationCode = sha256(shareId + ":" + fileId).slice(0, 36)
 formattedCode    = UUID(verificationCode)  # XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX
 ```

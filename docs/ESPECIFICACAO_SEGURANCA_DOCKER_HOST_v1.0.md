@@ -65,6 +65,7 @@ Motivo: remove grande parte do isolamento de privilégios do container e amplia 
 
 4.2 Montagem do Docker socket
 Proibido, por exemplo:
+
 - /var/run/docker.sock:/var/run/docker.sock
 - /run/docker.sock:/run/docker.sock
 
@@ -72,6 +73,7 @@ Motivo: acesso ao Docker daemon pode permitir criação, alteração ou execuç�
 
 4.3 Montagem do filesystem raiz do host
 Proibido:
+
 - /:/app
 - /:/host
 - /etc do host sem necessidade formal
@@ -103,6 +105,7 @@ Proibida por padrão. Exceções devem ser justificadas pelo requisito técnico 
 5.1 Atualizações
 
 O host deve receber atualizações de segurança de:
+
 - kernel;
 - glibc;
 - OpenSSL;
@@ -164,6 +167,7 @@ Não adicionar usuários comuns ao grupo docker.
 5.6 LSM
 
 Manter ativo:
+
 - AppArmor em Debian/Ubuntu quando disponível;
 - SELinux em distribuições que o utilizem.
 
@@ -257,7 +261,8 @@ Diretórios temporários devem utilizar tmpfs quando possível.
 
 Exemplo:
 tmpfs:
-  - /tmp
+
+- /tmp
 
 Se a aplicação precisar persistir dados, montar somente o diretório necessário.
 
@@ -272,6 +277,7 @@ volume:ro
 quando o container não precisa escrever.
 
 Evitar:
+
 - montagem de /
 - /etc do host
 - /root do host
@@ -303,7 +309,8 @@ Segredos não devem ser enviados para o contexto de build.
 Remover capabilities desnecessárias:
 
 cap_drop:
-  - ALL
+
+- ALL
 
 Adicionar somente capabilities comprovadamente necessárias.
 
@@ -329,7 +336,8 @@ SYS_CHROOT
 
 Obrigatório:
 security_opt:
-  - no-new-privileges:true
+
+- no-new-privileges:true
 
 O objetivo é impedir que processos obtenham privilégios adicionais por mecanismos como setuid/setgid e file capabilities.
 
@@ -356,6 +364,7 @@ networks:
 11. LIMITES DE RECURSOS
 
 Todos os serviços devem possuir limites adequados de:
+
 - CPU;
 - memória;
 - PIDs;
@@ -441,6 +450,7 @@ secret manager externo
 arquivo protegido fora do repositório, quando compatível com o ambiente.
 
 14.4 Segredos de runtime não devem aparecer em:
+
 - docker history;
 - logs;
 - mensagens de erro;
@@ -453,6 +463,7 @@ arquivo protegido fora do repositório, quando compatível com o ambiente.
 15. DOCKERFILE
 
 O Dockerfile deve:
+
 - utilizar imagem base suportada;
 - fixar versão da imagem;
 - executar como non-root;
@@ -467,10 +478,12 @@ O Dockerfile deve:
 O Compose de produção deve, quando compatível, aplicar:
 
 security_opt:
-  - no-new-privileges:true
+
+- no-new-privileges:true
 
 cap_drop:
-  - ALL
+
+- ALL
 
 read_only: true
 
@@ -515,6 +528,7 @@ oom
 destroy
 
 Dar atenção especial a:
+
 - docker exec inesperado;
 - criação de containers fora do processo de deploy;
 - alteração de imagens;
@@ -583,6 +597,7 @@ Exceções não devem ser permanentes por padrão.
 21.1 Inventário
 
 Mapear:
+
 - containers;
 - imagens;
 - portas;
@@ -602,6 +617,7 @@ Aplicar patches do host e runtime.
 21.3 Redução de privilégios
 
 Aplicar:
+
 - non-root;
 - cap_drop ALL;
 - no-new-privileges;
@@ -612,6 +628,7 @@ Aplicar:
 21.4 Isolamento
 
 Aplicar:
+
 - read_only;
 - tmpfs;
 - volumes mínimos;

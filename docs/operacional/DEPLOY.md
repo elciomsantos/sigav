@@ -106,6 +106,7 @@ CADDYFILE=local docker compose up -d --build
 ### 3.3 Modo de passar variáveis
 
 - **Com `.env`** (recomendado para `docker-compose.yml`):
+
   ```bash
   cat > .env <<'EOF'
   DOMAIN=controle.example.gov.br
@@ -116,9 +117,11 @@ CADDYFILE=local docker compose up -d --build
   EOF
   chmod 600 .env
   ```
+
   Em seguida `docker compose up -d --build` (o compose lê `.env` automaticamente).
 
 - **Na linha de comando** (uma única vez):
+
   ```bash
   DOMAIN=controle.example.gov.br ACME_EMAIL=sre@example.gov.br \
   ADMIN_EMAIL=admin@empresa.local ADMIN_PASSWORD=$(openssl rand -base64 32) \
@@ -146,6 +149,7 @@ echo "smtp-password"                  | docker secret create smtp_password -
 ```
 
 Os containers leem:
+
 - `ADMIN_EMAIL_FILE=/run/secrets/admin_email`
 - `ADMIN_USERNAME_FILE=/run/secrets/admin_username`
 - `ADMIN_PASSWORD_FILE=/run/secrets/admin_password`
@@ -238,6 +242,7 @@ Não edite o Caddyfile — apenas ajuste `.env`:
 DOMAIN=novo.dominio.gov.br
 ACME_EMAIL=novo@email.gov.br
 ```
+
 ```bash
 docker compose up -d   # Caddy re-emitirá certificado para o novo domínio
 ```
@@ -342,10 +347,10 @@ Se a máquina não usa os defaults (distro Debian, usuário `urubu`, caminho
 > O aviso `Cross-Origin-Opener-Policy header has been ignored` no console é
 > **benigno** — COOP/COEP só se aplicam a origens confiáveis (HTTPS ou
 > `localhost`); em HTTP por IP o navegador ignora esses headers.
-
+>
 > **Portas mapeadas:** 3000 (Caddy → app), 3333 (frontend interno),
 > 8090 (backend interno) — as duas últimas são utilitárias (debug).
-
+>
 > **Troubleshooting:** se `localhost:3000` responde mas `http://<IP-LAN>:3000`
 > dá timeout e os containers estão `healthy`, verifique o **iptables do Docker
 > no WSL2**: a rede bridge pode ter perdido as regras `FORWARD ACCEPT` (política
@@ -377,10 +382,11 @@ Os recursos por container estão definidos no compose:
 | caddy | 256 MB / 0.25 vCPU | 64 MB / 0.05 vCPU |
 
 **Quando considerar escala (roadmap v1.3):**
+>
 - > 500 usuários simultâneos → avaliar migração SQLite → PostgreSQL
   (estimativa 2-3 semanas; ver `docs/auditoria/ROADMAP.md` seção 3).
 - Cache de configurações/permissões → subir Redis e setar `cache.redis-enabled=true`
-  + `cache.redis-url` (backend já tem `@keyv/redis` + fallback in-memory).
+  - `cache.redis-url` (backend já tem `@keyv/redis` + fallback in-memory).
 - Volume de uploads > 100 GB → avaliar storage S3/MinIO (v1.4, `S3UploadRepository`).
 
 ### 8.1 Limites de runtime conhecidos

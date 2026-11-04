@@ -12,10 +12,12 @@
 healthcheck `/api/health` falha intermitentemente, uploads falham.
 
 **Causa comum:**
+
 - Muitos processos tentando escrever no SQLite simultaneamente (backup + cron jobs + uploads).
 - Arquivo WAL (`-wal` / `-shm`) corrompido ou lock residual.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-backend 2>&1 | grep -iE "SQLITE_BUSY|database is locked" | tail -10
 docker exec controle-share-videos-backend ls -la /opt/app/backend/data/
@@ -23,29 +25,36 @@ docker exec controle-share-videos-backend ls -la /opt/app/backend/data/
 ```
 
 **Mitigação (ordem de preferência):**
+
 1. **Aguarde 30s** — o WAL checkpoint costuma resolver sozinho.
 2. **Reinicie apenas o backend:**
+
    ```bash
    docker compose restart backend
    # aguarda healthcheck voltar a healthy
    watch -n3 'docker ps --filter name=controle-share-videos-backend --format "{{.Status}}"'
    ```
+
 3. **Se persistir** — pare backend + Caddy, faça checkpoint manual:
+
    ```bash
    docker compose stop backend caddy
    docker exec controle-share-videos-backend node -e \
      "require('better-sqlite3')('/opt/app/backend/data/controle-videos.db').pragma('wal_checkpoint(TRUNCATE)')"
    docker compose start backend caddy
    ```
+
 4. **Último recurso** — restore do backup mais recente (ver BACKUP_RESTORE.md §4).
 
 **Validação:**
+
 ```bash
 docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/health
 # deve retornar OK
 ```
 
 **Pós-incidente:**
+
 - Verificar se `RETENTION_DAYS` do backup não está muito alto gerando arquivos grandes.
 - Considerar migrar para Redis cache (v1.3) ou PostgreSQL se frequência > 1/dia.
 
@@ -57,6 +66,7 @@ docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/hea
 `500` ou timeout.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-backend --tail 100
 # Procure: PrismaClientInitializationError, EACCES, ENOENT, OutOfMemory, stack trace
@@ -73,6 +83,7 @@ docker logs controle-share-videos-backend --tail 100
 | `JWT_SECRET not configured` | Variável `.env` ausente → ver DEPLOY.md §3 |
 
 **Mitigação geral:**
+
 ```bash
 docker compose restart backend
 # se não resolver:
@@ -82,6 +93,7 @@ docker compose up -d --build
 ```
 
 **Validação:**
+
 ```bash
 docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/health
 ```
@@ -95,21 +107,25 @@ docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/hea
 limpa `.tmp-chunk` órfãos com mais de 1 dia).
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-backend 2>&1 | grep -iE "deleteExpiredShares|deleteTemporaryFiles|temporary files|cleanup" | tail -20
 ```
 
 **Causas comuns:**
+
 - Permissão no volume de uploads (arquivos órfãos não podem ser removidos).
 - Transação SQLite abortada por lock (ver RUNBOOKS §1).
 - `fileRetentionPeriod` configurado como `-1` (desabilitado) — ok, log apenas.
 
 **Ação:**
+
 1. Se erro de permissão: verificar ownership do volume (`UID 1002:1002`).
 2. Se lock: RUNBOOKS §1.
 3. Se erro de schema: rodar `npx prisma db push` no container (dev) ou rebuild.
 
 **Validação:**
+
 ```bash
 # Aguardar próximo ciclo (1 min para deleteExpiredShares, 24h para deleteTemporaryFiles)
 # Verificar logs novamente — deve não aparecer erro
@@ -123,6 +139,7 @@ docker logs controle-share-videos-backend 2>&1 | grep -iE "deleteExpiredShares|d
 podem falhar com `ENOSPC`.
 
 **Diagnóstico:**
+
 ```bash
 df -h /srv/controle-share-videos
 docker exec controle-share-videos-backend du -sh /opt/app/backend/data
@@ -130,18 +147,24 @@ docker system df
 ```
 
 **Mitigação:**
+
 1. **Limpeza de Docker** (imagens/containers parados):
+
    ```bash
    docker system prune -f --volumes
    ```
+
 2. **Backup antigo** (ver BACKUP_RESTORE.md §2.3 cron):
+
    ```bash
    find /opt/app/backups -name 'controle-videos_*.db.gz.gpg' -mtime +30 -delete
    ```
+
 3. **Uploads expirados não limpos** (job falhou → RUNBOOKS §3).
 4. **Log rotation** — já configurado no compose (`max-size: 10m`, `max-file: 5`).
 
 **Se crítico (> 95%):**
+
 ```bash
 docker compose down
 # libera espaço
@@ -156,17 +179,20 @@ docker compose up -d
 para requests de UI.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-frontend --tail 100
 # Procure: Error: listen EADDRINUSE, build errors, Node OOM, NEXT_RUNTIME errors
 ```
 
 **Causas comuns:**
+
 - Build falhou (frontend não compilou) → `docker compose logs frontend` durante build.
 - Porta 3333 ocupada internamente → restart resolve.
 - Variável `JWT_SECRET` ausente → frontend middleware falha na verificação.
 
 **Ação:**
+
 ```bash
 docker compose restart frontend
 # se não resolver:
@@ -174,6 +200,7 @@ docker compose up -d --build frontend
 ```
 
 **Validação:**
+
 ```bash
 docker exec controle-share-videos-frontend curl -fs http://127.0.0.1:3333
 ```
@@ -189,6 +216,7 @@ reinício ou deploy.
 secrets dessincronizados).
 
 **Ação:**
+
 ```bash
 # Verificar consistência
 docker exec controle-share-videos-backend  env | grep JWT_SECRET
@@ -198,6 +226,7 @@ docker exec controle-share-videos-caddy    env | grep JWT_SECRET
 ```
 
 **Mitigação:**
+
 1. Ajustar `.env` / Docker secrets para valor consistente.
 2. `docker compose restart backend frontend caddy`
 3. Comunicar usuários para **fazer login novamente** (sessões antigas são
@@ -211,12 +240,14 @@ docker exec controle-share-videos-caddy    env | grep JWT_SECRET
 certificate` / `rate limited` / `DNS problem`.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-caddy --tail 50
 # Procure: "acme: error", "DNS problem", "rate limited"
 ```
 
 **Ações:**
+
 | Erro | Solução |
 |---|---|
 | `DNS problem: NXDOMAIN` | `dig +short <DOMAIN>` — A/AAAA deve apontar para IP do host |
@@ -225,6 +256,7 @@ docker logs controle-share-videos-caddy --tail 50
 | Porta 80/443 bloqueada no firewall | `ufw allow 80,443/tcp` ou security group da nuvem |
 
 **Workaround rápido (sem TLS):**
+
 ```bash
 # Usar compose local ou editar Caddyfile para HTTP only
 # (apenas para teste interno — NÃO em produção)
@@ -238,6 +270,7 @@ docker logs controle-share-videos-caddy --tail 50
 normais (login, upload, listagem).
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-caddy 2>&1 | grep -c '429'
 # ou
@@ -245,6 +278,7 @@ docker logs controle-share-videos-caddy | jq -r '.status' | grep 429 | wc -l
 ```
 
 **Mitigação:**
+
 - Aumentar limites em `reverse-proxy/Caddyfile.prod`:
   - Zona `dynamic`: `events 200` / `window 10s` (era 100/10s)
   - Zona `auth`: `events 20` / `window 60s` (era 10/60s)
@@ -258,18 +292,21 @@ docker logs controle-share-videos-caddy | jq -r '.status' | grep 429 | wc -l
 repetido; `completeShare` falha.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-backend | grep -iE "chunk|upload|completeShare" | tail -20
 # Verifique: tamanho do arquivo vs maxSize, chunkSize, disco cheio
 ```
 
 **Causas comuns:**
+
 - Arquivo > `share.maxSize` (default 1 GB, max 50 GB via config).
 - `share.chunkSize` muito pequeno para arquivo grande → muitos requests.
 - Disco cheio (RUNBOOKS §4).
 - Rede instável entre frontend → Caddy → backend.
 
 **Ação:**
+
 1. Verificar configs: `Administração → Configurações → share.maxSize`,
    `share.chunkSize`.
 2. Se arquivo muito grande, aumentar `maxSize` ou dividir.
@@ -284,12 +321,14 @@ docker logs controle-share-videos-backend | grep -iE "chunk|upload|completeShare
 chegam; logs mostram erro SMTP.
 
 **Diagnóstico:**
+
 ```bash
 docker logs controle-share-videos-backend | grep -iE "smtp|email|mailer" | tail -20
 docker exec controle-share-videos-backend env | grep -i smtp
 ```
 
 **Configuração (via UI: Administração → Configurações → smtp):**
+
 | Campo | Obrigatório | Exemplo |
 |---|---|---|
 | `smtp.enabled` | ✅ | `true` |
@@ -300,6 +339,7 @@ docker exec controle-share-videos-backend env | grep -i smtp
 | `smtp.email` | ✅ | `Controle Share <no-reply@dominio.com>` |
 
 **Problemas comuns:**
+
 - Gmail: usar **App Password** (não a senha da conta) + `smtp.port 587`.
 - Porta 465 com SSL: `smtp.port=465`.
 - Firewall bloqueia porta de saída → `telnet smtp.host 587` do host.

@@ -28,6 +28,7 @@
 ## 3. Infraestrutura de Chaves
 
 ### 3.1 PGP Keys da Equipe
+
 | Papel | Nome | Key ID | Fingerprint | Keybase |
 |-------|------|--------|-------------|---------|
 | Security Lead | [Nome] | 0xABCD1234 | XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX | @security-lead |
@@ -39,6 +40,7 @@
 > **Importante:** Verificar fingerprints **fora de banda** (telefone, presencial) na primeira troca.
 
 ### 3.2 Geração e Backup de Chaves
+
 ```bash
 # Gerar chave PGP (se não tiver)
 gpg --full-generate-key
@@ -50,6 +52,7 @@ gpg --export-secret-keys "seu@email.com" | gpg --symmetric --cipher-algo AES256 
 ```
 
 ### 3.3 Rotação de Chaves
+
 - **Frequência:** Anual ou após incidente SEV-1 envolvendo credenciais
 - **Processo:** Gerar nova → Assinar com antiga → Publicar → Revogar antiga após 30 dias
 - **Emergência:** Revogação imediata via servidor de chaves + notificação equipe
@@ -59,6 +62,7 @@ gpg --export-secret-keys "seu@email.com" | gpg --symmetric --cipher-algo AES256 
 ## 4. Procedimentos de Comunicação
 
 ### 4.1 Início de Incidente (SEV-1/2)
+
 ```bash
 # 1. IC cria tópico criptografado no Slack #sec-incidents
 # 2. Envia chave de sessão PGP para participantes:
@@ -74,6 +78,7 @@ EOF
 ```
 
 ### 4.2 Compartilhamento de Evidências Sensíveis
+
 ```bash
 # Arquivo com credenciais, IPs, PII, etc.
 # 1. Comprimir + criptografar com chave de sessão
@@ -89,6 +94,7 @@ gpg --encrypt --recipient "security@empresa.com" \
 ```
 
 ### 4.3 Assinatura de Decisões Críticas
+
 ```bash
 # Decisões: "Autorizo rollback produção", "Notifico ANPD", "Pago resgate (NÃO)"
 # 1. Documentar decisão em arquivo texto
@@ -120,6 +126,7 @@ gpg --clearsign --armor decisao_$(date +%s).txt
 | Videoconferência | Jitsi Meet (self-hosted) | E2E encrypt, gravação opcional |
 
 ### 5.1 Configuração Rápida - GnuPG
+
 ```bash
 # ~/.gnupg/gpg.conf
 default-key 0xABCD1234
@@ -137,6 +144,7 @@ default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES CAMELLIA256
 ## 6. Procedimentos de Emergência
 
 ### 6.1 Comprometimento de Canal
+
 ```bash
 # Se Slack/Email comprometido:
 # 1. Mover comunicação para Signal/Keybase (out-of-band)
@@ -146,6 +154,7 @@ default-preference-list SHA512 SHA384 SHA256 AES256 AES192 AES CAMELLIA256
 ```
 
 ### 6.2 Perda de Chave Privada
+
 ```bash
 # 1. Revogar certificado imediatamente
 gpg --gen-revoke 0xABCD1234 > revoke_cert.asc
@@ -201,7 +210,7 @@ gpg --full-generate-key
 
 ## 10. Checklist Rápido (Laminado para Mesa)
 
-```
+```text
 ☐ Canal correto para classificação?
 ☐ Destinatários verificados (fingerprint)?
 ☐ Arquivo criptografado antes de enviar?
@@ -214,5 +223,6 @@ gpg --full-generate-key
 ---
 
 **APROVAÇÃO:**
-- Security Lead: _________________ Data: ____/____/____
-- CTO: ___________________________ Data: ____/____/____
+
+- Security Lead: _________________ Data: ****/****/____
+- CTO: ___________________________ Data: ****/****/____

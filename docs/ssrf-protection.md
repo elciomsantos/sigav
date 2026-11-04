@@ -1,4 +1,5 @@
 # SSRF Protection Documentation
+
 **Versão:** 1.0  
 **Data:** 2026-08-21  
 **Status:** Implementado - Sem URLs controladas por usuário  
@@ -14,6 +15,7 @@ O sistema **não possui funcionalidades que façam requisições HTTP externas c
 ## Auditoria de Código Realizada
 
 ### Comando Executado
+
 ```bash
 grep -r "fetch\|axios\|http.get\|http.post\|http.request\|net/http\|urllib\|requests" \
   --include="*.ts" --include="*.js" --include="*.json" \
@@ -79,6 +81,7 @@ Mesmo com risco baixo, as seguintes proteções existem:
 Se futuramente houver necessidade de URLs controladas por usuário (ex: webhooks, importação de URLs, webhooks de terceiros):
 
 ### 1. Allowlist de Domínios
+
 ```typescript
 // Exemplo de validação
 const ALLOWED_WEBHOOK_DOMAINS = [
@@ -95,6 +98,7 @@ function validateWebhookUrl(url: string): boolean {
 ```
 
 ### 2. Bloqueio de IPs Privados/Reservados
+
 ```typescript
 const BLOCKED_IP_RANGES = [
   '10.0.0.0/8',
@@ -114,11 +118,13 @@ async function validateNoPrivateIP(url: string): Promise<boolean> {
 ```
 
 ### 3. Timeout e Limites
+
 - Timeout máximo: 5 segundos
 - Limite de tamanho de resposta: 1MB
 - Seguir redirects: **não** (ou máximo 3 com validação)
 
 ### 4. Auditoria
+
 - Log de todas URLs requisitadas (auditoria)
 - Alertar em domínios não-allowlisted
 

@@ -18,17 +18,20 @@
 ## Controles implementados
 
 ### Identidade e acesso
+
 - **Sem convidados:** `guest ok = no` + `map to guest = never`.
 - **Usuário dedicado** `uploader` (UID 1102) com shell `nologin` — não é o usuário do container.
 - **Único usuário válido:** `valid users = uploader`; senha gerenciada via `smbpasswd`
   (rotação: `smbpasswd uploader`).
 
 ### Rede
+
 - `hosts allow` restrito a RFC1918 + loopback; `hosts deny = ALL`.
 - **UFW:** porta 445 negada por padrão, liberada apenas para os ranges internos.
 - **fail2ban:** jail `samba` ativa — 5 tentativas → ban de 1h (`/var/log/samba/log.smbd`).
 
 ### Protocolo (endurecimento adicionado em 2026-08-22)
+
 - **SMB3 mínimo no servidor** (`server min protocol = SMB3`, máximo SMB3_11) — elimina
   SMB1 (vetor EternalBlue/WannaCry). Clientes precisam de Windows 8+.
 - **Criptografia obrigatória** (`server smb encrypt = required`) — os vídeos trafegam
@@ -38,11 +41,13 @@
 - `null passwords = no` explícito.
 
 ### Conteúdo
+
 - **Veto de payload ampliado:** `.bat .exe .scr .com .cmd .vbs .js .jse .wsf .ps1`
-  + `.hta .lnk .iso .img .msi .jar .dll .cpl` — droppers clássicos (HTA, atalhos
+  - `.hta .lnk .iso .img .msi .jar .dll .cpl` — droppers clássicos (HTA, atalhos
   maliciosos, ISOs montáveis, instaladores). Arquivos de vídeo legítimos não são afetados.
 
 ### Auditoria
+
 - **VFS `full_audit`:** registra connect/disconnect/opendir/mkdir/rmdir/unlink/rename/pwrite
   com prefixo `usuário|IP|share|timestamp`.
 - Destino: syslog `local7` → `/etc/rsyslog.d/30-samba-audit.conf` → `/var/log/samba/audit.log`.
@@ -52,6 +57,7 @@
   (as diretivas acima permanecem válidas).
 
 ### Permissões POSIX
+
 - Diretório `1002:1002` + setgid (`2775`); arquivos `0664`.
 - `force group = 1002`: todo arquivo colado pela estação herda o grupo do container —
   leitura/escrita coerente entre Samba e aplicação sem privilégios extras.

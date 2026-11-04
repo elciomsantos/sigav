@@ -77,7 +77,7 @@ Set-Cookie: __Host-SID=<TOKEN>; Path=/; Secure; HttpOnly; SameSite=Strict
 8.2 HttpOnly obrigatório.
 8.3 SameSite obrigatório; Lax pode ser utilizado quando Strict for incompatível com o fluxo.
 8.4 Path=/.
-8.5 Não definir Domain com prefixo __Host-.
+8.5 Não definir Domain com prefixo `__Host-`.
 8.6 Não armazenar credenciais de sessão em localStorage, sessionStorage, IndexedDB, URL, query string ou fragmento.
 
 9. CRIAÇÃO E REGENERAÇÃO DA SESSÃO
@@ -363,6 +363,7 @@ Logs de auditoria devem possuir retenção definida e proteção contra alteraç
 Dados de auditoria devem ser minimizados conforme necessidade operacional e requisitos legais aplicáveis.
 
 37. CHECKLIST
+
 - HTTPS obrigatório
 - HSTS configurado quando aplicável
 - CSPRNG
@@ -452,26 +453,20 @@ OWASP ASVS.
 OWASP Rate Limiting Cheat Sheet.
 
 40. DECISÃO ARQUITETURAL
+
 Para aplicação web tradicional acessada por navegador, a arquitetura padrão é:
-Cookie HttpOnly + Secure + SameSite
-+
-token aleatório de 256 bits
-+
-SHA-256(token) no banco
-+
-user_id na sessão server-side
-+
-expiração por inatividade e absoluta
-+
-revogação server-side
-+
-CSRF protection
-+
-autorização por recurso no servidor
-+
-Cache-Control: no-store para dados sensíveis
-+
-auditoria.
+
+- Cookie HttpOnly + Secure + SameSite
+- Token aleatório de 256 bits
+- SHA-256(token) no banco
+- user_id na sessão server-side
+- Expiração por inatividade e absoluta
+- Revogação server-side
+- CSRF protection
+- Autorização por recurso no servidor
+- Cache-Control: no-store para dados sensíveis
+- Auditoria
+
 JWT não é necessário para este cenário quando a aplicação possui backend e banco próprios. Sessão server-side fornece revogação e controle centralizados.
 
 41. PRINCÍPIO FINAL

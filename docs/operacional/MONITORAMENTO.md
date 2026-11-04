@@ -223,7 +223,7 @@ curl -fs http://127.0.0.1:8080/api/metrics | grep tls_certificate
 Exit code 1 = expira em menos de `TLS_MIN_DAYS` (default 30), expirado ou
 handshake falhou. Útil para cron externo ao backend:
 
-```
+```bash
 0 6 * * * /opt/controle-share-videos-v1.0/scripts/security/check-tls-cert.sh \
   $(grep -oP '(?<=TLS_PROBE_DOMAINS=)[^ ]*' /etc/environment) \
   >> /var/log/tls-check.log 2>&1
