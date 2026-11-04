@@ -79,13 +79,22 @@ jobs:
       - name: Install dependencies (root)
         run: npm ci --ignore-scripts
 
-      - name: Run npm audit (backend)
+      # P1-02 (PLANO-CORRECOES-2026-11-03): enforcement real — o `|| true`
+      # anterior deixava o npm audit em modo informativo (só publicava
+      # artefato). O gate roda em scripts/ci/npm-audit-gate.mjs com as
+      # exclusões documentadas (braces GHSA-vfj7-8cjw-p6xm, zod
+      # GHSA-mrhx-c7xc-m3w5); falha em HIGH/CRITICAL fora delas.
+      - name: Run npm audit gate (backend)
         working-directory: ./backend
-        run: npm audit --audit-level=high --json > npm-audit-backend.json || true
+        run: |
+          npm audit --audit-level=high --json > npm-audit-backend.json || true
+          node ../scripts/ci/npm-audit-gate.mjs npm-audit-backend.json
 
-      - name: Run npm audit (frontend)
+      - name: Run npm audit gate (frontend)
         working-directory: ./frontend
-        run: npm audit --audit-level=high --json > npm-audit-frontend.json || true
+        run: |
+          npm audit --audit-level=high --json > npm-audit-frontend.json || true
+          node ../scripts/ci/npm-audit-gate.mjs npm-audit-frontend.json
 
       # osv-scanner exits 1 on ANY vulnerability (incl. LOW/MEDIUM); the
       # explicit HIGH/CRITICAL gate below decides whether the job fails.
@@ -106,13 +115,16 @@ jobs:
           # 2026-10-13). No frontend a cadeia e 100% dev-time (eslint); no
           # backend foi eliminada via override de chokidar@4 no nestjs-i18n.
           # Remover quando upstream publicar correcao.
-          OSV_EXCLUDED='GHSA-vfj7-8cjw-p6xm'
-          CRITICAL_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "CRITICAL") | select(.id != $ex)] | length' osv-results.json 2>/dev/null || echo 0)
-          HIGH_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "HIGH") | select(.id != $ex)] | length' osv-results.json 2>/dev/null || echo 0)
+          # GHSA-mrhx-c7xc-m3w5 (zod <4.6.6): fix exige downgrade do
+          # @serwist/next 9→8 (breaking); risco aceito, reavaliar a cada bump
+          # do serwist (ver scripts/ci/npm-audit-gate.mjs).
+          OSV_EXCLUDED='GHSA-vfj7-8cjw-p6xm,GHSA-mrhx-c7xc-m3w5'
+          CRITICAL_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "CRITICAL") | select(.id as $id | $ex | split(",") | index($id) | not)] | length' osv-results.json 2>/dev/null || echo 0)
+          HIGH_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "HIGH") | select(.id as $id | $ex | split(",") | index($id) | not)] | length' osv-results.json 2>/dev/null || echo 0)
           
           if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 0 ]; then
             echo "::error::Found $CRITICAL_COUNT CRITICAL and $HIGH_COUNT HIGH vulnerabilities"
-            cat osv-results.json | jq --arg ex "$OSV_EXCLUDED" '.results[].packages[] | select(.vulnerabilities[]?.severity == "CRITICAL" or .vulnerabilities[]?.severity == "HIGH") | {package: .package.name, version: .package.version, vulnerabilities: .vulnerabilities[] | select(.severity == "CRITICAL" or .severity == "HIGH") | select(.id != $ex) | {id: .id, severity: .severity, summary: .summary}}'
+            cat osv-results.json | jq --arg ex "$OSV_EXCLUDED" '.results[].packages[] | select(.vulnerabilities[]?.severity == "CRITICAL" or .vulnerabilities[]?.severity == "HIGH") | {package: .package.name, version: .package.version, vulnerabilities: .vulnerabilities[] | select((.severity == "CRITICAL" or .severity == "HIGH") and (.id as $id | $ex | split(",") | index($id) | not)) | {id: .id, severity: .severity, summary: .summary}}'
             exit 1
           fi
           

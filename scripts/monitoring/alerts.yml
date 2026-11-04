@@ -1,5 +1,7 @@
 # Prometheus Alerting Rules for controle-share-videos
-# Apply: kubectl apply -f alerts.yml (or add to Prometheus config)
+# Loaded via docker-compose.monitoring.yml (bind mount em
+# /etc/prometheus/alerts.yml, lido pelo flag --config.file do Prometheus) —
+# ver docs/alert-tuning.md para tuning.
 # 
 # Groups: security, availability, performance, infrastructure
 # Severities: critical (pages immediately), warning (pages in business hours), info (logs only)

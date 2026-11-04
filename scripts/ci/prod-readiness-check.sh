@@ -190,6 +190,23 @@ check_https_enforced() {
     else
         fail "HSTS not configured in Helmet (backend/src/main.ts)"
     fi
+
+    # SEC-1.2/VULN-13 (P0-02, PLANO-CORRECOES-2026-11-03): quando TLS está
+    # habilitado (Caddyfile.prod), secureCookies TEM que ser true no config
+    # efetivo — cookies __Host-. Default do config.example.yaml é "false"
+    # (correto para LAN/dev); prod precisa sobrescrever.
+    if [[ -f "reverse-proxy/Caddyfile.prod" ]] && grep -q "tls" reverse-proxy/Caddyfile.prod; then
+        local secure_cfg="${CONFIG_FILE:-config.yaml}"
+        if [[ -f "$secure_cfg" ]]; then
+            if grep -qiE 'secureCookies:[[:space:]]*"?true"?' "$secure_cfg"; then
+                pass "secureCookies: true ($secure_cfg) ↔ TLS habilitado"
+            else
+                fail "TLS habilitado (Caddyfile.prod) mas secureCookies ≠ true em $secure_cfg — cookies __Host- exigidos em HTTPS (VULN-13)"
+            fi
+        else
+            warn "config não encontrado em $secure_cfg — validar secureCookies: true no host de produção antes do go-live (VULN-13)"
+        fi
+    fi
 }
 
 # =============================================================================
