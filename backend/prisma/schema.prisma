@@ -50,7 +50,10 @@ model User {
 
 model RefreshToken {
   id        String   @id @default(uuid())
-  token     String   @unique @default(uuid())
+  // TOKEN-HASH: persistido apenas como SHA-256 (hashToken()). O @default(uuid())
+  // foi removido (P1-05): nenhum valor em texto claro deve existir — o service
+  // sempre passa explicitamente o hash do token gerado.
+  token     String   @unique
   createdAt DateTime @default(now())
 
   expiresAt DateTime
@@ -106,6 +109,11 @@ model LoginToken {
   userId String
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   used   Boolean @default(false)
+
+  // Índice já presente em 20261103000000_login_token_hash (lookups por userId
+  // em logoutAllDevices/createLoginToken). Sem esta declaração o Prisma
+  // detecta drift e gera migração de DROP INDEX espúria.
+  @@index([userId])
 }
 
 // SEC-1.2/15.3: recovery codes de uso único para o segundo fator. Apenas o

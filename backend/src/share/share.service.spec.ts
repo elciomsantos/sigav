@@ -85,6 +85,55 @@ describe("ShareMapper", () => {
       passwordProtected: false,
     });
   });
+
+  // P1-03 (PLANO-CORRECOES-2026-11-03): whitelist explícita no mapper — a
+  // saída NÃO pode carregar campo fora da lista (um include futuro — ex.
+  // shareTokens — vegação antes vaziaria tokenHash silenciosamente). Se um
+  // campo novo do Share precisar ser exposto, adicione-o aqui DELIBERADAMENTE
+  // e atualize este teste.
+  it("não expõe campo fora da whitelist (tokenHash, segredos, creator completo)", () => {
+    const result = mapper.transformShare({
+      id: "s3",
+      shareTokens: [{ tokenHash: "hash-secreto" }] as never,
+      security: { password: "hash", maxViews: 1 } as ShareSecurity,
+      creator: {
+        id: "u1",
+        email: "a@x.com",
+        username: "owner",
+        password: "$argon2-hash",
+        totpSecret: "secret-totp",
+      } as User,
+    } as never);
+
+    // Nenhum campo sensível vaza...
+    expect(result).not.toHaveProperty("shareTokens");
+    expect(result).not.toHaveProperty("tokenHash");
+    // ...nem o objeto creator cru (hash de senha / TOTP secret):
+    expect(result.creator).toEqual({ id: "u1", email: "a@x.com", username: "owner" });
+
+    // A saída contém EXATAMENTE a whitelist + campos computados:
+    expect(Object.keys(result).sort()).toEqual(
+      [
+        "createdAt",
+        "creator",
+        "description",
+        "downloads",
+        "expiration",
+        "files",
+        "id",
+        "isZipReady",
+        "name",
+        "recipients",
+        "removedReason",
+        "security",
+        "size",
+        "storageProvider",
+        "updatedAt",
+        "uploadLocked",
+        "views",
+      ].sort(),
+    );
+  });
 });
 
 describe("FileStorageService", () => {

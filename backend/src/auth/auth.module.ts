@@ -4,7 +4,6 @@ import { EmailModule } from "../email/email.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { AuthTotpService } from "./authTotp.service";
-import { JwtStrategy } from "./strategy/jwt.strategy";
 import { UserModule } from "../user/user.module";
 import { RolesGuard } from "./guard/roles.guard";
 import { PasswordMustChangeGuard } from "./guard/passwordMustChange.guard";
@@ -36,7 +35,6 @@ import { RecoveryCodeService } from "./recovery-code.service";
     SessionService,
     VerificationService,
     RecoveryCodeService,
-    JwtStrategy,
     JwtGuard,
     RolesGuard,
     PasswordMustChangeGuard,
