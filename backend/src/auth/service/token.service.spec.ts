@@ -124,18 +124,24 @@ describe("TokenService", () => {
   });
 
   describe("createLoginToken", () => {
-    it("invalida loginTokens antigos não usados antes de criar um novo", async () => {
+    it("invalida loginTokens antigos não usados e persiste apenas o SHA-256 (P0-01)", async () => {
       prisma.loginToken.updateMany.mockResolvedValue({ count: 2 });
-      prisma.loginToken.create.mockResolvedValue({ token: "new-login-token" });
+      prisma.loginToken.create.mockResolvedValue({ tokenHash: "hash" });
 
-      const result = await service.createLoginToken("u1");
+      const plainToken = await service.createLoginToken("u1");
 
       expect(prisma.loginToken.updateMany).toHaveBeenCalledWith({
         where: { userId: "u1", used: false },
         data: { used: true },
       });
-      expect(prisma.loginToken.create).toHaveBeenCalled();
-      expect(result).toBe("new-login-token");
+      expect(prisma.loginToken.create).toHaveBeenCalledWith({
+        // P0-01: somente o hash vai para o banco; nunca o plaintext.
+        data: { userId: "u1", tokenHash: service.hashToken(plainToken), expiresAt: expect.any(Date) },
+      });
+      expect(prisma.loginToken.create.mock.calls[0][0].data.tokenHash).not.toBe(
+        plainToken,
+      );
+      expect(plainToken).toBeTruthy();
     });
   });
 

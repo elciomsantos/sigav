@@ -75,12 +75,12 @@ model RefreshToken {
 // -> expirado? -> usuário ativo? -> autorização (§10). Expiração absoluta
 // (expiresAt) e timeout por inatividade (lastActivityAt + idle) (§11).
 model Session {
-  id             String   @id @default(uuid())
-  tokenHash      String   @unique
+  id             String    @id @default(uuid())
+  tokenHash      String    @unique
   userId         String
-  refreshTokenId String   @unique
-  createdAt      DateTime @default(now())
-  lastActivityAt DateTime @default(now())
+  refreshTokenId String    @unique
+  createdAt      DateTime  @default(now())
+  lastActivityAt DateTime  @default(now())
   expiresAt      DateTime
   revokedAt      DateTime?
   ipAddress      String?
@@ -93,8 +93,12 @@ model Session {
   @@index([expiresAt])
 }
 
+// P0-01 (Plano de correções 2026-11-03): token do segundo fator persistido
+// apenas como SHA-256 (`tokenHash`), mesmo contrato dos tokens opacos de
+// acesso/refresh. O valor em texto puro é retornado uma única vez ao cliente e
+// expira em 5 minutos.
 model LoginToken {
-  token     String   @id @default(uuid())
+  tokenHash String   @id
   createdAt DateTime @default(now())
 
   expiresAt DateTime
@@ -108,9 +112,9 @@ model LoginToken {
 // hash SHA-256 é armazenado; o valor em texto puro é exibido uma única vez na
 // ativação do TOTP.
 model RecoveryCode {
-  id        String   @id @default(uuid())
-  codeHash  String   @unique
-  createdAt DateTime @default(now())
+  id        String    @id @default(uuid())
+  codeHash  String    @unique
+  createdAt DateTime  @default(now())
   usedAt    DateTime?
 
   userId String
@@ -212,10 +216,10 @@ model ShareSecurity {
 // SHA-256. revokedAt invalida tokens ao trocar a senha do share (revogação em
 // lote via updateMany) sem depender de assinatura.
 model ShareToken {
-  id        String   @id @default(uuid())
-  tokenHash String   @unique
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
   shareId   String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   expiresAt DateTime
   revokedAt DateTime?
   ipAddress String?
@@ -253,17 +257,17 @@ model DownloadLog {
   fileSize String?
 
   // AUD-ENRICH: contexto e rastreabilidade adicionais do evento.
-  fileHash          String?
-  shareName         String?
-  creatorUsername   String?
-  recipientId       String?
-  recipientEmail    String?
-  mimeType          String?
-  referer           String?
-  durationMs        Int?
-  transferBytes     String?
-  authMethod        String?
-  httpStatus        Int?
+  fileHash        String?
+  shareName       String?
+  creatorUsername String?
+  recipientId     String?
+  recipientEmail  String?
+  mimeType        String?
+  referer         String?
+  durationMs      Int?
+  transferBytes   String?
+  authMethod      String?
+  httpStatus      Int?
 
   userId   String?
   username String?
@@ -309,7 +313,7 @@ model AuditLog {
 
   // WORM (issue #10, 2.3.2): hash chain p/ tamper-evidence.
   // Linhas anteriores à migração ficam com NULL e ficam fora da chain.
-  sequenceNumber Int?   @unique
+  sequenceNumber Int?    @unique
   previousHash   String?
   currentHash    String?
 

@@ -172,19 +172,27 @@ export class TokenService {
   /**
    * Cria um login token de uso único para o segundo fator (TOTP). Invalida os
    * login tokens anteriores não usados antes de criar um novo.
+   *
+   * P0-01 (Plano de correções 2026-11-03): o token é opaco de 256 bits (CSPRNG)
+   * e somente o SHA-256 é persistido (`LoginToken.tokenHash`). O valor em texto
+   * puro é retornado uma única vez e nunca mais sai do servidor.
    */
-  createLoginToken(userId: string) {
+  async createLoginToken(userId: string) {
     return this.prisma.$transaction(async (tx) => {
       await tx.loginToken.updateMany({
         where: { userId, used: false },
         data: { used: true },
       });
 
-      return (
-        await tx.loginToken.create({
-          data: { userId, expiresAt: dayjs().add(5, "minutes").toDate() },
-        })
-      ).token;
+      const plainToken = this.generateAccessToken();
+      await tx.loginToken.create({
+        data: {
+          userId,
+          tokenHash: this.hashToken(plainToken),
+          expiresAt: dayjs().add(5, "minutes").toDate(),
+        },
+      });
+      return plainToken;
     });
   }
 

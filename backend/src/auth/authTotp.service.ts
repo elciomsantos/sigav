@@ -27,6 +27,7 @@ import {
   encryptSecret,
 } from "../config/jwt-secret-crypto";
 import { AuthSignInTotpDTO } from "./dto/authSignInTotp.dto";
+import { hashShareableToken } from "../utils/token-hash.util";
 
 const legacyGuardrails = createGuardrails({
   MIN_SECRET_BYTES: 10,
@@ -50,10 +51,15 @@ export class AuthTotpService {
     return getRequestContext()?.ip ?? "unknown";
   }
 
-  /** Valida um login token não usado e não expirado, retornando-o com o usuário. */
+  /**
+   * Valida um login token não usado e não expirado, retornando-o com o usuário.
+   * P0-01: o lookup usa o SHA-256 do token recebido (`tokenHash`) — o banco
+   * nunca armazena o token em texto puro.
+   */
   private async validateLoginToken(loginToken: string) {
+    const tokenHash = hashShareableToken(loginToken);
     const token = await this.prisma.loginToken.findFirst({
-      where: { token: loginToken },
+      where: { tokenHash },
       include: { user: true },
     });
 
@@ -69,9 +75,9 @@ export class AuthTotpService {
     return token;
   }
 
-  private async consumeLoginToken(loginToken: string) {
+  private async consumeLoginToken(tokenHash: string) {
     await this.prisma.loginToken.update({
-      where: { token: loginToken },
+      where: { tokenHash },
       data: { used: true },
     });
   }
@@ -120,7 +126,7 @@ export class AuthTotpService {
       }
     }
 
-    await this.consumeLoginToken(token.token);
+    await this.consumeLoginToken(token.tokenHash);
     const session = await this.issueSession(user);
 
     void this.auditService?.record(AuditEvent.LOGIN_SUCCESS, {
@@ -205,7 +211,7 @@ export class AuthTotpService {
       throw new BadRequestException(this.i18n.t("auth.invalidCode"));
     }
 
-    await this.consumeLoginToken(token.token);
+    await this.consumeLoginToken(token.tokenHash);
 
     await this.prisma.user.update({
       where: { id: user.id },
