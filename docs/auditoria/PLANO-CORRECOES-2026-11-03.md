@@ -36,12 +36,13 @@ Cada item tem: problema → evidência → ação → critério de aceite → es
 - **Aceite:** nenhum campo de token plaintext no DB (`grep` no schema); testes unitários de enroll/verificação TOTP passando.
 - **Esforço:** M
 
-### P0-02 · Garantir `secureCookies: true` em produção — Item 3
+### P0-02 · Garantir `secureCookies: true` em produção — Item 3 · **✅ IMPLEMENTADO 2026-11-03**
 
 - **Problema:** default de `config.example.yaml:12` é `false` (correto para LAN/dev). Em produção TLS os cookies precisam do modo `__Host-` (VULN-13).
 - **Ação:** alinhar com o `config.example.yaml`/RUNBOOK prod: declarar explicitamente `secureCookies: true` no config de produção + checar no `prod-readiness-check.sh` (script já existente em `scripts/ci/`) — fail-fast se TLS habilitado e secureCookies false.
 - **Aceite:** readiness check falha se combinação TLS-desligado-for-one estiver em prod.
 - **Esforço:** S
+- **Execução:** placed em `scripts/ci/prod-readiness-check.sh` (CHECK 4, fail-fast se TLS ↔ secureCookies ≠ true). Marcar como verificado após aplicar config no host (Fase 3).
 
 ### P0-03 · Rotacionar secrets do `.env.local` (operacional)
 
@@ -69,44 +70,50 @@ Cada item tem: problema → evidência → ação → critério de aceite → es
 - **Esforço:** S
 - **Execução:** repo sincronizado (inclusive após a renomeação para `controle-share-videos`, remote atualizado); `docs/PLANO-STORAGE-EXTERNO.md` e este plano commitados em `8d06e6e`; correções de deps em `2ebf48b`.
 
-### P1-02 · Enforcement real do `npm audit` no security-gate — Item 10
+### P1-02 · Enforcement real do `npm audit` no security-gate — Item 10 · **✅ IMPLEMENTADO 2026-11-03**
 
 - **Problema:** em `.github/workflows/security-gate.yml:84,88` o npm audit roda com `|| true` (só publica artefato). Enforcement existe apenas no `ci.yml` (root/shared) e no osv-scanner.
 - **Ação:** remover `|| true` e aplicar o mesmo gate (exit 1 em high/critical) aos jobs backend/frontend, alinhado com a exclusão documentada (braces/GHSA-vfj7-8cjj-p6jm, sem fix).
 - **Aceite:** PR de teste com vuln high simulada (override artificial) bloqueia o pipeline.
 - **Esforço:** S
+- **Execução:** gate em `security-gate.yml:84-97` + `scripts/ci/npm-audit-gate.mjs` (exclusões documentadas braces/zod); deps corrigidas em `2ebf48b` (commit `ed9b190`).
 
-### P1-03 · Whitelist explícita no `ShareMapper` (defesa em profundidade) — Item 4
+### P1-03 · Whitelist explícita no `ShareMapper` (defesa em profundidade) — Item 4 · **✅ IMPLEMENTADO 2026-11-03**
 
 - **Problema:** `...share` spread (`share/share.mapper.ts:14`) é seguro hoje porque `ShareToken` nunca é `include`d, mas um `include` futuro vaza `tokenHash` silenciosamente.
 - **Ação:** substituir spread por whitelist explícita de campos + teste que falha se campo novo aparecer na saída.
 - **Esforço:** S
+- **Execução:** `SHARE_WHITELIST` em `share/share.mapper.ts` + teste de contrato (commit `0b223f0`).
 
-### P1-04 · Decidir responsabilidade única por HSTS/CSP — Itens 3 e 7
+### P1-04 · Decidir responsabilidade única por HSTS/CSP — Itens 3 e 7 · **✅ IMPLEMENTADO 2026-11-04**
 
 - **Problema:** helmet aplica HSTS (2 anos, preload) e CSP incondicionalmente no backend (`main.ts:163-191`) enquanto Caddy injeta os mesmos headers (`Caddyfile.prod:24,43`) — primeira fonte vence no browser; risco de drift quando alguém editar só um lado.
 - **Ação (decisão de arquitetura):** recomendação — **Caddy como fonte da verdade** para headers de edge; no helmet, desativar HSTS/CSP quando `TRUST_PROXY`/produção-via-Caddy (ou manter CSP idêntica e registrar a duplicação deliberada em comentário + doc de runbook).
 - **Aceite:** resposta via Caddy e resposta direta ao container têm a MESMA CSP (script de verificação nos e2e de seguridad).
 - **Esforço:** M
+- **Execução (decisão registrada):** **fonte única de HSTS = Caddy** (o edge conhece o estado do TLS por variante: prod 2 anos+preload, lan 1 ano, ip sem HSTS). Backend (`main.ts`) emite `strictTransportSecurity: false` com comentário; CSP/COOP/CORP/restantes headers do helmet permanecem como defense-in-depth para respostas diretas da API. `prod-readiness-check.sh` passou a validar HSTS no `Caddyfile.prod` e falha se o backend voltar a emitir HSTS.
 
-### P1-05 · Limpar dívida de auth legada
+### P1-05 · Limpar dívida de auth legada · **✅ IMPLEMENTADO 2026-11-03** (commit `0b223f0`)
 
 - **Problema:** `JwtStrategy` (passport-jwt) está registrado em `auth.module.ts:7,39` mas **nenhum guard a usa** — todos validam via `SessionService` (token opaco). Superfície morta + `RefreshToken.token @default(uuid())` mortos/misleading (`schema.prisma:53`).
 - **Ação:** remover `JwtStrategy` + dependência passport-jwt (se sem outro uso); schema: renomear/limpar default (a coluna `tokenHash` no P0-01 já cobre LoginToken; RefreshToken segue o mesmo padrão).
 - **Aceite:** e2e security + auth passando; grep `PassportStrategy` retorna zero.
 - **Esforço:** S/M
+- **Execução:** passport/passport-jwt removidos — `grep PassportStrategy` = 0 (commit `0b223f0`).
 
-### P1-06 · Atualizar o checklist de segmentos desatualizados
+### P1-06 · Atualizar o checklist de segmentos desatualizados · **✅ CONCLUÍDO 2026-11-04**
 
 - **Problema:** referências de linha defasadas (local.service.ts:54→55), `safeRedirectPath` agora está no **frontend** (`frontend/src/utils/router.util.ts`), Item 10 npm audit não é gate direto, Item 12 Samba é doc-only.
 - **Ação:** edit de CHECKLIST-SEGURANCA-FINAL.md — corrigir evidências e re-marcar #1/#3/#10/#12 como 🟡 PARCIAL até fechamento deste plano; referenciar este plano.
 - **Esforço:** S
+- **Execução:** checklist re-avaliado em 2026-11-04 (veredito 12 ✅ · 3 🟡 · 0 🔴); evidências atualizadas — ShareMapper whitelist, HSTS fonte única no Caddy, gates P1-02/P2-03 concluídos, allowlist em `local.service.ts:55-78`, `safeRedirectPath` no `frontend/src/utils/router.util.ts`, Samba com nota de aplicação no host (Fase 1). Ver `CHECKLIST-SEGURANCA-FINAL.md`.
 
-### P1-07 · Comentário desatualizado em `alerts.yml`
+### P1-07 · Comentário desatualizado em `alerts.yml` · **✅ IMPLEMENTADO 2026-11-03** (commit `ed9b190`)
 
 - **Problema:** cabeçalho menciona `kubectl apply` (origem K8s); o carregamento real é via `--config.file` no compose.
 - **Ação:** corrigir comentário.
 - **Esforço:** S
+- **Execução:** comentário corrigido para "bind mount via compose" (`alerts.yml:3`).
 
 ---
 
@@ -122,9 +129,10 @@ Cada item tem: problema → evidência → ação → critério de aceite → es
 
 - Sign-off LGPD/DPIA, DR drill, pentest externo, aceite de risco AV — conforme `docs/GOLIVE-CHECKLIST.md` (fases 0–5, tudo pendente).
 
-### P2-03 · Gate de deps git+/URL para backend/frontend
+### P2-03 · Gate de deps git+/URL para backend/frontend · **✅ CONCLUÍDO 2026-11-04**
 
 - **Status:** `ci.yml:87-122` valida apenas manifest raiz; backend verificado manualmente (limpo), frontend não. Estender script aos 3 manifests.
+- **Execução:** backend e frontend **já tinham** o gate nos seus jobs; adicionado step "Check for Git/URL dependencies (root + shared)" no job backend, cobrindo `package.json` raiz e `packages/shared/package.json` (raiz/shared limpos — verificados 2026-11-04).
 
 ---
 

@@ -8,6 +8,7 @@ import {
   IUploadRepository,
   type IUploadRepository as IUploadRepositoryType,
 } from "../storage/upload-repository.interface";
+import { ELIMINATED_EMAIL_DOMAIN } from "../privacy/privacy.service";
 
 @Injectable()
 export class JobsService {
@@ -234,6 +235,10 @@ export class JobsService {
           isActivated: false,
           createdAt: { lt: cutoff },
           id: lastId ? { gt: lastId } : undefined,
+          // LGPD DSR: contas anonimizadas (`PrivacyService.eliminatePersonalData`)
+          // ficam com isActivated=false para sempre — NÃO são lixo do signup.
+          // Se fossem removidas aqui, o cascade apagaria os shares do titular.
+          email: { not: { endsWith: `@${ELIMINATED_EMAIL_DOMAIN}` } },
         },
         orderBy: { id: "asc" },
         take: 50,

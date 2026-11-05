@@ -120,6 +120,38 @@ jobs:
             exit 1
           fi
 
+      - name: Check for Git/URL dependencies (root + shared)
+        run: |
+          # P2-03 (PLANO-CORRECOES-2026-11-03): o backend é verificado acima e
+          # o frontend no job próprio; este step cobre o manifest raiz do
+          # monorepo e packages/shared (não cobertos por nenhum job).
+          # Allow file: relative paths (internal monorepo packages)
+          node -e '
+            const fs = require("fs");
+            const paths = ["../package.json", "../packages/shared/package.json"];
+            const models = ["dependencies", "devDependencies", "optionalDependencies"];
+            const issues = [];
+            for (const p of paths) {
+              if (!fs.existsSync(p)) continue;
+              const pkg = JSON.parse(fs.readFileSync(p, "utf8"));
+              for (const m of models) {
+                if (!pkg[m]) continue;
+                for (const [name, version] of Object.entries(pkg[m])) {
+                  if (typeof version !== "string") continue;
+                  // Allow relative file: paths (internal workspaces)
+                  if (/^file:\.\.?\//.test(version)) continue;
+                  if (/^(git\+https?|git\+ssh|https?|file):/.test(version))
+                    issues.push(`${p}  ${name}: ${version}`);
+                }
+              }
+            }
+            if (issues.length) {
+              console.log("Git/URL dependencies found:");
+              issues.forEach((i) => console.log("  " + i));
+              process.exit(1);
+            }
+          ' && echo "No Git/URL dependencies in root/shared manifests"
+
       - name: Lint
         run: npm run lint
 
@@ -220,10 +252,16 @@ jobs:
           # No backend a cadeia foi eliminada via override de chokidar@4 no
           # nestjs-i18n; a exclusão é no-op lá. Remover quando upstream
           # publicar correção.
+          # GHSA-mrhx-c7xc-m3w5 (zod — memory exhaustion em collections):
+          # fix em 4.6.6, mas a cadeia @serwist é 100% build-time (serwist/
+          # @serwist/next agora são devDependencies; `npm audit --omit=dev`
+          # do frontend = 0 vulnerabilidades) e o @serwist@9.5.13 fixa as
+          # versões de zod/glob de forma exata, sem fix upstream aplicável
+          # ainda. Remover quando @serwist atualizar zod/glob.
           npm audit --audit-level=high --json > npm-audit.json || true
           node -e '
             const fs = require("fs");
-            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm"];
+            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm", "GHSA-mrhx-c7xc-m3w5"];
             const a = JSON.parse(fs.readFileSync("npm-audit.json", "utf8"));
             const vs = a.vulnerabilities || {};
             const blocked = Object.entries(vs).filter(([name, v]) =>

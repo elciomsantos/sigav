@@ -7,6 +7,30 @@
 
 ---
 
+## v1.2.22 — P1-04/P1-06/P2-03 fechados + LGPD DSR + deps runtime (2026-11-04)
+
+### Resumo
+
+Segunda rodada do `PLANO-CORRECOES-2026-11-03`: itens de arquitetura/CI/documentação fechados, **endpoint LGPD DSR** (`/api/privacy/dsr`) implementado e árvore de dependências **runtime zerada** de vulnerabilidades conhecidas. Estados de prontidão re-atualizados nas docs (ver `docs/auditoria/`).
+
+### Implementado
+
+- **P1-04 — HSTS com fonte única**: decisão registrada de arquitetura — **Caddy é a única fonte de `Strict-Transport-Security`** (edge conhece o TLS por variante: prod 2 anos+preload, lan 1 ano, ip sem HSTS). Backend `main.ts` passa a `strictTransportSecurity: false` (sem header duplicado); `prod-readiness-check.sh` valida HSTS no `Caddyfile.prod` e falha se o backend voltar a emitir o header.
+- **LGPD — DSR `/api/privacy/dsr`** (Art. 18, action item vencido de `lgpd-lawful-basis.md`): novo módulo `backend/src/privacy/`:
+  - `GET /dsr/data` — acesso/portabilidade: export JSON estruturado via **whitelist** de campos (senha, totpSecret e tokens nunca aparecem na saída); perfil + shares/files/recipients + download logs + sessões + resumo agregado da trilha de auditoria;
+  - `POST /dsr/delete` — eliminação/anonimização: transação que revoga sessões, elimina refresh/login/recovery/reset tokens e pseudonimiza o perfil (login impossível); trilha WORM **preservada** (retenção 7 anos, vínculo nominal pseudonimizado);
+  - Ambos com `ReauthRequired` (reautenticação recente de senha + TOTP) e rate limit dedicado; eventos de auditoria `DSR_EXPORT_REQUESTED`/`DSR_ELIMINATION_REQUESTED`; 6 testes unitários;
+  - `jobs.deleteUnactivatedUsers` não remove contas anonimizadas (e-mail `@eliminado.lgpd.invalid`) — o cascade apagaria os shares do titular.
+- **P2-03 — gate deps git+/URL nos 3 manifests**: novo step "root + shared" no job backend do `ci.yml` (root e `packages/shared` limpos — verificados).
+- **P1-06 — checklist re-avaliado**: `CHECKLIST-SEGURANCA-FINAL.md` atualizado (veredito 12 ✅ · 3 🟡 · 0 🔴; evidências de linha corrigidas); itens P0-02/P1-02/P1-03/P1-04/P1-05/P1-07/P2-03 do plano re-marcados com evidência de execução.
+- **Dependências runtime**: backend `minimatch` fixado em 11.0.4 via override (CVE-2026-118764 / GHSA-g3hv-75wg-m249) — audit runtime do backend = **0 vulnerabilidades**; frontend `@serwist/next` movido para devDependencies (cadeia era 100% build-time) — `npm audit --omit=dev` = **0 vulnerabilidades**; gate do `ci.yml` do frontend passa a excluir `GHSA-mrhx-c7xc-m3w5` (zod, dev-time chain pinada pelo @serwist 9.5.13) com justificativa.
+
+### Validado
+
+- 342 testes unitários backend (33 suites) passando; frontend build + tsc + lint sem erros; `npm audit --omit=dev` backend/frontend = 0 vulns.
+
+---
+
 ## v1.2.21 — R01/P0-01 (auth) + hardening de dependências (2026-11-03/04)
 
 ### Resumo

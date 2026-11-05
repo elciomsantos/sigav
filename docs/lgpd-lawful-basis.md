@@ -105,7 +105,7 @@
 | **Transferência Internacional** | [Sim/Não] - Se sim: país, mecanismo (SCC, BCR, decisão adequação) |
 | **Retenção** | Ver coluna "Retenção" por atividade |
 | **Medidas Segurança** | Ver coluna "Medidas de Segurança" + WORM, Criptografia, RBAC, MFA, TLS, Rate Limit |
-| **DPIA** | Concluída para: TOTP secret, Metadados arquivo, Auditoria. Pendente: DSR endpoint. |
+| **DPIA** | Concluída para: TOTP secret, Metadados arquivo, Auditoria. DSR endpoint: implementado 2026-11-04 (avaliação concluída junto — ver `backend/src/privacy/`). |
 
 ---
 
@@ -153,7 +153,7 @@
 | Item | Responsável | Prazo | Status |
 |------|-------------|-------|--------|
 | Legal revisar e aprovar bases legais por atividade | Legal/DPO | 2026-09-01 | ☐ |
-| Security implementar DSR endpoint (`/api/privacy/dsr`) | Backend Lead | 2026-09-15 | ☐ |
+| Security implementar DSR endpoint (`/api/privacy/dsr`) | Backend Lead | 2026-09-15 | **✅ 2026-11-04** — `backend/src/privacy/` (export JSON + anonimização/eliminação; ReauthRequired, audit `DSR_EXPORT_REQUESTED`/`DSR_ELIMINATION_REQUESTED`, trilha WORM preservada) |
 | Security completar DPIA para TOTP secret + Metadados arquivo | Security Lead | 2026-09-15 | ☐ |
 | Legal elaborar Política de Privacidade (Art. 9) | Legal | 2026-09-01 | ☐ |
 | Legal elaborar Termo de Consentimento (se base consentimento) | Legal | 2026-09-01 | ☐ |

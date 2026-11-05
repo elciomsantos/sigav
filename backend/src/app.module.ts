@@ -23,6 +23,7 @@ import { PrismaModule } from "./prisma/prisma.module";
 import { ShareModule } from "./share/share.module";
 import { SystemModule } from "./system/system.module";
 import { UserModule } from "./user/user.module";
+import { PrivacyModule } from "./privacy/privacy.module";
 import { AccessReviewModule } from "./admin/access-review.module";
 import { JwtGuard } from "./auth/guard/jwt.guard";
 import { RolesGuard } from "./auth/guard/roles.guard";
@@ -44,6 +45,7 @@ const i18nPath = existsSync(join(__dirname, "../i18n"))
     PrismaModule,
     JobsModule,
     UserModule,
+    PrivacyModule,
     SystemModule,
     ThrottlerModule.forRoot([
       {

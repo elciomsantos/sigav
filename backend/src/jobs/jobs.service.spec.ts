@@ -124,6 +124,19 @@ describe("JobsService", () => {
       });
       expect(fileService.deleteAllFiles).toHaveBeenCalledWith("s1");
     });
+
+    it("exclui contas anonimizadas (LGPD DSR) da limpeza", async () => {
+      prisma.user.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      await service.deleteUnactivatedUsers();
+
+      const where = prisma.user.findMany.mock.calls[0][0].where;
+      expect(where.email).toEqual({
+        not: { endsWith: "@eliminado.lgpd.invalid" },
+      });
+    });
   });
 
   describe("deleteTemporaryFiles", () => {

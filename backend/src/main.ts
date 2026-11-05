@@ -180,11 +180,12 @@ export async function configureApp(
       crossOriginOpenerPolicy: { policy: "same-origin" },
       crossOriginResourcePolicy: { policy: "same-origin" },
       referrerPolicy: { policy: "same-origin" },
-      strictTransportSecurity: {
-        maxAge: 63072000,
-        includeSubDomains: true,
-        preload: true,
-      },
+      // HSTS: fonte única é o Caddy (reverse-proxy/Caddyfile.prod|lan) — o edge
+      // conhece o estado do TLS por variante (prod: 2 anos + preload; lan: 1
+      // ano; ip: sem HSTS). O backend NÃO emite Strict-Transport-Security para
+      // evitar header duplicado e drift de configuração
+      // (P1-04, PLANO-CORRECOES-2026-11-03).
+      strictTransportSecurity: false,
     }),
   );
 

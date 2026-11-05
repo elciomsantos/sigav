@@ -184,11 +184,20 @@ check_https_enforced() {
         warn "Caddyfile.prod not found (using default?)"
     fi
     
-    # Check for HSTS in Helmet config
-    if grep -q "strictTransportSecurity" backend/src/main.ts; then
-        pass "HSTS configured in Helmet"
+    # HSTS: fonte única é o Caddy (edge conhece o TLS por variante — prod:
+    # 2 anos+preload; lan: 1 ano; ip: sem HSTS). Verificar
+    # Strict-Transport-Security no Caddyfile.prod (P1-04,
+    # PLANO-CORRECOES-2026-11-03). O backend intencionalmente NÃO emite HSTS.
+    if grep -q "Strict-Transport-Security" reverse-proxy/Caddyfile.prod; then
+        pass "HSTS configured in Caddyfile.prod (single source)"
     else
-        fail "HSTS not configured in Helmet (backend/src/main.ts)"
+        fail "HSTS not configured in Caddyfile.prod (reverse-proxy/Caddyfile.prod)"
+    fi
+    if grep -q "strictTransportSecurity" backend/src/main.ts && \
+       ! grep -q "strictTransportSecurity: false" backend/src/main.ts; then
+        fail "backend/src/main.ts ainda emite HSTS (duplicado com Caddy) — ver P1-04"
+    else
+        pass "Backend sem HSTS duplicado (fonte única: Caddy)"
     fi
 
     # SEC-1.2/VULN-13 (P0-02, PLANO-CORRECOES-2026-11-03): quando TLS está

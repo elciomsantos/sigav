@@ -32,6 +32,11 @@ export const AuditEvent = {
   // Access review (issue #11, 2.4.2/2.4.3)
   ACCESS_REVIEW_CERTIFIED: "ACCESS_REVIEW_CERTIFIED",
   ACCESS_REVIEW_QUARTERLY_REMINDER: "ACCESS_REVIEW_QUARTERLY_REMINDER",
+
+  // LGPD — Art. 18 (DSR): exportação (acesso/portabilidade) e solicitação de
+  // eliminação/anonimização de dados do titular (/api/privacy/dsr)
+  DSR_EXPORT_REQUESTED: "DSR_EXPORT_REQUESTED",
+  DSR_ELIMINATION_REQUESTED: "DSR_ELIMINATION_REQUESTED",
 } as const;
 
 export type AuditEventType = (typeof AuditEvent)[keyof typeof AuditEvent];
