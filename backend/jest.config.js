@@ -11,7 +11,9 @@ module.exports = {
     "^file-type$": "<rootDir>/test/stubs/file-type.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  transformIgnorePatterns: ["node_modules/(?!(?:@scure|@noble|@otplib)/)"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(?:@scure|@noble|@otplib|@nestjs/jwt)/)",
+  ],
   collectCoverageFrom: [
     "src/config/config.service.ts",
     "src/auth/guard/jwt.guard.ts",
