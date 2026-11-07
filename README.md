@@ -547,6 +547,9 @@ actions estão pinadas por SHA em versões Node 24 (sem warnings de deprecação
 O **Dependabot** (`.github/dependabot.yml`) mantém dependências npm dos 5
 projetos e os pins de GitHub Actions atualizados semanalmente.
 
+> Passo a passo para ativar e validar o deploy automático:
+> `docs/operacional/ATIVAR-DEPLOY-GITHUB.md`.
+>
 > Ver `docs/auditoria/CHECKLIST-SEGURANCA-FINAL.md` para a verificação item a item.
 
 ---

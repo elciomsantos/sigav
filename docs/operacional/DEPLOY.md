@@ -10,6 +10,9 @@
 > **Deploy para a empresa:** antes de implantar a partir de um repositório de
 > organização corporativa, siga `docs/operacional/FORK-EMPRESA.md` (fork do
 > repositório, habilitação de Actions/secrets e repontuação das URLs).
+>
+> **Deploy automático via GitHub Actions:** passo a passo em
+> `docs/operacional/ATIVAR-DEPLOY-GITHUB.md`.
 
 | Item | Obrigatório | Observação |
 |---|---|---|
