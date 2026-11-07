@@ -61,11 +61,13 @@ COPY backend/package.json backend/package-lock.json ./
 # postinstall `prisma generate` (fix(ci) bfef55d), which needs the schema.
 COPY backend/prisma.config.ts ./
 COPY backend/prisma ./prisma
+# Não executar `npm cache clean --force` aqui: /root/.npm é um cache mount
+# (não entra na layer), e o npm 11 pode falhar com ENOTEMPTY (exit 217) ao
+# tentar remover o cache em paralelo ao overlayfs do BuildKit.
 RUN --mount=type=cache,target=/root/.npm \
     apk add --no-cache --virtual .build-deps python3 make g++ \
     && npm ci --prefer-offline \
-    && apk del --no-cache --purge .build-deps \
-    && npm cache clean --force
+    && apk del --no-cache --purge .build-deps
 
 # =============================================================================
 # Stage 4: Build backend
@@ -143,10 +145,11 @@ ENV NODE_ENV=docker
 # Install runtime dependencies: curl (healthcheck), caddy (reverse proxy), su-exec (user switching)
 # P3 INFRA-LOW-01: clear the npm cache before removing the npm binary so any
 # residual cache in /root/.npm is dropped from the final image.
+# `rm -rf /root/.npm` já limpa o cache; não usar `npm cache clean --force`,
+# que pode falhar com ENOTEMPTY (exit 217) no overlayfs do BuildKit.
 RUN apk update --no-cache && \
     apk upgrade --no-cache && \
     apk add --no-cache curl caddy su-exec openssl ffmpeg && \
-    npm cache clean --force && \
     rm -rf /var/cache/apk/* /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /root/.npm
 
 # Create non-root user and group
