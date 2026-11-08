@@ -35,6 +35,8 @@ cp .env.local.example .env.local
 
 ```bash
 docker compose --env-file .env.local -f docker-compose.local.yml up -d --build
+
+docker compose -f docker-compose.prod.yml -f docker-compose.preprod.yml up -d --build
 ```
 
 Ou em duas etapas (build e depois subir):
