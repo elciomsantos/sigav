@@ -12,6 +12,7 @@ Este documento reúne os comandos principais para desenvolvimento, teste de hard
 | `docker-compose.staging.yml` | **Overlay hardening** (sobe em cima do local) | ❌ HTTP :3000 | ✅ Completo |
 | `docker-compose.yml` | **Produção** (domínio real + Let's Encrypt) | ✅ HTTPS :443 | ✅ Completo |
 | `docker-compose.prod.yml` | **Produção Swarm/disco local** (secrets externos, bind mounts `/opt/app`) | ✅ HTTPS :443 | ✅ Completo |
+| `docker-compose.preprod.yml` | **Overlay de ensaio pré-produção** (sobe em cima do prod, TLS interno por IP) | ✅ HTTPS interno | ✅ Completo |
 | `docker-compose.monitoring.yml` | **Observabilidade** (Prometheus, Grafana, Loki, Promtail, node-exporter) | — | — |
 
 ---

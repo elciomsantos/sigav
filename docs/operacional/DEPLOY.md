@@ -45,9 +45,13 @@ ss -ltnp 'sport = :80 or sport = :443'   # deve virar vazio
 | `docker-compose.yml` | Produção padrão (TLS Let's Encrypt) | variáveis de ambiente (`.env`) | volumes nomeados |
 | `docker-compose.prod.yml` | Produção com Docker Swarm/secrets externos | Docker secrets (arquivo) | bind mounts em `/opt/app/data` (disco local) |
 | `docker-compose.local.yml` | Teste local (HTTP, sem TLS) | `.env.local` | volume nomeado (backend-data) |
+| `docker-compose.preprod.yml` | Ensaio pré-produção no servidor final (sobe sobre o `prod`, TLS interno por IP) | Docker secrets (ensaio) | bind mounts em `/opt/app/data` |
 | `docker-compose.monitoring.yml` | Stack de observabilidade (prometheus, grafana, loki, promtail) | — | — |
 
 > Detalhes de cada variante em `README.md` → "Docker Compose (variantes)".
+>
+> **Antes do go-live:** roteiro de ensaio no servidor final em
+> `docs/operacional/ENSAIO-PRE-PRODUCAO.md`.
 
 ### 2.1 Selecionar o Caddyfile (`CADDYFILE`)
 

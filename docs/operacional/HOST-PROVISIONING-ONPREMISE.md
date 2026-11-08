@@ -72,7 +72,7 @@ não cifra o volume Docker: a cifra é feita na camada de bloco do host.
 > instalação do Debian), o item #2 está atendido — registre a evidência e pule
 > para a §5. Se o disco local **não** é cifrado, use a camada de bloco do
 > sistema antes de criar os dados.
-
+>
 > **Procedimento opcional (volume dedicado):** LUKS2 sobre um dispositivo
 > dedicado (`/dev/md0` neste exemplo) montado em `/opt/app`, com passphrase
 > guardada fora do host (cofre/serviço de segredos). Se a empresa optar por
