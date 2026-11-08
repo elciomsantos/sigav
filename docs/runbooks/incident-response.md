@@ -178,7 +178,7 @@ sqlite3 /var/evidence/INC-2026-001_*/database/controle-videos-snapshot.db \
 
 ```bash
 # Revogar TODAS as sessões de um usuário
-sqlite3 /opt/app/backend/data/controle-videos.db \
+sqlite3 /opt/app/data/controle-videos.db \
   "DELETE FROM refresh_token WHERE userId = 'USER_ID';"
 
 # Bloquear IP no Caddy (adicionar ao Caddyfile e reload)
@@ -234,7 +234,7 @@ aws ec2 create-snapshot --volume-id vol-xxx --description "IR-isolation-$(date +
 
 ```bash
 # 1. Verificar integridade do banco (se restaurado)
-sqlite3 /opt/app/backend/data/controle-videos.db "PRAGMA integrity_check;"
+sqlite3 /opt/app/data/controle-videos.db "PRAGMA integrity_check;"
 
 # 2. Verificar backups recentes
 ./scripts/backup/restore.sh sqlite latest  # DRY RUN first!
@@ -394,10 +394,10 @@ docker exec controle-share-videos-caddy caddy run --config /etc/caddy/Caddyfile 
 sqlite3 $DB "SELECT * FROM audit_log WHERE eventType='LOGIN_FAILURE' GROUP BY ipAddress HAVING COUNT(*) > 10;"
 
 # Buscar IPs suspeitos
-grep -r "192.168.1.100" /var/log/nginx/ /opt/app/backend/logs/
+grep -r "192.168.1.100" /var/log/nginx/ /opt/app/data/logs/
 
 # Verificar integridade de arquivos (sha256)
-find /opt/app/backend/data/uploads -type f -exec sha256sum {} \; > current_hashes.txt
+find /opt/app/data/uploads -type f -exec sha256sum {} \; > current_hashes.txt
 diff baseline_hashes.txt current_hashes.txt
 ```
 

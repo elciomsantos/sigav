@@ -40,7 +40,7 @@ services:
     networks:
       - local-network
     # backend-runner tem USER appuser (UID 1001) embutido, mas o volume nomeado
-    # /opt/app/backend/data é inicializado como root no primeiro boot. Rodar
+    # /opt/app/data é inicializado como root no primeiro boot. Rodar
     # como root aqui é pragmático para teste LOCAL; em produção o stage runner
     # (create-user.sh) faz o chown 1002:1002 antes de iniciar os serviços.
     user: "0:0"
@@ -55,7 +55,8 @@ services:
       - NODE_ENV=production
       - TRUST_PROXY=true
       - BACKEND_PORT=8080
-      - DATABASE_URL=file:/opt/app/backend/data/controle-videos.db
+      - DATABASE_URL=file:/opt/app/data/controle-videos.db
+      - DATA_DIRECTORY=/opt/app/data
       # JWT_SECRET — shared entre backend (assina) e frontend middleware (verifica).
       # Sem isto o middleware jose trata todo request como não-autenticado.
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Set it in .env.local.}
@@ -69,16 +70,16 @@ services:
       # (signIn, token refresh, totp, etc.) e validar o R01.
       - SWAGGER_ENABLED=true
     volumes:
-      - backend-data:/opt/app/backend/data
+      - backend-data:/opt/app/data
     # O entrypoint do Dockerfile (create-user.sh) espera ser root; o stage
     # backend-runner não define ENTRYPOINT/CMD, então sobrescrevemos o command
     # para rodar migrations + seed + main diretamente.
     entrypoint: [""]
     command: >
       sh -c "
-        mkdir -p /opt/app/backend/data &&
+        mkdir -p /opt/app/data &&
         cd /opt/app/backend &&
-        export DATABASE_URL=file:./data/controle-videos.db &&
+        export DATABASE_URL=file:/opt/app/data/controle-videos.db &&
         ./node_modules/.bin/prisma migrate deploy &&
         node dist/prisma/seed/config.seed.js &&
         node dist/prisma/seed/user.seed.js &&

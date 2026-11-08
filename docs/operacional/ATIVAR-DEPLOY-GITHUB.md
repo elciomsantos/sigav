@@ -109,8 +109,8 @@ docker inspect controle-share-videos-backend \
 
 - Retornou `docker-compose.yml` → produção padrão (backend/frontend/caddy com
   TLS via Caddy). Veja o ajuste na §4.
-- Retornou `docker-compose.prod.yml` → produção Swarm/RAID6 com secrets
-  externos. O padrão do script já atende.
+- Retornou `docker-compose.prod.yml` → produção Swarm com secrets externos e
+  dados em disco local. O padrão do script já atende.
 
 ### 2.4 Testar o backup pré-deploy (obrigatório)
 
@@ -135,12 +135,15 @@ O script exige no host:
 - comando `gpg`;
 - `GPG_RECIPIENT` definido quando `NODE_ENV=production`;
 - caminho correto do banco em `DB_FILE` (padrão:
-  `/opt/app/backend/data/controle-videos.db`).
+  `/opt/app/data/controle-videos.db`).
 
-> **Atenção:** o deploy padrão (`docker-compose.yml`) guarda os dados em volume
-> Docker, não em `/opt/app/backend/data`. Se o teste acima falhar por banco
-> inexistente, ajuste `DB_FILE`/`DATA_DIR` ou o workflow antes de ativar o
-> deploy. Veja a §4.3.
+> **Atenção (host × container):** dentro do container o banco fica em
+> `/opt/app/data/controle-videos.db`. No `docker-compose.prod.yml` o host usa o
+> **mesmo caminho** (`/opt/app/data:/opt/app/data`), então o `DB_FILE` padrão
+> funciona no host. Já no `docker-compose.yml` os dados ficam em volume Docker
+> nomeado (`backend-data`) e `/opt/app/data` não existe no host — nesse caso
+> execute o backup via `docker exec` ou aponte `DB_FILE` para o volume. Veja a
+> §4.3.
 
 ### 2.5 Criar a chave SSH de deploy
 
@@ -297,7 +300,7 @@ do GitHub**, onde `APP_DIR` não está definido; portanto, o valor sempre cai no
 default. Para usar outro caminho, troque o literal no comando remoto:
 
 ```yaml
-            "APP_DIR='/srv/controle-share-videos' RUN_BACKUP=1 ..."
+            "APP_DIR='/opt/controle-share-videos-v1.0' RUN_BACKUP=1 ..."
 ```
 
 ### 4.3 Backup incompatível com o compose padrão

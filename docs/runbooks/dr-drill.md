@@ -42,7 +42,7 @@
 date -u +%s > /tmp/dr-drill-start.epoch
 
 # Env limpo: sem dados pré-existentes
-mkdir -p /opt/dr-drill/data/backend && cd /opt/dr-drill
+mkdir -p /opt/dr-drill/data && cd /opt/dr-drill
 # Copiar apenas código/config (git clone checkout <tag>) — NUNCA dados
 ```
 
@@ -51,7 +51,7 @@ mkdir -p /opt/dr-drill/data/backend && cd /opt/dr-drill
 ```bash
 set -euo pipefail
 BACKUP_DIR=/caminho/backups        # backup MAIS ANTIGO permitido pela política? Não: o mais RECENTE
-APP_DATA=/opt/dr-drill/data/backend
+APP_DATA=/opt/dr-drill/data
 
 LATEST=$(ls -1t "${BACKUP_DIR}"/controle-videos_*.db.gz.gpg | head -n1)
 echo "Backup selecionado: ${LATEST} ($(stat -c %y "${LATEST}"))"   # ← base do RPO
@@ -88,7 +88,7 @@ curl -fs http://127.0.0.1:8080/api/health             # 200
 #    Login com usuário conhecido do backup → 200
 
 # 3. Integridade referencial (amostra)
-sqlite3 data/backend/controle-videos.db "
+sqlite3 data/controle-videos.db "
   SELECT 'users', COUNT(*) FROM User UNION ALL
   SELECT 'shares', COUNT(*) FROM Share UNION ALL
   SELECT 'files', COUNT(*) FROM File UNION ALL

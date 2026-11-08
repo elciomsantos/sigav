@@ -50,10 +50,12 @@ yarn-error.log*
 /frontend/public/sw.*
 
 # project specific
+# /backend/data/ guarda apenas artefatos de E2E/teste (e2e-test, e2e-pw)
 /backend/data/
 /backend/prisma/generated/
 /backend/src/generated/
-/data/
+/data/*
+!/data/.gitkeep
 # local dev database (SQLite)
 /backend/prisma/dev.db
 /backend/prisma/dev.db-journal

@@ -39,7 +39,7 @@ async function seedAdminUser() {
   }
 
   const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL || "file:./data/controle-videos.db",
+    url: process.env.DATABASE_URL || "file:../data/controle-videos.db",
   });
   const prisma = new PrismaClient({ adapter });
 

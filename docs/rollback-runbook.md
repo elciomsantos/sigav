@@ -109,7 +109,7 @@ ls -la /backups/sqlite/
 /opt/scripts/backup/restore.sh sqlite latest
 
 # 4. Verificar integridade
-sqlite3 /opt/app/backend/data/controle-videos.db "PRAGMA integrity_check;"
+sqlite3 /opt/app/data/controle-videos.db "PRAGMA integrity_check;"
 
 # 4. Reiniciar aplicacao
 docker compose start backend

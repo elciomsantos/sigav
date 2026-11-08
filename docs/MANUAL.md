@@ -11,7 +11,7 @@ Este documento reúne os comandos principais para desenvolvimento, teste de hard
 | `docker-compose.local.yml` | **Desenvolvimento local** (padrão) | ❌ HTTP :3000 | ❌ Básico |
 | `docker-compose.staging.yml` | **Overlay hardening** (sobe em cima do local) | ❌ HTTP :3000 | ✅ Completo |
 | `docker-compose.yml` | **Produção** (domínio real + Let's Encrypt) | ✅ HTTPS :443 | ✅ Completo |
-| `docker-compose.prod.yml` | **Produção Swarm/RAID6** (secrets externos, bind mounts `/srv`) | ✅ HTTPS :443 | ✅ Completo |
+| `docker-compose.prod.yml` | **Produção Swarm/disco local** (secrets externos, bind mounts `/opt/app`) | ✅ HTTPS :443 | ✅ Completo |
 | `docker-compose.monitoring.yml` | **Observabilidade** (Prometheus, Grafana, Loki, Promtail, node-exporter) | — | — |
 
 ---
@@ -150,12 +150,12 @@ Ver guia completo em `docs/operacional/DEPLOY.md` e `docs/PLANO-DOMINIO.md`.
 
 ---
 
-## 5. Produção com Docker Swarm / RAID6 (`/srv`)
+## 5. Produção com Docker Swarm / disco local (`/opt/app`)
 
 Usa `docker-compose.prod.yml` com:
 
 - **Secrets externos** (Docker Swarm): `domain`, `acme_email`, `admin_email`, `admin_username`, `admin_password`, `smtp_password`
-- **Bind mounts** para `/srv/controle-share-videos/data` (RAID6)
+- **Bind mounts** para `/opt/app/data` (disco local; host = container)
 - **UID/GID 1002:1002** consistente host↔container
 
 Ver `docs/PLANO-IMPLANTACAO.md` e `docs/operacional/DEPLOY.md` §7–10.
@@ -268,8 +268,8 @@ sudo /opt/controle-share-videos-v1.0/scripts/backup.sh
 # Restore test (valida backup em DB temporário)
 sudo /opt/controle-share-videos-v1.0/scripts/restore-test.sh
 
-# Ver integridade do SQLite
-sqlite3 /srv/controle-share-videos/data/controle-videos.db "PRAGMA integrity_check;"
+# Ver integridade do SQLite (host = container no compose.prod)
+sqlite3 /opt/app/data/controle-videos.db "PRAGMA integrity_check;"
 ```
 
 Ver `docs/operacional/BACKUP_RESTORE.md`.
@@ -306,7 +306,7 @@ docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/hea
 | **Testar hardening (HTTP)** | `docker compose --env-file .env.local -f docker-compose.local.yml -f docker-compose.staging.yml up -d --build` |
 | **Produção (HTTPS + domínio)** | `DOMAIN=... ACME_EMAIL=... ADMIN_PASSWORD=... JWT_SECRET=... docker compose up -d --build` |
 | **Produção IP (HTTP)** | `CADDYFILE=ip ADMIN_PASSWORD=... JWT_SECRET=... docker compose up -d --build` |
-| **Produção Swarm/RAID6** | `docker compose -f docker-compose.prod.yml up -d` |
+| **Produção Swarm/disco local** | `docker compose -f docker-compose.prod.yml up -d` |
 | **Monitoramento** | `docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d` |
 | **Parar dev** | `docker compose --env-file .env.local -f docker-compose.local.yml down` |
 | **Parar dev + staging** | `docker compose --env-file .env.local -f docker-compose.local.yml -f docker-compose.staging.yml down` |

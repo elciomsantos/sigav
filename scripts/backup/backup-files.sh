@@ -10,7 +10,7 @@ set -euo pipefail
 # CONFIGURATION - ADJUST THESE VALUES
 # =============================================================================
 SOURCE_DIRS=(
-    "/opt/app/backend/data/uploads"
+    "/opt/app/data/uploads"
     "/opt/app/frontend/public/img"
 )
 # Debian 13 (trixie): /tmp é tmpfs (~50% RAM) — backups não podem ir para lá.

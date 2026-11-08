@@ -49,7 +49,8 @@ services:
       - NODE_ENV=production
       - TRUST_PROXY=true
       - BACKEND_PORT=8080
-      - DATABASE_URL=file:/opt/app/backend/data/controle-videos.db
+      - DATABASE_URL=file:/opt/app/data/controle-videos.db
+      - DATA_DIRECTORY=/opt/app/data
       - CADDY_DISABLED=true
       # Admin bootstrap from Docker secrets (file-based env so seed reads them)
       - ADMIN_EMAIL_FILE=/run/secrets/admin_email
@@ -64,7 +65,9 @@ services:
       - acme_email
       - domain
       - jwt_secret
-    # Bind mounts to RAID6 — data lives outside the container lifecycle.
+    # Bind mount local disk — data lives outside the container lifecycle.
+    # Caminho host = caminho container (/opt/app/data) para simplificar backup
+    # e restore executados no host.
     # (PLANO_HARDENING_DOCKER item 11) UID/GID consistente: host 1002:1002 =
     # container 1002:1002 (create-user.sh defaults PUID=1002/PGID=1002; runner
     # stage cria controle-user UID 1002). SELinux desativado no host → :z é
@@ -72,8 +75,8 @@ services:
     # frontend montam o MESMO diretório images — :Z (private) causaria conflito
     # de relabeling entre os dois containers em hosts SELinux.
     volumes:
-      - /srv/controle-share-videos/data:/opt/app/backend/data:rw,z
-      - /srv/controle-share-videos/data/images:/opt/app/frontend/public/img:rw,z
+      - /opt/app/data:/opt/app/data:rw,z
+      - /opt/app/data/images:/opt/app/frontend/public/img:rw,z
     # Entrypoint runs migrations, seed, then starts servers via Caddy
     entrypoint: ["sh", "./scripts/docker/create-user.sh"]
     command: ["sh", "./scripts/docker/entrypoint.sh"]
@@ -128,11 +131,11 @@ services:
     secrets:
       - domain
       - jwt_secret
-    # Bind mount to RAID6 — images shared with backend (host: 1002:1002).
+    # Bind mount to local disk — images shared with backend (host: 1002:1002).
     # (PLANO_HARDENING_DOCKER item 11) :z (compartilhado) e não :Z porque o
     # mesmo diretório também é montado pelo backend.
     volumes:
-      - /srv/controle-share-videos/data/images:/opt/app/frontend/public/img:rw,z
+      - /opt/app/data/images:/opt/app/frontend/public/img:rw,z
 
   caddy:
     container_name: controle-share-videos-caddy
@@ -202,8 +205,8 @@ networks:
     name: controle-share-videos-backend
     internal: true
 
-# Bind mounts replace named volumes so persistent data lives on the RAID6
-# disk (/srv/controle-share-videos/data) rather than in
+# Bind mounts replace named volumes so persistent data lives on the local
+# disk at /opt/app/data rather than in
 # /var/lib/docker/volumes. Only caddy-data and caddy-config remain as
 # named volumes (let's-encrypt state, not user data).
 volumes:

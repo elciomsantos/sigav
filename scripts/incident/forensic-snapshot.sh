@@ -88,7 +88,7 @@ crontab -l > "$VOLATILE_DIR/crontab-root.txt" 2>&1 || true
 # 2. BANCO DE DADOS — checkpoint WAL e cópia consistente
 # -----------------------------------------------------------------------------
 log "[2/5] Capturando banco de dados..."
-DB_FILE="${DATA_DIR}/backend/controle-videos.db"
+DB_FILE="${DATA_DIR}/controle-videos.db"
 
 if [[ -f "$DB_FILE" ]]; then
     if command -v sqlite3 >/dev/null 2>&1; then

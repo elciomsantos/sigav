@@ -30,7 +30,8 @@ services:
       - TRUST_PROXY=true
       - NODE_ENV=production
       - BACKEND_PORT=8080
-      - DATABASE_URL=file:/opt/app/backend/data/controle-videos.db
+      - DATABASE_URL=file:/opt/app/data/controle-videos.db
+      - DATA_DIRECTORY=/opt/app/data
       # CORS origin must be set explicitly for production (MED-02). Defaults
       # to https://<DOMAIN>; override with CORS_ORIGIN=http://<ip> for IP access.
       - CORS_ORIGIN=${CORS_ORIGIN:-https://${DOMAIN}}
@@ -41,7 +42,7 @@ services:
       - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD is required. Generate with openssl rand -base64 32.}
     volumes:
-      - backend-data:/opt/app/backend/data
+      - backend-data:/opt/app/data
       - frontend-images:/opt/app/frontend/public/img
 
   frontend:

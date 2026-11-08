@@ -43,7 +43,7 @@ ss -ltnp 'sport = :80 or sport = :443'   # deve virar vazio
 | Arquivo | Quando usar | Secrets | Dados persistentes |
 |---|---|---|---|
 | `docker-compose.yml` | Produção padrão (TLS Let's Encrypt) | variáveis de ambiente (`.env`) | volumes nomeados |
-| `docker-compose.prod.yml` | Produção com Docker Swarm/secrets externos | Docker secrets (arquivo) | bind mounts em `/srv/...` (RAID6) |
+| `docker-compose.prod.yml` | Produção com Docker Swarm/secrets externos | Docker secrets (arquivo) | bind mounts em `/opt/app/data` (disco local) |
 | `docker-compose.local.yml` | Teste local (HTTP, sem TLS) | `.env.local` | volume nomeado (backend-data) |
 | `docker-compose.monitoring.yml` | Stack de observabilidade (prometheus, grafana, loki, promtail) | — | — |
 

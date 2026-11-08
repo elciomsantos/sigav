@@ -223,7 +223,7 @@ Permissões:
 
 ## Banco de Dados
 
-* **SQLite** (arquivo local `./data/controle-videos.db`) via **better-sqlite3** (padrão, WAL mode)
+* **SQLite** (arquivo `/opt/app/data/controle-videos.db` no container) via **better-sqlite3** (padrão, WAL mode)
 * **Prisma 7** (schema em `backend/prisma/schema.prisma`, migrations versionadas)
 * **Models:** User, RefreshToken, LoginToken, ResetPasswordToken, Share, ShareRecipient, File, ShareSecurity, Config, DownloadLog, AuditLog, Session, RecoveryCode (12 models — `ReverseShare` removido; Session + RecoveryCode adicionados Fase 4/5)
 * Suporte nativo a **PostgreSQL/MySQL** trocando apenas `datasource provider` e `DATABASE_URL` (Prisma multi-provider)
@@ -301,7 +301,8 @@ O sistema segue arquitetura **monolítica modular** containerizada, com separaç
                                  ┌─────────────────────────────┐
                                  │      PRISMA ORM             │
                                  │  SQLite (better-sqlite3)    │
-                                 │  /data/controle-videos.db   │
+                                 │  /opt/app/data/             │
+                                 │  controle-videos.db         │
                                  │  (ou PostgreSQL/MySQL)      │
                                  └─────────────┬───────────────┘
                                                │
@@ -310,7 +311,7 @@ O sistema segue arquitetura **monolítica modular** containerizada, com separaç
                 ┌───────────────┐      ┌───────────────┐
                 │  FILE SYSTEM  │      │   CLAMAV      │
                 │  (local disk)│      │ (daemon 3310) │
-                │  ./data/     │      │  opcional     │
+                │ /opt/app/data │      │  opcional     │
                 │  uploads/    │      │  auto-detect  │
                 │  Debian 13   │       └───────────────┘
                 └───────────────┘
@@ -327,12 +328,12 @@ Essa separação facilita manutenção, testes, evolução independente e deploy
 1. Usuário acessa `/upload` (PWA instalável, funciona offline para shell)
 2. Arrasta arquivos no `@mantine/dropzone` → upload **chunked** (config `share.chunkSize`, default 10MB)
 3. Backend recebe chunks em `POST /api/shares/:shareId/files` (raw body, `application/octet-stream`)
-4. Chunks salvos em `./data/uploads/_temp/<shareId>/` como `.tmp-chunk-N`
+4. Chunks salvos em `/opt/app/data/uploads/_temp/<shareId>/` como `.tmp-chunk-N`
 5. Usuário finaliza share → `POST /api/shares/:shareId/complete`
 6. Backend: move chunks → arquivo final, calcula hash, atualiza `File` model. (ClamAV scan removido do fluxo — ver `docs/Padronizacao-07-clamav.md`)
 7. Se scan limpo: share fica `uploadLocked=true`, disponível para download
 8. Se infectado: share + arquivos deletados, log de auditoria
-9. **Geração automática de certificado** (`ShareService.generateCertificates()` — fire-and-forget, falha apenas logada e não bloqueia a conclusão): para cada arquivo do share, o `CertificateService` calcula o hash SHA-256, opcionalmente embute metadados de autenticidade no vídeo via `ffmpeg -metadata` (in-place), gera o PDF A4 (pdfkit) com hash/metadados/share/sistema/eventos e datas em horário de Brasília (UTC-3), salva em `data/uploads/shares/{shareId}/{fileId}.certificado.pdf` e registra um `File` no banco (aparece na listagem e é baixável). Documentação completa em `docs/CERTIFICADO.md`.
+9. **Geração automática de certificado** (`ShareService.generateCertificates()` — fire-and-forget, falha apenas logada e não bloqueia a conclusão): para cada arquivo do share, o `CertificateService` calcula o hash SHA-256, opcionalmente embute metadados de autenticidade no vídeo via `ffmpeg -metadata` (in-place), gera o PDF A4 (pdfkit) com hash/metadados/share/sistema/eventos e datas em horário de Brasília (UTC-3), salva em `/opt/app/data/uploads/shares/{shareId}/{fileId}.certificado.pdf` e registra um `File` no banco (aparece na listagem e é baixável). Documentação completa em `docs/CERTIFICADO.md`.
 10. Operação registrada em `DownloadLog` (tipo upload) e audit trail
 
 ## 9.2 Compartilhamento (Link Seguro)
@@ -451,7 +452,7 @@ Não há job específico de expiração de certificados — o ciclo de vida é o
 * 4+ núcleos CPU (Intel Xeon / AMD EPYC / ARM Neoverse)
 * 16+ GB RAM (recomendado 32 GB para cache Redis + arquivos grandes; ClamAV removido do escopo — ver `docs/Padronizacao-07-clamav.md`)
 * SSD NVMe para sistema operacional + banco de dados
-* **Disco dedicado para armazenamento** (HDD/SSD/SAN/NAS montado em `/opt/app/backend/data` ou volume Docker)
+* **Disco dedicado para armazenamento** (HDD/SSD/SAN/NAS montado em `/opt/app/data` ou volume Docker)
 * Interface de rede 1 Gbps+ (10 Gbps para arquivos grandes)
 * Backup automatizado do volume `data/` (SQLite + uploads + logs)
 
@@ -473,7 +474,7 @@ Não há job específico de expiração de certificados — o ciclo de vida é o
 | `API_URL` | URL interna do backend (para SSR Next) | `http://localhost:8080` |
 | `CORS_ORIGIN` | Origens permitidas (CSV) | `false` (same-origin) |
 | `TRUST_PROXY` | Habilita `X-Forwarded-*` headers | `false` |
-| `DATABASE_URL` | Connection string Prisma | `file:./data/controle-videos.db` |
+| `DATABASE_URL` | Connection string Prisma (relativa a `backend/`; resolve para `/opt/app/data/controle-videos.db` no container) | `file:../data/controle-videos.db` |
 | `JWT_SECRET` | Segredo assinatura JWT (mín 32 chars) | **obrigatório** |
 | `JWT_REFRESH_SECRET` | Segredo refresh token | **obrigatório** |
 | `SMTP_*` | Configurações e-mail | (opcional) |
@@ -555,7 +556,7 @@ O sistema opera continuamente com mecanismos de resiliência:
 
 # 16. Restrições
 
-* O sistema depende de acesso de leitura/escrita ao volume de dados (`/opt/app/backend/data`)
+* O sistema depende de acesso de leitura/escrita ao volume de dados (`/opt/app/data`)
 * O servidor deve possuir espaço suficiente para arquivos + banco + temp + logs
 * Ambiente deve possuir **Node.js 24+** (imagem Docker `node:24-alpine` garante)
 * Banco de dados padrão **SQLite** — para produção com alta concorrência, migrar para **PostgreSQL 15+** ou **MySQL 8+**

@@ -20,7 +20,7 @@ healthcheck `/api/health` falha intermitentemente, uploads falham.
 
 ```bash
 docker logs controle-share-videos-backend 2>&1 | grep -iE "SQLITE_BUSY|database is locked" | tail -10
-docker exec controle-share-videos-backend ls -la /opt/app/backend/data/
+docker exec controle-share-videos-backend ls -la /opt/app/data/
 # Verifica se -wal e -shm existem junto ao .db
 ```
 
@@ -40,7 +40,7 @@ docker exec controle-share-videos-backend ls -la /opt/app/backend/data/
    ```bash
    docker compose stop backend caddy
    docker exec controle-share-videos-backend node -e \
-     "require('better-sqlite3')('/opt/app/backend/data/controle-videos.db').pragma('wal_checkpoint(TRUNCATE)')"
+     "require('better-sqlite3')('/opt/app/data/controle-videos.db').pragma('wal_checkpoint(TRUNCATE)')"
    docker compose start backend caddy
    ```
 
@@ -78,7 +78,7 @@ docker logs controle-share-videos-backend --tail 100
 |---|---|
 | `PrismaClientInitializationError: database is locked` | Ver RUNBOOKS §1 |
 | `PrismaClientInitializationError: table ... does not exist` | Migração incompleta → `docker compose logs backend` para ver `prisma migrate deploy` |
-| `EACCES` / `EROFS` no `/opt/app/backend/data` | Permissão do volume: `ls -la /srv/controle-share-videos/data` (deve ser UID 1002:1002) |
+| `EACCES` / `EROFS` no `/opt/app/data` | Permissão do volume: `ls -la /opt/app/data` (deve ser UID 1002:1002) |
 | `OutOfMemory` / `OOMKilled` | Aumentar `limits.memory` no compose (prod.yml: 2G) ou reiniciar host |
 | `JWT_SECRET not configured` | Variável `.env` ausente → ver DEPLOY.md §3 |
 
@@ -135,14 +135,14 @@ docker logs controle-share-videos-backend 2>&1 | grep -iE "deleteExpiredShares|d
 
 ## 4. Disco cheio / Volume > 80%
 
-**Sintoma:** `df -h /srv/controle-share-videos` mostra uso > 80%; Caddy/backend
+**Sintoma:** `df -h /opt/app/data` mostra uso > 80%; Caddy/backend
 podem falhar com `ENOSPC`.
 
 **Diagnóstico:**
 
 ```bash
-df -h /srv/controle-share-videos
-docker exec controle-share-videos-backend du -sh /opt/app/backend/data
+df -h /opt/app/data
+docker exec controle-share-videos-backend du -sh /opt/app/data
 docker system df
 ```
 

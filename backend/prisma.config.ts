@@ -8,6 +8,6 @@ export default defineConfig({
     seed: "./node_modules/.bin/tsx prisma/seed/config.seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL || "file:./data/controle-videos.db",
+    url: process.env.DATABASE_URL || "file:../data/controle-videos.db",
   },
 });

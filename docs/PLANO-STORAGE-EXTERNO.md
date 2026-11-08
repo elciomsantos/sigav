@@ -310,7 +310,7 @@ sudo mkdir -p /media/videos-a /media/videos-b
 services:
   backend:
     volumes:
-      - /srv/controle-share-videos/data:/opt/app/backend/data:rw,z
+      - /opt/app/data:/opt/app/data:rw,z
       - /media/videos-a:/media/videos-a:ro
       - /media/videos-b:/media/videos-b:ro
       - ./libraries.yaml:/opt/app/libraries.yaml:ro

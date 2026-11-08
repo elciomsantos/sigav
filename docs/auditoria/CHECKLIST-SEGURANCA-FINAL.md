@@ -12,7 +12,7 @@ Item 9, DDoS volumétrico Item 11), já cobertos pelo `docs/GOLIVE-CHECKLIST.md`
 | # | Item | Status | Evidência |
 |---|---|---|---|
 | 1 | Hash de senha | ✅ | Argon2id (`backend/src/constants.ts:25`, memoryCost=128MB/timeCost=4/parallelism=2); access/refresh/share tokens opacos e `LoginToken` com apenas SHA-256 persistido (P0-01 concluído — migration `20261103000000_login_token_hash`, commit `8d06e6e`) |
-| 2 | Criptografia em repouso | 🟡 | **Segredos sensíveis**: AES-256-GCM (`backend/src/config/jwt-secret-crypto.ts`) ✅ · **Vídeos/DB em disco**: texto claro → exigir LUKS/RAID6 no host (procedimento documentado em `HOST-PROVISIONING-ONPREMISE.md` §4; execução pendente — Fase 1 do go-live) |
+| 2 | Criptografia em repouso | 🟡 | **Segredos sensíveis**: AES-256-GCM (`backend/src/config/jwt-secret-crypto.ts`) ✅ · **Vídeos/DB em disco**: texto claro → exigir LUKS no disco local (ou volume dedicado cifrado) no host (procedimento documentado em `HOST-PROVISIONING-ONPREMISE.md` §4; execução pendente — Fase 1 do go-live) |
 | 3 | Criptografia em trânsito | ✅ | TLS via Caddy (Let's Encrypt ou internal CA) + HSTS **com fonte única no Caddy** (P1-04 concluído — `main.ts` não emite HSTS); cookies Secure+httpOnly+sameSite=strict; SMB3 `server smb encrypt = required` (2026-08-22) |
 | 4 | Mascaramento de dados | ✅ | Caddy mascara `pwd=` em query string dos logs (SEC-05); `tokenHash` nunca exposto na API; **whitelist explícita de campos no ShareMapper** (P1-03 concluído — commit `0b223f0`); auditoria não registra senhas |
 | 5 | Validação & Sanitização | ✅ | `I18nValidationPipe` global com DTOs class-validator; `safeRedirectPath` blindado contra protocol-relative/control chars (+9 testes — commit c90567c) — util vive em `frontend/src/utils/router.util.ts` |
@@ -29,7 +29,7 @@ Item 9, DDoS volumétrico Item 11), já cobertos pelo `docs/GOLIVE-CHECKLIST.md`
 
 ## Itens amarelos — plano de fechamento
 
-1. **#2 Criptografia de disco**: aplicar LUKS sobre a RAID6 no provisionamento do host
+1. **#2 Criptografia de disco**: aplicar LUKS no disco local (ou volume dedicado cifrado) no provisionamento do host
    (guia `docs/operacional/HOST-PROVISIONING-ONPREMISE.md` §4 — inclui `cryptsetup`,
    crypttab e validação como evidência da Fase 1) ou validar criptografia
    do volume gerenciado. Verificar na Fase 1 do go-live.

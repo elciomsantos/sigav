@@ -244,14 +244,14 @@ groups:
       # Disk space critical
       - alert: DiskSpaceCritical
         expr: |
-          (node_filesystem_avail_bytes{mountpoint="/opt/app/backend/data"} / node_filesystem_size_bytes{mountpoint="/opt/app/backend/data"}) < 0.1
+          (node_filesystem_avail_bytes{mountpoint="/opt/app/data"} / node_filesystem_size_bytes{mountpoint="/opt/app/data"}) < 0.1
         for: 5m
         labels:
           severity: critical
           category: availability
         annotations:
           summary: "Disk space < 10% on backend data volume"
-          description: "Only {{ $value | humanizePercentage }} free on /opt/app/backend/data. Uploads and database at risk."
+          description: "Only {{ $value | humanizePercentage }} free on /opt/app/data. Uploads and database at risk."
           runbook_url: "https://github.com/elciomsantos/controle-share-videos-v1.0/docs/operacional/MONITORAMENTO.md"
 
       # Memory usage critical

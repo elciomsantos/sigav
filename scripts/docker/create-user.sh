@@ -23,8 +23,8 @@ if ! id -u controle-user > /dev/null 2>&1; then
 fi
 
 # Change ownership of the data directory
-mkdir -p /opt/app/backend/data
-find /opt/app/backend/data \( ! -group "${PGID}" -o ! -user "${PUID}" \) -exec chown "${PUID}:${PGID}" {} +
+mkdir -p /opt/app/data
+find /opt/app/data \( ! -group "${PGID}" -o ! -user "${PUID}" \) -exec chown "${PUID}:${PGID}" {} +
 
 # Change ownership of the frontend public directory
 find /opt/app/frontend/public \( ! -group "${PGID}" -o ! -user "${PUID}" \) -exec chown "${PUID}:${PGID}" {} +
