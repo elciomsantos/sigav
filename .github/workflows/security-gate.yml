@@ -30,6 +30,15 @@ jobs:
   secret-scan:
     name: Secret Scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # gitleaks-action v2 consulta a API de commits do PR
+      # (GET /repos/:owner/:repo/pulls/:n/commits) antes de escanear.
+      # Sem esse escopo o GITHUB_TOKEN recebe 403 "Resource not
+      # accessible by integration" e o job falha em TODO pull_request
+      # (runs 42536714392, 42404982457, 34655786995) — falso positivo
+      # de infraestrutura, sem relação com vazamento detectado.
+      pull-requests: read
     steps:
       - name: Checkout code
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5

@@ -58,7 +58,17 @@ jobs:
       - name: Run ZAP baseline scan
         id: zap
         run: |
+          # A imagem ghcr.io/zaproxy/zaproxy:stable roda como uid 1000
+          # (usuário `zap`), enquanto o runner é uid 1001. Sem escrita no
+          # diretório montado o ZAP não consegue criar /zap/wrk/zap.yaml
+          # ("[Errno 13] Permission denied") e falha ao gerar os
+          # relatórios ("AccessDeniedException /zap/wrk/zap-report.html").
+          # Resultado: zap-report/ fica vazio e o upload-artifact com
+          # if-no-files-found: error derruba o job — aconteceu em TODAS
+          # as 11 execuções desde 2026-08-24. O chmod 0777 libera a
+          # escrita para o uid do container sem rodar o scan como root.
           mkdir -p "$PWD/zap-report"
+          chmod 0777 "$PWD/zap-report"
           set +e
           docker run --rm --network host \
             -v "$PWD/zap-report:/zap/wrk:rw" \
