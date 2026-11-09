@@ -49,4 +49,10 @@ export const BACKEND_ENV = {
   ADMIN_PASSWORD: E2E_ADMIN.password,
   E2E_TOTP_ADMIN_EMAIL: E2E_ADMIN.email,
   E2E_TOTP_ADMIN_SECRET: E2E_TOTP_SECRET,
+  // SEC-1.2/22: o limite padrão é 5 tentativas de login por minuto (chave
+  // conta+IP). A suite loga com o mesmo admin em vários specs dentro da
+  // mesma janela de 60s; com 5 a 6ª tentativa leva 429, a tela volta para
+  // /auth/signIn e os asserts de /auth/totp/ falham de forma intermitente.
+  // O valor alto existe apenas neste ambiente de teste (backend/src/constants.ts).
+  AUTH_LOGIN_THROTTLE_LIMIT: "1000",
 } as Record<string, string>;

@@ -13,6 +13,7 @@ import { Throttle } from "@nestjs/throttler";
 import { User } from "../../prisma/generated/prisma/client";
 import { Request, Response } from "express";
 import { I18nService } from "nestjs-i18n";
+import { AUTH_LOGIN_THROTTLE } from "../constants";
 import { ConfigService } from "../config/config.service";
 import { AuthService } from "./auth.service";
 import { AuthTotpService } from "./authTotp.service";
@@ -176,7 +177,7 @@ export class AuthController {
   // SEC-1.2/15.4: reautenticação forte para operações críticas.
   @Post("reauthenticate")
   @Authenticated()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   @HttpCode(200)
   async reauthenticate(
     @GetUser() user: User,
@@ -346,21 +347,21 @@ export class AuthController {
 
   @Post("totp/enable")
   @Authenticated()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async enableTotp(@GetUser() user: User, @Body() body: EnableTotpDTO) {
     return this.authTotpService.enableTotp(user, body.password);
   }
 
   @Post("totp/verify")
   @Authenticated()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async verifyTotp(@GetUser() user: User, @Body() body: VerifyTotpDTO) {
     return this.authTotpService.verifyTotp(user, body.password, body.code);
   }
 
   @Post("totp/disable")
   @Authenticated()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async disableTotp(@GetUser() user: User, @Body() body: VerifyTotpDTO) {
     return this.authTotpService.disableTotp(user, body.password, body.code);
   }
@@ -368,7 +369,7 @@ export class AuthController {
   // SEC-1.2/15.3: regeneração de recovery codes (uso único, exibidos uma vez).
   @Post("totp/recovery")
   @Authenticated()
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async regenerateRecoveryCodes(
     @GetUser() user: User,
     @Body() body: VerifyTotpDTO,

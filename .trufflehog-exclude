@@ -1,0 +1,18 @@
+# truffleHog — caminhos ignorados (uma regex por linha, aplicada ao path
+# relativo do arquivo no repositório).
+#
+# 1) frontend/public/img/favicon.svg embute um PNG em data-URI base64. Um
+#    trecho aleatório desse blob casa com o detector "TLy" (serviço de
+#    encurtamento de URL) e gera um achado NÃO verificado — que faz o
+#    truffleHog sair com código 183 e derrubar o job "Build Docker Images".
+#    Não é credencial: são bytes de imagem.
+#
+# 2) opencode.json (config local do agente, hoje fora do git — .gitignore)
+#    contém, no commit histórico efc3a63, um GitHub PAT que já foi REVOGADO
+#    e confirmado inativo em 2026-08-24 (ver .gitleaks.toml). O truffleHog
+#    não permite escopo por commit, então a exclusão é por path — o arquivo
+#    atual só tem placeholders ({env:...}), nenhum segredo.
+#
+# Remover uma entrada apenas se o arquivo deixar de existir/mudar de formato.
+^frontend/public/img/favicon\.svg$
+^opencode\.json$
