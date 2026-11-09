@@ -1,0 +1,113 @@
+# PR automático para branches de correção.
+#
+# Push em `fix/*` abre (uma única vez) um pull request para `main`. Sem esse
+# workflow o push nessas branches não dispara PR algum: `ci.yml` escuta
+# `push` em `main`/`fix/*` (só o CI roda) e os demais workflows dependem de
+# `pull_request`. O PR, uma vez aberto, passa a receber os commits novos
+# automaticamente e é ele que dispara o CI/Security Gate.
+#
+# Nenhuma action de terceiro: usa o `gh` CLI já presente no runner, com o
+# GITHUB_TOKEN e o mínimo de permissões (pull-requests: write).
+
+name: Auto PR
+
+on:
+  push:
+    branches: ["fix/*"]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch de origem (vazio = branch atual)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auto-pr-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  open-pull-request:
+    name: Abrir PR para main
+    runs-on: ubuntu-latest
+    if: github.ref_name != 'main' || inputs.branch != ''
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.branch || github.ref }}
+
+      - name: Abrir (ou manter) pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE_BRANCH: main
+          HEAD_BRANCH: ${{ inputs.branch || github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          BRANCH="$HEAD_BRANCH"
+          BASE="$BASE_BRANCH"
+
+          if [ -z "$BRANCH" ]; then
+            echo "::error::Branch de origem vazia (necessária em workflow_dispatch)."
+            exit 1
+          fi
+
+          OPEN=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
+            --json number --jq '.[].number')
+          if [ -n "$OPEN" ]; then
+            echo "::notice::Já existe PR aberto de $BRANCH → $BASE; nada a fazer. Commits novos entram no PR automaticamente."
+            gh pr list --head "$BRANCH" --base "$BASE" --state open \
+              --json number,url --jq '.[] | "PR #\(.number): \(.url)"'
+            exit 0
+          fi
+
+          # Branch já mergeada: não reabrir PR duplicado.
+          MERGED=$(gh pr list --head "$BRANCH" --base "$BASE" --state merged \
+            --json number --jq '.[].number')
+          if [ -n "$MERGED" ]; then
+            echo "::notice::$BRANCH já possui PR mergeado em $BASE; PR não recriado."
+            exit 0
+          fi
+
+          git fetch origin "$BASE" --quiet
+
+          MERGE_BASE=$(git merge-base "origin/$BASE" HEAD)
+          COMMITS=$(git log --no-decorate --pretty='- %s (%h)' \
+            "$MERGE_BASE"..HEAD)
+
+          if [ -z "$COMMITS" ]; then
+            echo "::notice::$BRANCH não tem commits além de $BASE; PR não criado."
+            exit 0
+          fi
+
+          TITLE=$(git log -1 --no-decorate --pretty=%s)
+
+          # O repositório pode estar com "Allow GitHub Actions to create and
+          # approve pull requests" desligado (Settings → Actions → General →
+          # Workflow permissions). Nesse caso o GITHUB_TOKEN leva 403 no
+          # createPullRequest mesmo com `pull-requests: write` no job. Como
+          # criar PR é conveniência — e não um gate de qualidade — o job
+          # apenas avisa e segue verde; assim que a opção for ligada, o
+          # próximo push passa a criar o PR sem mais nenhuma mudança.
+          if ! PR_URL=$(gh pr create \
+            --base "$BASE" \
+            --head "$BRANCH" \
+            --title "$TITLE" \
+            --body "$(printf 'PR aberto automaticamente pelo workflow **Auto PR**.\n\nBranch `%s` → `%s`\n\nCommits incluídos:\n\n%s\n\n> Novos commits na branch entram neste PR automaticamente; o workflow não recria PR quando já existe um aberto.\n' "$BRANCH" "$BASE" "$COMMITS")" 2>&1); then
+            if echo "$PR_URL" | grep -q "not permitted to create or approve pull requests"; then
+              echo "::warning::$PR_URL"
+              echo "::warning::O GITHUB_TOKEN está impedido de criar PRs. Habilite 'Allow GitHub Actions to create and approve pull requests' em Settings → Actions → General → Workflow permissions (ou use manualmente o botão 'Compare & pull request'). O CI segue verde."
+              exit 0
+            fi
+            echo "::error::$PR_URL"
+            exit 1
+          fi
+
+          echo "::notice::PR criado: $PR_URL"
