@@ -334,6 +334,12 @@ jobs:
     needs: [backend, frontend]
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5
+        with:
+          # truffleHog usa o source `git` do próprio checkout: com clone
+          # raso (padrão, depth 1) ele não resolve os commits
+          # ("error chunking dir: unable to resolve commit") e escaneia 0
+          # chunks — o step passava verde sem analisar nada.
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
@@ -414,7 +420,13 @@ jobs:
         uses: trufflesecurity/trufflehog@421026a6540c63cf143ef53a5859389d473e88da # main
         with:
           path: ./
-          extra_args: --json
+          # Pin explícito: com `latest` o conjunto de detectores muda entre
+          # runs — o mesmo commit passou em um run e falhou em outro (falso
+          # positivo novo do detector TLy).
+          version: 3.99.8
+          # Ignora o falso positivo documentado em .trufflehog-exclude
+          # (PNG base64 embutido no favicon.svg).
+          extra_args: --json --exclude-paths .trufflehog-exclude
 
   e2e:
     name: E2E (Playwright)
