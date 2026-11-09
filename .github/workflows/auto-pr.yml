@@ -1,9 +1,8 @@
 # PR automático para branches de correção.
 #
-# Push em `fix/*` ou `fix-dev` abre (uma única vez) um pull request para
-# `main`. Sem esse workflow o push nessas branches não disparava nada:
-# `ci.yml` só escuta `push` em `main`/`fix/*` — e `fix-dev` não casa com
-# `fix/*` (não tem a barra) — enquanto os demais workflows dependem de
+# Push em `fix/*` abre (uma única vez) um pull request para `main`. Sem esse
+# workflow o push nessas branches não dispara PR algum: `ci.yml` escuta
+# `push` em `main`/`fix/*` (só o CI roda) e os demais workflows dependem de
 # `pull_request`. O PR, uma vez aberto, passa a receber os commits novos
 # automaticamente e é ele que dispara o CI/Security Gate.
 #
@@ -14,7 +13,7 @@ name: Auto PR
 
 on:
   push:
-    branches: ["fix/*", "fix-dev"]
+    branches: ["fix/*"]
   workflow_dispatch:
     inputs:
       branch:
@@ -90,8 +89,25 @@ jobs:
 
           TITLE=$(git log -1 --no-decorate --pretty=%s)
 
-          gh pr create \
+          # O repositório pode estar com "Allow GitHub Actions to create and
+          # approve pull requests" desligado (Settings → Actions → General →
+          # Workflow permissions). Nesse caso o GITHUB_TOKEN leva 403 no
+          # createPullRequest mesmo com `pull-requests: write` no job. Como
+          # criar PR é conveniência — e não um gate de qualidade — o job
+          # apenas avisa e segue verde; assim que a opção for ligada, o
+          # próximo push passa a criar o PR sem mais nenhuma mudança.
+          if ! PR_URL=$(gh pr create \
             --base "$BASE" \
             --head "$BRANCH" \
             --title "$TITLE" \
-            --body "$(printf 'PR aberto automaticamente pelo workflow **Auto PR**.\n\nBranch `%s` → `%s`\n\nCommits incluídos:\n\n%s\n\n> Novos commits na branch entram neste PR automaticamente; o workflow não recria PR quando já existe um aberto.\n' "$BRANCH" "$BASE" "$COMMITS")"
+            --body "$(printf 'PR aberto automaticamente pelo workflow **Auto PR**.\n\nBranch `%s` → `%s`\n\nCommits incluídos:\n\n%s\n\n> Novos commits na branch entram neste PR automaticamente; o workflow não recria PR quando já existe um aberto.\n' "$BRANCH" "$BASE" "$COMMITS")" 2>&1); then
+            if echo "$PR_URL" | grep -q "not permitted to create or approve pull requests"; then
+              echo "::warning::$PR_URL"
+              echo "::warning::O GITHUB_TOKEN está impedido de criar PRs. Habilite 'Allow GitHub Actions to create and approve pull requests' em Settings → Actions → General → Workflow permissions (ou use manualmente o botão 'Compare & pull request'). O CI segue verde."
+              exit 0
+            fi
+            echo "::error::$PR_URL"
+            exit 1
+          fi
+
+          echo "::notice::PR criado: $PR_URL"
