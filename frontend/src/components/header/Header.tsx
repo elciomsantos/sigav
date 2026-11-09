@@ -270,29 +270,26 @@ const Header = () => {
               <Text fw={600}>{config.get("general.appName")}</Text>
             </Group>
           </Link>
-          <Group gap={5} style={{ "@media (max-width: 767px)": { display: "none" } } as React.CSSProperties}>
+          {/* visibleFrom/hiddenFrom geram as media queries via MantineProvider —
+              um style={{ "@media ..." }} seria descartado pelo React. */}
+          <Group gap={5} visibleFrom="sm">
             <Group>{desktopItems}</Group>
           </Group>
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            style={{ "@media (min-width: 768px)": { display: "none" } } as React.CSSProperties}
-            size="sm"
-          />
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         </Container>
       </Box>
       <Transition transition="scale-y" duration={20} mounted={opened}>
         {(styles) => (
           <Paper
+            hiddenFrom="sm"
             style={{
               marginBottom: theme.spacing.md,
               borderTopRightRadius: 0,
               borderTopLeftRadius: 0,
               overflow: "hidden",
               width: "100%",
-              "@media (min-width: 768px)": { display: "none" },
               ...styles,
-            } as React.CSSProperties}
+            }}
             withBorder
           >
             <Stack gap={0}>
