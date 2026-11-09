@@ -6,7 +6,7 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 // é idempotente (update). Sem top-level await (tsx do backend).
 async function main() {
   const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL || "file:./data/controle-videos.db",
+    url: process.env.DATABASE_URL || "file:../data/controle-videos.db",
   });
   const prisma = new PrismaClient({ adapter });
 

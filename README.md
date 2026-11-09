@@ -183,7 +183,7 @@ docker compose up -d --build
 
 Requer as variáveis `DOMAIN`, `ACME_EMAIL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` e `JWT_SECRET` (env ou `.env`). Não há mais secrets em arquivos — credenciais entram via variáveis de ambiente.
 
-Para produção com Docker Swarm/secrets externos e dados em RAID6 (`/srv`):
+Para produção com Docker Swarm/secrets externos e dados no disco local (`/opt/app/data`):
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d
@@ -441,7 +441,7 @@ docker compose up -d --build
 |---|---|
 | `docker-compose.yml` | Produção padrão (backend, frontend, caddy; admin e TLS via variáveis de ambiente — `DOMAIN`, `ACME_EMAIL`, `ADMIN_*`, `JWT_SECRET`) |
 | `docker-compose.local.yml` | Ambiente de teste local — topologia de produção (backend, frontend e caddy em containers separados), sem TLS, entrada única `:3000`, com `.env.local` |
-| `docker-compose.prod.yml` | Produção com secrets externos (Docker Swarm), TLS via Caddy 2.9 e dados em RAID6 (`/srv/controle-share-videos`) |
+| `docker-compose.prod.yml` | Produção com secrets externos (Docker Swarm), TLS via Caddy 2.9 e dados no disco local (`/opt/app/data`) |
 | `docker-compose.monitoring.yml` | Observabilidade (prometheus, alertmanager, grafana, loki, promtail, node-exporter) |
 
 O serviço `caddy` monta `Caddyfile.${CADDYFILE:-prod}` em

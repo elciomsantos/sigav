@@ -1,0 +1,49 @@
+# =============================================================================
+# docker-compose.preprod.yml — overlay de ENSAIO pré-produção (mesmo host)
+# =============================================================================
+# Objetivo: rodar o MESMO docker-compose.prod.yml no servidor que será o de
+# produção, para validar storage, secrets, permissões, backup/restore e TLS
+# ANTES do go-live. Depois do aceite, o stack é removido e a produção é criada
+# limpa (ver docs/operacional/ENSAIO-PRE-PRODUCAO.md).
+#
+# Este overlay NÃO é para produção. Ele apenas:
+#   1. usa o Caddyfile.lan (TLS autoassinado `tls internal`) para acesso por
+#      IP/hostname interno, sem depender de domínio público/Let's Encrypt;
+#   2. renomeia os containers para `preprod-*`, evitando confusão com o stack
+#      final e permitindo remover só o ensaio;
+#   3. define um project name próprio (volumes de ensaio isolados).
+#
+# O restante (imagem `target: runner`, bind mount /opt/app/data, secrets do
+# Swarm, hardening, healthchecks) vem integralmente de docker-compose.prod.yml.
+#
+# Uso (exige LAN_HOST; IP ou hostname que os clientes usarão):
+#   LAN_HOST=192.168.0.10 \
+#   docker compose -f docker-compose.prod.yml -f docker-compose.preprod.yml up -d --build
+#
+# Acesso: https://<LAN_HOST>  (aviso de certificado autoassinado na 1ª visita)
+#
+# Remoção do ensaio:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.preprod.yml down -v --remove-orphans
+#   (o bind mount /opt/app/data NÃO é removido por `down -v`; apague manualmente
+#    depois de confirmar que não há nada que você queira preservar)
+# =============================================================================
+
+name: controle-share-videos-preprod
+
+services:
+  backend:
+    container_name: preprod-controle-share-videos-backend
+
+  frontend:
+    container_name: preprod-controle-share-videos-frontend
+
+  caddy:
+    container_name: preprod-controle-share-videos-caddy
+    environment:
+      # Caddyfile.lan usa estas variáveis para emitir o certificado com o
+      # IP/hostname correto como SAN (e default_sni para conexões por IP).
+      LAN_HOST: "${LAN_HOST:?LAN_HOST required (ex: 192.168.0.10)}"
+      TLS_EXTRA_HOSTS: "${TLS_EXTRA_HOSTS:-${LAN_HOST}}"
+    volumes:
+      # Substitui o Caddyfile.prod montado pelo compose base.
+      - ./reverse-proxy/Caddyfile.lan:/etc/caddy/Caddyfile:ro

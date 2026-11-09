@@ -133,8 +133,8 @@ simples + cron, ou Prometheus quando v1.2 estiver disponível):
 | Frontend `unhealthy` | porta 3333 não responde | ALTO | RUNBOOKS §2 |
 | SQLite lock contention | `SQLITE_BUSY` > 5/min | ALTO | RUNBOOKS §1 |
 | Job de limpeza falhou | erro em `deleteExpiredShares` no log | MÉDIO | RUNBOOKS §3 |
-| Disco > 80% | `df` no volume `/srv/...` | ALTO | RUNBOOKS §4 |
-| Disco > 95% | `df` no volume `/srv/...` | CRÍTICO | RUNBOOKS §4 |
+| Disco > 80% | `df` no volume `/opt/app/data` | ALTO | RUNBOOKS §4 |
+| Disco > 95% | `df` no volume `/opt/app/data` | CRÍTICO | RUNBOOKS §4 |
 | Latência p95 > 500ms | métrica de API (ex: via Caddy logs) | MÉDIO | Avaliar Redis/migração |
 | 429 excessivo | > 50 req/s rejeitadas no edge | MÉDIO | Ajustar `Caddyfile.prod` |
 | Falha de emissão TLS | Caddy repetindo `obtain certificate` | ALTO | Verificar DNS/ACME_EMAIL |
@@ -150,7 +150,7 @@ o webhook pela sua ferramenta):
 set -euo pipefail
 BK=$(docker exec controle-share-videos-backend  curl -fs http://127.0.0.1:8080/api/health 2>/dev/null || echo ERR)
 FR=$(docker exec controle-share-videos-frontend curl -fs http://127.0.0.1:3333 2>/dev/null || echo ERR)
-DISK=$(df -P /srv/controle-share-videos 2>/dev/null | awk 'NR==2{gsub(/%/,"",$5); print $5}')
+DISK=$(df -P /opt/app/data 2>/dev/null | awk 'NR==2{gsub(/%/,"",$5); print $5}')
 [ "$BK" = "OK" ] && [ "$FR" != "ERR" ] || alert "Controle-Share: backend=$BK frontend=$FR"
 [ "${DISK:-0}" -lt 80 ] || alert "Controle-Share: disco em ${DISK}%"
 # agende com: */5 * * * * /usr/local/bin/csv-health.sh

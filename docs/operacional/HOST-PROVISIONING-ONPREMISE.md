@@ -64,20 +64,25 @@ sudo sshd -t && sudo systemctl restart ssh
 ## 4. Criptografia de disco (LUKS) — Item #2 do checklist
 
 O checklist de segurança exige vídeos e banco **cifrados em repouso**. O compose
-não cifra o volume Docker: a cifra é feita na camada de bloco do host. Faça esta
-etapa **antes** de criar `/srv/controle-share-videos` e subir o stack — se o host
-já estiver em uso, o caminho seguro é backup → recriar o volume → restore
-(janela de manutenção).
+não cifra o volume Docker: a cifra é feita na camada de bloco do host.
 
-> **Decisão registrada:** LUKS2 sobre a RAID6 (`/dev/md0`) com passphrase
+> **Mudança de topologia:** os dados agora ficam no **disco local do sistema**
+> em `/opt/app/data` (bind mount do `docker-compose.prod.yml`), e não mais em
+> um drive externo/RAID6. Se o disco raiz já é cifrado (LUKS/dm-crypt na
+> instalação do Debian), o item #2 está atendido — registre a evidência e pule
+> para a §5. Se o disco local **não** é cifrado, use a camada de bloco do
+> sistema antes de criar os dados.
+>
+> **Procedimento opcional (volume dedicado):** LUKS2 sobre um dispositivo
+> dedicado (`/dev/md0` neste exemplo) montado em `/opt/app`, com passphrase
 > guardada fora do host (cofre/serviço de segredos). Se a empresa optar por
 > volume gerenciado com criptografia nativa (cloud/EBS, storage com SED etc.),
 > anexar a comprovação ao aceite de risco da Fase 5 e marcar o item como N/A —
 > não deixar a decisão implícita.
 
-### 4.1 Pré-requisitos
+### 4.1 Pré-requisitos (apenas para volume dedicado)
 
-- RAID6 já montada (`/dev/md0`) e **sem file system em uso**;
+- dispositivo/RAID já montado (`/dev/md0`) e **sem file system em uso**;
 - `cryptsetup` instalado (seção 1);
 - console/IPMI ou segundo acesso SSH disponível — se o desbloqueio falhar, o
   boot para no `initramfs`.
@@ -100,8 +105,8 @@ sudo mkfs.ext4 -L appdata /dev/mapper/app_crypt
 ### 4.3 Montagem e desbloqueio no boot
 
 ```bash
-sudo mkdir -p /srv/controle-share-videos
-echo 'appdata /srv/controle-share-videos ext4 defaults,nofail 0 2' | sudo tee -a /etc/fstab
+sudo mkdir -p /opt/app
+echo 'appdata /opt/app ext4 defaults,nofail 0 2' | sudo tee -a /etc/fstab
 # /etc/crypttab: <nome> <dispositivo> <keyfile|none> <opções>
 echo 'app_crypt /dev/md0 none luks' | sudo tee -a /etc/crypttab
 sudo update-initramfs -u                  # Debian/Ubuntu
@@ -114,11 +119,11 @@ a escolha no aceite de risco.
 ### 4.4 Validar (Fase 1 do go-live)
 
 ```bash
-lsblk -f                                  # crypt + ext4 montado em /srv/controle-share-videos
+lsblk -f                                  # crypt + ext4 montado em /opt/app
 sudo cryptsetup status app_crypt          # type: LUKS2, cipher: aes-xts-plain64
-findmnt /srv/controle-share-videos        # confirma a montagem cifrada
+findmnt /opt/app                          # confirma a montagem cifrada
 sudo cryptsetup luksDump /dev/md0 | grep -E 'Version|Cipher|PBKDF'
-sudo touch /srv/controle-share-videos/.luks-test && sync
+sudo touch /opt/app/.luks-test && sync
 ```
 
 Registre a saída dos comandos como evidência na **Fase 1** do
@@ -129,11 +134,12 @@ de 🟡 depois dessa marcação.
 
 ```bash
 # Mesmo caminho bind-mountado por docker-compose.prod.yml (dados + imagens).
-# Criar DEPOIS de montar o volume LUKS da seção 4 — senão o Docker cria o
-# diretório como root no disco raiz e o backup/criptografia ficam errados.
-sudo mkdir -p /srv/controle-share-videos/data/images
-sudo chown -R 1002:1002 /srv/controle-share-videos/data
-sudo chmod 750 /srv/controle-share-videos/data
+# Criar DEPOIS de montar o volume cifrado da seção 4 (se aplicável) — senão o
+# Docker cria o diretório como root no disco raiz e o backup/criptografia ficam
+# errados.
+sudo mkdir -p /opt/app/data/images
+sudo chown -R 1002:1002 /opt/app/data
+sudo chmod 750 /opt/app/data
 
 # Secrets exigidos por docker-compose.prod.yml (valores do .env.production.local)
 printf '%s' "<ADMIN_EMAIL>"     | sudo docker secret create admin_email -

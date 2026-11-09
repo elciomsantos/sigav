@@ -296,7 +296,7 @@ Resposta 429 com countdown lendo header `Retry-After` (UX honesta).
 |---|---|
 | `docker-compose.yml` | Produção padrão (backend + frontend + caddy; config via env/secrets) |
 | `docker-compose.local.yml` | Teste local — container único, Swagger dev-only |
-| `docker-compose.prod.yml` | Produção com Swarm secrets externos, dados em RAID6 (`/srv`) |
+| `docker-compose.prod.yml` | Produção com Swarm secrets externos, dados no disco local (`/opt/app/data`) |
 | `docker-compose.staging.yml` | Homologação |
 | `docker-compose.monitoring.yml` | Observabilidade completa |
 

@@ -3,17 +3,20 @@ import * as path from "path";
 
 export const CONFIG_FILE = process.env.CONFIG_FILE || "../config.yaml";
 
-export const DATA_DIRECTORY = process.env.DATA_DIRECTORY || "./data";
+// DATA_DIRECTORY é o diretório de dados persistente da aplicação (DB,
+// uploads, audit-worm). O padrão `../data` resolve para /opt/app/data no
+// container (cwd=/opt/app/backend) e para <repo>/data em desenvolvimento.
+export const DATA_DIRECTORY = process.env.DATA_DIRECTORY || "../data";
 // Imagens usadas no cabeçalho padrão dos certificados (logo + brasão). Em
 // produção o build copia backend/assets/images para o container; localmente
-// aponta para ./assets/images relativo ao DATA_DIRECTORY.
+// aponta para ./assets/images relativo ao cwd do backend.
 export const CERTIFICATE_ASSETS_DIRECTORY =
   process.env.CERTIFICATE_ASSETS_DIRECTORY ||
-  path.resolve(path.dirname(DATA_DIRECTORY), "assets/images");
+  path.resolve("assets/images");
 export const SHARE_DIRECTORY = `${DATA_DIRECTORY}/uploads/shares`;
 export const DATABASE_URL =
   process.env.DATABASE_URL ||
-  "file:./data/controle-videos.db";
+  "file:../data/controle-videos.db";
 
 export const LOG_LEVEL_AVAILABLE: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error', 'fatal'];
 export const LOG_LEVEL_DEFAULT: LogLevel = process.env.NODE_ENV === 'development' ? "verbose" : "log";

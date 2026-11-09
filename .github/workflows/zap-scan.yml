@@ -34,7 +34,7 @@ jobs:
           docker run -d --name zap-target \
             -e NODE_ENV=production \
             -e BACKEND_PORT=8080 \
-            -e DATABASE_URL=file:/opt/app/backend/data/controle-videos.db \
+            -e DATABASE_URL=file:/opt/app/data/controle-videos.db \
             -e CORS_ORIGIN=http://localhost:3000 \
             -e ADMIN_EMAIL=admin@zap-scan.local \
             -e ADMIN_USERNAME=admin \

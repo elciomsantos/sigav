@@ -324,7 +324,7 @@ docker inspect controle-share-videos-backend | grep -i readonly
 ```bash
 # Verify WAL mode
 docker exec controle-share-videos-backend \
-  sqlite3 /opt/app/backend/data/controle-videos.db "PRAGMA journal_mode;"
+  sqlite3 /opt/app/data/controle-videos.db "PRAGMA journal_mode;"
 # Expected: wal
 
 # Verify backup integrity

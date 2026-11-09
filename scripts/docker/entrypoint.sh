@@ -32,7 +32,8 @@ PORT=3333 HOSTNAME=0.0.0.0 node server.js &
 
 # Run the backend server (NestJS)
 cd /opt/app/backend
-export DATABASE_URL="${DATABASE_URL:-file:./data/controle-videos.db}"
+export DATA_DIRECTORY="${DATA_DIRECTORY:-/opt/app/data}"
+export DATABASE_URL="${DATABASE_URL:-file:/opt/app/data/controle-videos.db}"
 ./node_modules/.bin/prisma migrate deploy
 # NOTE: use the COMPILED seeds from dist/ (not tsx on prisma/seed/*.ts). The
 # image ships only dist/, and the source seeds import from src/ (e.g.

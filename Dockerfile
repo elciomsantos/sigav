@@ -179,8 +179,8 @@ COPY ./reverse-proxy /opt/app/reverse-proxy
 COPY ./scripts/docker /opt/app/scripts/docker
 
 # Data directories
-RUN mkdir -p /opt/app/backend/data /opt/app/frontend/public/img && \
-    chown -R controle-user:controle-group /opt/app/backend/data /opt/app/frontend/public/img
+RUN mkdir -p /opt/app/data /opt/app/frontend/public/img && \
+    chown -R controle-user:controle-group /opt/app/data /opt/app/frontend/public/img
 
 # Expose backend (NestJS) and frontend (Next.js standalone) ports.
 # Caddy is disabled in production (CADDY_DISABLED=true); the external

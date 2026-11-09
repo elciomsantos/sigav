@@ -180,10 +180,10 @@ check_kms_access() {
 check_disk_space() {
     log "Verificando espaço em disco local..."
     local usage
-    usage=$(df /opt/app/backend/data --output=pcent | tail -1 | tr -dc '0-9')
+    usage=$(df /opt/app/data --output=pcent | tail -1 | tr -dc '0-9')
     if [[ $usage -gt 85 ]]; then
         warn "Espaço em disco alto: ${usage}%"
-        send_slack "⚠️ *DISCO CHEIO* - Uso: ${usage}% em /opt/app/backend/data"
+        send_slack "⚠️ *DISCO CHEIO* - Uso: ${usage}% em /opt/app/data"
     else
         success "Espaço em disco OK: ${usage}%"
     fi

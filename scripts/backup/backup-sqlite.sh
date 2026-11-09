@@ -9,7 +9,7 @@ set -euo pipefail
 # =============================================================================
 # CONFIGURATION - ADJUST THESE VALUES
 # =============================================================================
-DB_PATH="${DB_PATH:-/opt/app/backend/data/controle-videos.db}"
+DB_PATH="${DB_PATH:-/opt/app/data/controle-videos.db}"
 # Debian 13 (trixie): /tmp é tmpfs (~50% RAM) — backups não podem ir para lá.
 BACKUP_DIR="${BACKUP_DIR:-/var/tmp/sqlite-backups}"
 S3_BUCKET="${S3_BUCKET:-s3://controle-share-videos-backups/sqlite}"

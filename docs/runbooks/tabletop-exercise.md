@@ -38,7 +38,7 @@ Validar o runbook de IR, identificar gaps no processo, treinar a equipe em cená
 
 ### Cenário B: Ransomware no Volume de Uploads (SEV-1)
 >
-> **Situação:** Usuário relata "arquivos com extensão .locked". Logs mostram processo desconhecido criptografando `/opt/app/backend/data/uploads`. Container backend ainda responde.
+> **Situação:** Usuário relata "arquivos com extensão .locked". Logs mostram processo desconhecido criptografando `/opt/app/data/uploads`. Container backend ainda responde.
 >
 > **Perguntas-guia:**
 >

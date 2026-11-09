@@ -6,7 +6,7 @@ import * as crypto from "crypto";
 import * as path from "path";
 
 async function main() {
-  const adapter = new PrismaBetterSqlite3({ url: "file:./data/controle-videos.db" });
+  const adapter = new PrismaBetterSqlite3({ url: "file:../data/controle-videos.db" });
   const prisma = new PrismaClient({ adapter });
 
   // Clean previous test data
@@ -34,7 +34,7 @@ async function main() {
   });
 
   // Create a small fake video file
-  const videoDir = path.join("data", "uploads", "testshare2");
+  const videoDir = path.join("..", "data", "uploads", "testshare2");
   fs.mkdirSync(videoDir, { recursive: true });
   const fileId = crypto.randomUUID();
   const videoPath = path.join(videoDir, fileId);

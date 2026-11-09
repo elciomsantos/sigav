@@ -1,5 +1,6 @@
 backend/dist/
 backend/node_modules/
+# Dados locais (DB, uploads, audit-worm): nunca vão para a imagem.
 backend/data
 
 frontend/node_modules/

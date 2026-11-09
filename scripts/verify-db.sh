@@ -5,7 +5,7 @@
 # =============================================================================
 set -euo pipefail
 
-DB_FILE="${DB_FILE:-/opt/app/backend/data/controle-videos.db}"
+DB_FILE="${DB_FILE:-/opt/app/data/controle-videos.db}"
 
 echo "=== Database integrity check ==="
 echo "Database: ${DB_FILE}"
