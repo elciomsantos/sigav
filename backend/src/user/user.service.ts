@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger, Optional } from "@nestjs/common";
-import { Prisma } from "../../prisma/generated/prisma/client";
+import { Prisma, User } from "../../prisma/generated/prisma/client";
 import * as crypto from "crypto";
 import argon from "argon2";
 import { I18nService } from "nestjs-i18n";
@@ -98,9 +98,24 @@ export class UserService {
     }
   }
 
-  async update(id: string, user: UpdateUserDto) {
+  async update(
+    id: string,
+    user: UpdateUserDto,
+  ): Promise<{ user: User; temporaryPassword?: string }> {
     try {
-      const hash = user.password && (await argon.hash(user.password, ARGON2_OPTIONS));
+      let hash = user.password && (await argon.hash(user.password, ARGON2_OPTIONS));
+      let temporaryPassword: string | undefined;
+
+      // Reset de senha pelo administrador: mesma geração aleatória usada na
+      // criação de usuário — a senha é devolvida uma única vez para o admin
+      // entregá-la ao usuário por canal seguro.
+      if (user.generatePassword) {
+        const passwordLength = this.config.getNumber(
+          "share.generatedPasswordLength",
+        );
+        temporaryPassword = this.generateSecurePassword(passwordLength);
+        hash = await argon.hash(temporaryPassword, ARGON2_OPTIONS);
+      }
 
       const existing = await this.prisma.user.findUnique({ where: { id } });
       if (!existing)
@@ -158,7 +173,8 @@ export class UserService {
       if (deactivated || privilegeChanged || hash) {
         await this.prisma.refreshToken.deleteMany({ where: { userId: id } });
 
-        // SEC-1.2/§29.4: audita o evento de segurança correspondente.
+        // SEC-1.2/12: revoga todas as sessões em eventos de segurança —
+        // desativação do usuário, alteração de privilégios ou troca de senha.
         if (deactivated || privilegeChanged) {
           void this.auditService?.record(AuditEvent.SESSION_REVOKED, {
             userId: id,
@@ -167,6 +183,15 @@ export class UserService {
             metadata: { deactivated, privilegeChanged },
           });
         }
+      }
+
+      // SEC-1.2/§29.4: troca de senha administrativa (manual ou gerada).
+      if (hash) {
+        void this.auditService?.record(AuditEvent.PASSWORD_CHANGED, {
+          userId: id,
+          result: "success",
+          metadata: { generated: !!temporaryPassword },
+        });
       }
 
       if (user.role && user.role !== existing.role) {
@@ -188,7 +213,7 @@ export class UserService {
         });
       }
 
-      return updated;
+      return { user: updated, temporaryPassword };
     } catch (e) {
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
