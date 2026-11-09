@@ -399,6 +399,7 @@ export default {
 
   // /upload
   "upload.title": "Carregar",
+  "upload.greeting": "Bem-vindo, {username}",
   "upload.notify.confirm-leave": "Você tem certeza que deseja sair desta página? Seu envio será cancelado.",
   "upload.notify.generic-error": "Ocorreu um erro ao terminar seu compartilhamento.",
   "upload.notify.count-failed": "Falha ao enviar {count} arquivos. Tentando novamente.",

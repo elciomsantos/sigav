@@ -2,6 +2,8 @@ import { useModals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Center, Stack, Text } from "@mantine/core";
+import { FormattedMessage } from "react-intl";
 import Meta from "../../components/Meta";
 import Dropzone from "../../components/upload/Dropzone";
 import FileList from "../../components/upload/FileList";
@@ -291,6 +293,19 @@ const Upload = ({
     }
   }, [files, createdShare, pendingGeneratedPassword]);
 
+  // Mesma normalização de papel usada no getRoleBadge (admin/auditor/operador).
+  const getRoleLabelKey = () => {
+    const role = user?.isAdmin ? "admin" : user?.role || "operador";
+    switch (role) {
+      case "admin":
+        return "roles.admin";
+      case "auditor":
+        return "roles.auditor";
+      default:
+        return "roles.operador";
+    }
+  };
+
   return (
     <div
       style={{
@@ -304,6 +319,21 @@ const Upload = ({
       }}
     >
       <Meta title={t("upload.title")} />
+      {user && (
+        <Center mb="lg">
+          <Stack gap={4} align="center">
+            <Text size="xl" fw={700}>
+              <FormattedMessage
+                id="upload.greeting"
+                values={{ username: user.username }}
+              />
+            </Text>
+            <Text size="sm" c="dimmed">
+              <FormattedMessage id={getRoleLabelKey()} />
+            </Text>
+          </Stack>
+        </Center>
+      )}
       <Dropzone
         maxShareSize={maxShareSize}
         currentFilesSize={currentFilesSize}
