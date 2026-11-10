@@ -358,6 +358,7 @@ function App({ Component, pageProps }: AppProps) {
                       >
                         <Header />
                         <Container
+                          className="app-content"
                           size={
                             [
                               "/admin/download-logs",
@@ -368,6 +369,14 @@ function App({ Component, pageProps }: AppProps) {
                               : undefined
                           }
                           style={{
+                            // A coluna de conteúdo é flex para a página
+                            // preencher a altura entre cabeçalho e rodapé.
+                            // width: 100% é obrigatório: o Container do Mantine
+                            // usa margin-inline: auto e, como item flex de uma
+                            // coluna, essas margens automáticas o encolheriam
+                            // para a largura do conteúdo (shrink-to-fit),
+                            // estreitando o card de login e as demais telas.
+                            width: "100%",
                             display: "flex",
                             flexDirection: "column",
                             flexGrow: 1,

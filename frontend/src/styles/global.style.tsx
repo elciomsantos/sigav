@@ -4,6 +4,12 @@ const GlobalStyle = () => {
       dangerouslySetInnerHTML={{
         __html: `
           a { color: inherit; text-decoration: none; }
+          /* A coluna de conteúdo do layout é flex (para a página preencher a
+             altura). Numa coluna flex, um Container do Mantine filho direto
+             encolheria para a largura do conteúdo por causa das margens
+             automáticas — width: 100% devolve o comportamento de bloco,
+             respeitando o max-width de cada tela. */
+          .app-content > .mantine-Container-root { width: 100%; }
           /* Cabeçalho com tom levemente mais escuro que o corpo branco, para a
              tela não ficar inteiramente branca. */
           [data-mantine-color-scheme='light'] .app-header {
