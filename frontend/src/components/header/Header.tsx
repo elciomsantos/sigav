@@ -246,6 +246,7 @@ const Header = () => {
     <>
       <Box
         component="header"
+        className="app-header"
         h={HEADER_HEIGHT}
         mb={0}
         style={{ zIndex: 1 }}

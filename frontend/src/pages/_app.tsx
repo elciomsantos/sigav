@@ -344,7 +344,18 @@ function App({ Component, pageProps }: AppProps) {
                       justify="space-between"
                       style={{ minHeight: "100vh" }}
                     >
-                      <div>
+                      {/* A coluna do meio ocupa a altura restante para que a
+                          página preencha exatamente o espaço entre o cabeçalho
+                          e o rodapé — sem ela, um conteúdo com minHeight: 100vh
+                          (tela de upload) estourava a viewport e criava a barra
+                          de rolagem. */}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          flexGrow: 1,
+                        }}
+                      >
                         <Header />
                         <Container
                           size={
@@ -356,6 +367,11 @@ function App({ Component, pageProps }: AppProps) {
                               ? "xl"
                               : undefined
                           }
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            flexGrow: 1,
+                          }}
                         >
                           <Component {...pageProps} />
                         </Container>

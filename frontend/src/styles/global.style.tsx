@@ -4,6 +4,16 @@ const GlobalStyle = () => {
       dangerouslySetInnerHTML={{
         __html: `
           a { color: inherit; text-decoration: none; }
+          /* Cabeçalho com tom levemente mais escuro que o corpo branco, para a
+             tela não ficar inteiramente branca. */
+          [data-mantine-color-scheme='light'] .app-header {
+            background-color: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+          }
+          [data-mantine-color-scheme='dark'] .app-header {
+            background-color: #1f2023;
+            border-bottom: 1px solid #373a40;
+          }
           [data-mantine-color-scheme='dark'] table.md, [data-mantine-color-scheme='dark'] table.md th:nth-of-type(odd), [data-mantine-color-scheme='dark'] table.md td:nth-of-type(odd) {
             background: rgba(50, 50, 50, 0.5);
           }
