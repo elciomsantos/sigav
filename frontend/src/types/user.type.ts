@@ -24,6 +24,7 @@ export type UpdateUser = {
   username?: string;
   email?: string;
   password?: string;
+  generatePassword?: boolean;
   isAdmin?: boolean;
   role?: string;
   isActivated?: boolean;

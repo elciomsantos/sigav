@@ -23,7 +23,7 @@ import {
   withReauth,
 } from "../../../utils/reauth.util";
 import toast from "../../../utils/toast.util";
-import { copyToClipboard } from "../../../utils/clipboard.util";
+import showTemporaryPasswordModal from "./showTemporaryPasswordModal";
 
 type ModalsContextProps = ReturnType<typeof useModals>;
 
@@ -147,39 +147,7 @@ const Body = ({
               .then((result) => {
                 getUsers();
                 if (result.temporaryPassword) {
-                  modals.openConfirmModal({
-                    title: t("admin.users.modal.create.temporaryPassword"),
-                    children: (
-                      <Stack gap="md">
-                        <p>{t("admin.users.modal.create.temporaryPassword.warning")}</p>
-                        <div
-                          style={{
-                            background: "var(--mantine-color-gray-1)",
-                            padding: "md",
-                            borderRadius: "md",
-                            fontFamily: "monospace",
-                            wordBreak: "break-all",
-                          }}
-                        >
-                          {result.temporaryPassword}
-                        </div>
-                        <Button
-                          onClick={() => {
-                            copyToClipboard(result.temporaryPassword);
-                            toast.success(t("common.notify.copied"));
-                          }}
-                        >
-                          {t("common.button.copy")}
-                        </Button>
-                      </Stack>
-                    ),
-                    labels: {
-                      confirm: t("common.button.done"),
-                      cancel: t("common.button.cancel"),
-                    },
-                    cancelProps: { style: { display: "none" } },
-                    onClose: () => modals.closeAll(),
-                  });
+                  showTemporaryPasswordModal(modals, result.temporaryPassword);
                 } else {
                   modals.closeAll();
                 }

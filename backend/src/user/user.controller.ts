@@ -56,7 +56,10 @@ export class UserController {
     @GetUser() user: User,
     @Body() data: UpdateOwnUserDTO,
   ) {
-    return new UserDTO().from(await this.userService.update(user.id, data) as unknown as Partial<UserDTO>);
+    return new UserDTO().from(
+      (await this.userService.update(user.id, data))
+        .user as unknown as Partial<UserDTO>,
+    );
   }
 
   @Delete("me")
@@ -111,10 +114,17 @@ export class UserController {
   ) {
     // SEC-1.2/15.4: o admin não altera a própria senha por este canal — deve
     // usar a página "Trocar senha" da própria conta.
-    if (id === currentUser.id && user.password) {
+    if (id === currentUser.id && (user.password || user.generatePassword)) {
       throw new ForbiddenException(this.i18n.t("auth.cannotChangeOwnPassword"));
     }
-    return new UserDTO().from(await this.userService.update(id, user) as unknown as Partial<UserDTO>);
+    const result = await this.userService.update(id, user);
+    if (result.temporaryPassword) {
+      return {
+        user: new UserDTO().from(result.user as unknown as Partial<UserDTO>),
+        temporaryPassword: result.temporaryPassword,
+      };
+    }
+    return new UserDTO().from(result.user as unknown as Partial<UserDTO>);
   }
 
   @Delete(":id")

@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import * as yup from "yup";
 import { showBlockingErrorModal } from "../core/showBlockingErrorModal";
+import showForgotPasswordModal from "./showForgotPasswordModal";
 import useConfig from "../../hooks/config.hook";
 import useUser from "../../hooks/user.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
@@ -229,16 +230,26 @@ if (response.data["loginToken"]) {
           />
           {showForgotPasswordLink ? (
             <Group justify="flex-end" mt="xs">
-              <Anchor component={Link} href="/auth/resetPassword" size="xs">
+              <Button
+                variant="subtle"
+                size="xs"
+                px={0}
+                onClick={() => showForgotPasswordModal(modals)}
+              >
                 <FormattedMessage id="signin.forgot-password" />
-              </Anchor>
+              </Button>
             </Group>
           ) : (
             config.get("smtp.enabled") && (
               <Group justify="flex-end" mt="xs">
-                <Anchor component={Link} href="/auth/resetPassword" size="xs">
+                <Button
+                  variant="subtle"
+                  size="xs"
+                  px={0}
+                  onClick={() => showForgotPasswordModal(modals)}
+                >
                   <FormattedMessage id="resetPassword.title" />
-                </Anchor>
+                </Button>
               </Group>
             )
           )}

@@ -6,6 +6,7 @@ import {
   PasswordInput,
   Select,
   Stack,
+  Switch,
   Text,
   TextInput,
 } from "@mantine/core";
@@ -20,6 +21,7 @@ import userService from "../../../services/user.service";
 import User from "../../../types/user.type";
 import { withReauth } from "../../../utils/reauth.util";
 import toast from "../../../utils/toast.util";
+import showTemporaryPasswordModal from "./showTemporaryPasswordModal";
 
 type ModalsContextProps = ReturnType<typeof useModals>;
 
@@ -109,12 +111,14 @@ const Body = ({
   const passwordForm = useForm({
     initialValues: {
       password: "",
+      generatePassword: false,
     },
     validate: (values) => {
       const schema = yup.object().shape({
-        password: yup
-          .string()
-          .min(8, t("common.error.too-short", { length: 8 })),
+        // Com geração automática o campo manual fica vazio e é ignorado.
+        password: values.generatePassword
+          ? yup.string()
+          : yup.string().min(8, t("common.error.too-short", { length: 8 })),
       });
       try {
         schema.validateSync(values, { abortEarly: false });
@@ -187,27 +191,27 @@ const Body = ({
               <FormattedMessage id="admin.users.edit.update.change-password.title" />
             </Accordion.Control>
             <Accordion.Panel>
-              {passwordChanged && (
-                <Alert
-                  icon={<TbCheck size={18} />}
-                  color="green"
-                  variant="light"
-                  mb="sm"
-                >
-                  <FormattedMessage id="admin.users.edit.update.notify.password.success" />
-                </Alert>
-              )}
               <form
                 onSubmit={passwordForm.onSubmit((values) => {
                   const run = () =>
                     userService.update(user.id, {
-                      password: values.password,
+                      password: values.generatePassword
+                        ? undefined
+                        : values.password,
+                      generatePassword: values.generatePassword,
                     });
-                  const done = () => {
+                  const done = (result: { temporaryPassword?: string }) => {
                     setPasswordChanged(true);
-                    toast.success(
-                      t("admin.users.edit.update.notify.password.success"),
-                    );
+                    if (result?.temporaryPassword) {
+                      showTemporaryPasswordModal(
+                        modals,
+                        result.temporaryPassword,
+                      );
+                    } else {
+                      toast.success(
+                        t("admin.users.edit.update.notify.password.success"),
+                      );
+                    }
                   };
                   run()
                     .then(done)
@@ -215,10 +219,32 @@ const Body = ({
                 })}
               >
                 <Stack>
-                  <PasswordInput
-                    label={t("admin.users.edit.update.change-password.field")}
-                    {...passwordForm.getInputProps("password")}
+                  {passwordChanged && (
+                    <Alert
+                      icon={<TbCheck size={18} />}
+                      color="green"
+                      variant="light"
+                      mb="sm"
+                    >
+                      <FormattedMessage id="admin.users.edit.update.notify.password.success" />
+                    </Alert>
+                  )}
+                  <Switch
+                    labelPosition="left"
+                    label={t("admin.users.modal.create.generatePassword")}
+                    description={t(
+                      "admin.users.modal.create.generatePassword.description",
+                    )}
+                    {...passwordForm.getInputProps("generatePassword", {
+                      type: "checkbox",
+                    })}
                   />
+                  {!passwordForm.values.generatePassword && (
+                    <PasswordInput
+                      label={t("admin.users.edit.update.change-password.field")}
+                      {...passwordForm.getInputProps("password")}
+                    />
+                  )}
                   <Button variant="light" type="submit">
                     <FormattedMessage id="admin.users.edit.update.change-password.button" />
                   </Button>

@@ -294,7 +294,10 @@ const Upload = ({
   return (
     <div
       style={{
-        minHeight: "100vh",
+        // A altura vem do layout (_app.tsx): preenche o espaço entre o
+        // cabeçalho e o rodapé. Um minHeight: 100vh aqui somava os 146px do
+        // chrome e criava barra de rolagem na tela.
+        flexGrow: 1,
         backgroundImage: "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('/img/tela-fundo.png')",
         backgroundSize: "40% auto",
         backgroundRepeat: "no-repeat",
