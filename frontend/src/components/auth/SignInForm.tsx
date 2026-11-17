@@ -199,14 +199,14 @@ if (response.data["loginToken"]) {
   return (
     <div
       style={{
-        // Preenche o espaço entre cabeçalho e rodapé e centraliza o bloco de
-        // login: logotipo no topo, formulário e identificação SIGAV abaixo.
+        // Preenche o espaço entre cabeçalho e rodapé. O logotipo do topo fica
+        // a 15mm da borda superior dessa área; o restante vem abaixo dele.
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "1.5rem 1rem 2rem",
+        justifyContent: "flex-start",
+        padding: "15mm 1rem 2rem",
       }}
     >
       <div style={{ width: "100%", maxWidth: 420 }}>
@@ -292,7 +292,7 @@ if (response.data["loginToken"]) {
           style={{
             display: "block",
             width: "100%",
-            maxWidth: 200,
+            maxWidth: 300,
             height: "auto",
             margin: "1.5rem auto 0",
           }}
