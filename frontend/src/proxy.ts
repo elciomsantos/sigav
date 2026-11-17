@@ -117,7 +117,9 @@ export default async function proxy(request: NextRequest) {
       path: "/",
     },
     {
-      condition: user && routes.unauthenticated.contains(route),
+      // Logado: /auth/* ainda vai para /upload, mas a home (/) continua
+      // acessível — o ícone da navbar deve mostrar a landing page sem "piscar".
+      condition: user && route !== "/" && routes.unauthenticated.contains(route),
       path: "/upload",
     },
     {
@@ -142,7 +144,9 @@ export default async function proxy(request: NextRequest) {
       path: "/upload",
     },
     {
-      condition: (!getConfig("general.showHomePage") || user) && route == "/",
+      // A home é exibida inclusive para usuários autenticados; só é ocultada
+      // quando o administrador desabilita general.showHomePage.
+      condition: !getConfig("general.showHomePage") && route == "/",
       path: "/upload",
     },
     {

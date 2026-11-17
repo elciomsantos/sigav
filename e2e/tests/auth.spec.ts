@@ -9,6 +9,14 @@ test.describe("Autenticação (E2E)", () => {
     await expect(page.getByRole("button", { name: "Carregar Videos" })).toBeVisible();
   });
 
+  test("icone da navbar abre a home para usuario autenticado", async ({ page }) => {
+    await loginAsAdmin(page);
+    await page.locator('a[href="/"]').first().click();
+    await expect(page).toHaveURL(`${BASE_URL}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Carregar Videos" })).toHaveCount(0);
+  });
+
   test("login com senha inválida exibe erro no campo de senha", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth/signIn`);
     await expect(page.getByAltText("Logotipo SIGAV")).toBeVisible();

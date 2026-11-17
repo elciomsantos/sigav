@@ -21,9 +21,13 @@ const SignIn = ({ redirectPath }: { redirectPath?: string | null }) => {
 
   // Sanitiza uma única vez: query ?redirect= nunca vai direto ao
   // router.replace (open redirect via "//host" — issue #41).
-  const safeRedirect = safeRedirectPath(redirectPath ?? undefined);
+  const requestedRedirect = safeRedirectPath(redirectPath ?? undefined);
+  // Sem ?redirect= explícito o pós-login vai direto para a aplicação. Passar
+  // por "/" faria a home aparecer por um instante antes da navegação.
+  const safeRedirect =
+    requestedRedirect === "/" ? "/upload" : requestedRedirect;
 
-  const [isLoading, setIsLoading] = useState(safeRedirect !== "/" ? true : false);
+  const [isLoading, setIsLoading] = useState(requestedRedirect !== "/");
 
   // If the access token is expired, the middleware redirects to this page.
   // If the refresh token is still valid, the user will be redirected to the last page.
