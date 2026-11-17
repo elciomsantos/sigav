@@ -6,6 +6,7 @@ import {
   Paper,
   PasswordInput,
   Text,
+  useMantineColorScheme,
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -31,6 +32,8 @@ const SignInForm = ({ redirectPath }: { redirectPath: string }) => {
   const modals = useModals();
   const t = useTranslate();
   const { refreshUser } = useUser();
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
 
   const [showForgotPasswordLink, setShowForgotPasswordLink] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
@@ -199,29 +202,17 @@ if (response.data["loginToken"]) {
   return (
     <div
       style={{
-        // Preenche o espaço entre cabeçalho e rodapé e centraliza o bloco de
-        // login: logotipo no topo, formulário e identificação SIGAV abaixo.
+        // Preenche o espaço entre cabeçalho e rodapé. O cartão de login fica
+        // a 15mm da borda superior dessa área.
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "1.5rem 1rem 2rem",
+        justifyContent: "flex-start",
+        padding: "15mm 1rem 2rem",
       }}
     >
       <div style={{ width: "100%", maxWidth: 420 }}>
-        {/* Substitui o texto "Bem-vindo de volta" por uma imagem menor. */}
-        <img
-          src="/img/SIGAV_logo_login.png"
-          alt="Logotipo SIGAV"
-          style={{
-            display: "block",
-            width: "100%",
-            maxWidth: 240,
-            height: "auto",
-            margin: "0 auto 1.25rem",
-          }}
-        />
         <Container size={420} p={0} m={0}>
           {config.get("share.allowRegistration") && (
             <Text color="dimmed" size="sm" ta="center" mt={5}>
@@ -231,7 +222,26 @@ if (response.data["loginToken"]) {
               </Anchor>
             </Text>
           )}
-          <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+          <Paper
+            withBorder
+            shadow="md"
+            p={30}
+            radius="md"
+            bg={isDark ? "#2b2d31" : "#f8f9fa"}
+            style={{ borderColor: isDark ? "#3b3e45" : "#dee2e6" }}
+          >
+            {/* Substitui o texto "Bem-vindo de volta" dentro do cartão. */}
+            <img
+              src="/img/SIGAV_logo_login.png"
+              alt="Logotipo SIGAV"
+              style={{
+                display: "block",
+                width: "100%",
+                maxWidth: 240,
+                height: "auto",
+                margin: "0 auto 1.25rem",
+              }}
+            />
             <form
               onSubmit={form.onSubmit((values) => {
                 signIn(values.emailOrUsername, values.password);
@@ -286,15 +296,19 @@ if (response.data["loginToken"]) {
             </form>
           </Paper>
         </Container>
+        {/* Brasão abaixo do cartão, em tamanho contido para não repetir a
+            logomarca e manter o formulário como foco da tela. */}
         <img
-          src="/img/SIGAV.png"
-          alt="SIGAV"
+          src="/img/brasao_tela_fundo.png"
+          alt="Brasão SIGAV"
           style={{
             display: "block",
-            width: "100%",
-            maxWidth: 200,
+            width: "auto",
             height: "auto",
-            margin: "1.5rem auto 0",
+            maxWidth: 140,
+            maxHeight: 165,
+            objectFit: "contain",
+            margin: "1.25rem auto 0",
           }}
         />
       </div>
