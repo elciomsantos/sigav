@@ -1,9 +1,7 @@
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { FormattedMessage } from "react-intl";
-import useTranslate, {
-  translateOutsideContext,
-} from "../../hooks/useTranslate.hook";
+import { translateOutsideContext } from "../../hooks/useTranslate.hook";
 
 type ModalsContextProps = ReturnType<typeof useModals>;
 

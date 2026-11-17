@@ -1,8 +1,6 @@
 import { Button, Stack } from "@mantine/core";
 import { useModals } from "@mantine/modals";
-import useTranslate, {
-  translateOutsideContext,
-} from "../../../hooks/useTranslate.hook";
+import { translateOutsideContext } from "../../../hooks/useTranslate.hook";
 import { copyToClipboard } from "../../../utils/clipboard.util";
 import toast from "../../../utils/toast.util";
 
