@@ -14,7 +14,6 @@ import {
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { TbInfinity, TbServer, TbShieldLock } from "react-icons/tb";
 import { FormattedMessage } from "react-intl";
@@ -26,20 +25,15 @@ import useUser from "../hooks/user.hook";
 export default function Home() {
   const theme = useMantineTheme();
   const colorScheme = useComputedColorScheme("light");
-  const { refreshUser } = useUser();
+  const { user } = useUser();
   const config = useConfig();
-  const router = useRouter();
   const [signupEnabled, setSignupEnabled] = useState(true);
   const isMobile = useMediaQuery("(max-width: 575px)");
 
-  // If user is already authenticated, redirect to the upload page
+  // A home também é exibida para usuários autenticados (o proxy não desvia
+  // mais "/" para /upload). Sem redirect client-side: ele só pintava a tela
+  // antes de navegar e causava o "piscar" ao clicar no ícone da navbar.
   useEffect(() => {
-    refreshUser().then((user) => {
-      if (user) {
-        router.replace("/upload");
-      }
-    });
-
     // If registration is disabled, the "start" button should redirect to the sign-in page
     try {
       const allowRegistration = config.get("share.allowRegistration");
@@ -54,7 +48,10 @@ export default function Home() {
   const surfaceColor = isDark ? theme.colors.dark[6] : theme.white;
   const borderColor = isDark ? theme.colors.dark[4] : theme.colors.gray[2];
 
-  const getButtonHref = () => (signupEnabled ? "/auth/signUp" : "/auth/signIn");
+  // Para quem já entrou, o botão da home leva à aplicação; para visitantes,
+  // ao cadastro ou ao login conforme a configuração de registro.
+  const getButtonHref = () =>
+    user ? "/upload" : signupEnabled ? "/auth/signUp" : "/auth/signIn";
 
   const heroBackground = isDark
     ? `radial-gradient(800px 420px at 85% -10%, ${primary[8]}40, transparent 60%), ${theme.colors.dark[7]}`
