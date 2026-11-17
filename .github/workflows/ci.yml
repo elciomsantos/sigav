@@ -59,10 +59,19 @@ jobs:
           # No backend a cadeia foi eliminada via override de chokidar@4 no
           # nestjs-i18n; a exclusão é no-op lá. Remover quando upstream
           # publicar correção.
+          # GHSA-fc5q-39xc-vjpf (picomatch — ReDoS via extglobs repetidos):
+          # sem versão corrigida upstream (<=4.0.7 vulneráveis,
+          # first_patched_version=null; 4.0.7 é a latest em 2026-11-17).
+          # Cadeia 100% dev-time/build-time: eslint (eslint-config-next ->
+          # @next/eslint-plugin-next -> fast-glob -> micromatch -> picomatch@2)
+          # e vitest/vite (picomatch@4); padrões são paths internos de linter e
+          # test runner, sem input controlável por atacante. `npm audit
+          # --omit=dev` do frontend = 0 vulnerabilidades. Remover quando
+          # upstream publicar correção (>4.0.7).
           npm audit --audit-level=high --json > npm-audit.json || true
           node -e '
             const fs = require("fs");
-            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm"];
+            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm", "GHSA-fc5q-39xc-vjpf"];
             const a = JSON.parse(fs.readFileSync("npm-audit.json", "utf8"));
             const vs = a.vulnerabilities || {};
             const blocked = Object.entries(vs).filter(([name, v]) =>
@@ -261,10 +270,19 @@ jobs:
           # do frontend = 0 vulnerabilidades) e o @serwist@9.5.13 fixa as
           # versões de zod/glob de forma exata, sem fix upstream aplicável
           # ainda. Remover quando @serwist atualizar zod/glob.
+          # GHSA-fc5q-39xc-vjpf (picomatch — ReDoS via extglobs repetidos):
+          # sem versão corrigida upstream (<=4.0.7 vulneráveis,
+          # first_patched_version=null; 4.0.7 é a latest em 2026-11-17).
+          # Cadeia 100% dev-time/build-time: eslint (eslint-config-next ->
+          # @next/eslint-plugin-next -> fast-glob -> micromatch -> picomatch@2)
+          # e vitest/vite (picomatch@4); padrões são paths internos de linter e
+          # test runner, sem input controlável por atacante. `npm audit
+          # --omit=dev` do frontend = 0 vulnerabilidades. Remover quando
+          # upstream publicar correção (>4.0.7).
           npm audit --audit-level=high --json > npm-audit.json || true
           node -e '
             const fs = require("fs");
-            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm", "GHSA-mrhx-c7xc-m3w5"];
+            const EXCLUDED = ["GHSA-vfj7-8cjw-p6xm", "GHSA-mrhx-c7xc-m3w5", "GHSA-fc5q-39xc-vjpf"];
             const a = JSON.parse(fs.readFileSync("npm-audit.json", "utf8"));
             const vs = a.vulnerabilities || {};
             const blocked = Object.entries(vs).filter(([name, v]) =>
