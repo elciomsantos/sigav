@@ -41,7 +41,7 @@ const SignIn = ({ redirectPath }: { redirectPath?: string | null }) => {
 
   return (
     <>
-      <Meta title={t("signin.title")} />
+      <Meta title={t("signin.button.submit")} />
       <SignInForm redirectPath={safeRedirect} />
     </>
   );

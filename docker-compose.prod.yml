@@ -87,6 +87,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: frontend-runner
+      args:
+        # Versão exibida no rodapé; exportada pelo deploy-prod.sh a cada deploy.
+        - APP_VERSION=${APP_VERSION:-}
     restart: unless-stopped
     networks:
       - backend-net

@@ -5,10 +5,8 @@ import {
   Group,
   Paper,
   PasswordInput,
-
   Text,
   TextInput,
-  Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useModals } from "@mantine/modals";
@@ -201,61 +199,56 @@ if (response.data["loginToken"]) {
   return (
     <div
       style={{
-        // Preenche o espaço entre cabeçalho e rodapé (o container do layout
-        // já é flex) para o brasão servir de fundo da tela inteira. O gradiente
-        // claro mantém o título legível sobre a imagem.
+        // Preenche o espaço entre cabeçalho e rodapé e centraliza o bloco de
+        // login: logotipo no topo, formulário e identificação SIGAV abaixo.
         flexGrow: 1,
-        backgroundImage:
-          "linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('/img/brasao_tela_fundo.png')",
-        backgroundSize: "contain",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        padding: "1rem",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1.5rem 1rem 2rem",
       }}
     >
-      <Container size={420} my={40}>
-        <Title order={2} ta="center" fw={900}>
-          <FormattedMessage id="signin.title" />
-        </Title>
-        {config.get("share.allowRegistration") && (
-          <Text color="dimmed" size="sm" ta="center" mt={5}>
-            <FormattedMessage id="signin.description" />{" "}
-            <Anchor component={Link} href={"signUp"} size="sm">
-              <FormattedMessage id="signin.button.signup" />
-            </Anchor>
-          </Text>
-        )}
-        <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-          <form
-            onSubmit={form.onSubmit((values) => {
-              signIn(values.emailOrUsername, values.password);
-            })}
-          >
-            <TextInput
-              label={t("signin.input.email-or-username")}
-              placeholder={t("signin.input.email-or-username.placeholder")}
-              {...form.getInputProps("emailOrUsername")}
-            />
-            <PasswordInput
-              label={t("signin.input.password")}
-              placeholder={t("signin.input.password.placeholder")}
-              mt="md"
-              {...form.getInputProps("password")}
-            />
-            {showForgotPasswordLink ? (
-              <Group justify="flex-end" mt="xs">
-                <Button
-                  variant="subtle"
-                  size="xs"
-                  px={0}
-                  onClick={() => showForgotPasswordModal(modals)}
-                >
-                  <FormattedMessage id="signin.forgot-password" />
-                </Button>
-              </Group>
-            ) : (
-              config.get("smtp.enabled") && (
+      <div style={{ width: "100%", maxWidth: 420 }}>
+        {/* Substitui o texto "Bem-vindo de volta" por uma imagem menor. */}
+        <img
+          src="/img/SIGAV_logo_login.png"
+          alt="Logotipo SIGAV"
+          style={{
+            display: "block",
+            width: "100%",
+            maxWidth: 240,
+            height: "auto",
+            margin: "0 auto 1.25rem",
+          }}
+        />
+        <Container size={420} p={0} m={0}>
+          {config.get("share.allowRegistration") && (
+            <Text color="dimmed" size="sm" ta="center" mt={5}>
+              <FormattedMessage id="signin.description" />{" "}
+              <Anchor component={Link} href={"signUp"} size="sm">
+                <FormattedMessage id="signin.button.signup" />
+              </Anchor>
+            </Text>
+          )}
+          <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+            <form
+              onSubmit={form.onSubmit((values) => {
+                signIn(values.emailOrUsername, values.password);
+              })}
+            >
+              <TextInput
+                label={t("signin.input.email-or-username")}
+                placeholder={t("signin.input.email-or-username.placeholder")}
+                {...form.getInputProps("emailOrUsername")}
+              />
+              <PasswordInput
+                label={t("signin.input.password")}
+                placeholder={t("signin.input.password.placeholder")}
+                mt="md"
+                {...form.getInputProps("password")}
+              />
+              {showForgotPasswordLink ? (
                 <Group justify="flex-end" mt="xs">
                   <Button
                     variant="subtle"
@@ -263,24 +256,48 @@ if (response.data["loginToken"]) {
                     px={0}
                     onClick={() => showForgotPasswordModal(modals)}
                   >
-                    <FormattedMessage id="resetPassword.title" />
+                    <FormattedMessage id="signin.forgot-password" />
                   </Button>
                 </Group>
-              )
-            )}
-            <Button
-              fullWidth
-              mt="xl"
-              type="submit"
-              disabled={showCountdown}
-            >
-              {showCountdown
-                ? t("signin.rate-limited.description", { seconds: countdown })
-                : <FormattedMessage id="signin.button.submit" />}
-            </Button>
-          </form>
-        </Paper>
-      </Container>
+              ) : (
+                config.get("smtp.enabled") && (
+                  <Group justify="flex-end" mt="xs">
+                    <Button
+                      variant="subtle"
+                      size="xs"
+                      px={0}
+                      onClick={() => showForgotPasswordModal(modals)}
+                    >
+                      <FormattedMessage id="resetPassword.title" />
+                    </Button>
+                  </Group>
+                )
+              )}
+              <Button
+                fullWidth
+                mt="xl"
+                type="submit"
+                disabled={showCountdown}
+              >
+                {showCountdown
+                  ? t("signin.rate-limited.description", { seconds: countdown })
+                  : <FormattedMessage id="signin.button.submit" />}
+              </Button>
+            </form>
+          </Paper>
+        </Container>
+        <img
+          src="/img/SIGAV.png"
+          alt="SIGAV"
+          style={{
+            display: "block",
+            width: "100%",
+            maxWidth: 200,
+            height: "auto",
+            margin: "1.5rem auto 0",
+          }}
+        />
+      </div>
     </div>
   );
 };

@@ -51,6 +51,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: frontend-runner
+      args:
+        # Versão exibida no rodapé (derive do git e exporte antes do build).
+        - APP_VERSION=${APP_VERSION:-}
     restart: unless-stopped
     networks:
       - app-network

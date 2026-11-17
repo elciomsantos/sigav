@@ -1,4 +1,11 @@
-import { Anchor, Box as MFooter, SimpleGrid, Text } from "@mantine/core";
+import {
+  Anchor,
+  Badge,
+  Box as MFooter,
+  Group,
+  SimpleGrid,
+  Text,
+} from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import useConfig from "../../hooks/config.hook";
 import useTranslate from "../../hooks/useTranslate.hook";
@@ -25,13 +32,30 @@ const Footer = () => {
 
   const isMobile = useMediaQuery("(max-width: 700px)");
 
+  // Identificação do sistema com a versão resolvida em build-time pelo git
+  // (next.config.js). Centraliza numa única função para os dois layouts.
+  const systemId = (align: "center" | "left") => (
+    <Group gap={6} justify={align === "left" ? "flex-start" : "center"} wrap="wrap">
+      <Text size="xs" c="dimmed" component="span">
+        SIGAV
+      </Text>
+      <Badge
+        size="xs"
+        variant="light"
+        color="blue"
+        aria-label="Versão do sistema"
+        style={{ textTransform: "none", letterSpacing: 0 }}
+      >
+        {process.env.VERSION || "dev"}
+      </Badge>
+    </Group>
+  );
+
   return (
     <MFooter component="footer" h="auto" py={6} px="xl" style={{ zIndex: 100 }}>
       {!config.get("legal.enabled") && (
         <>
-          <Text size="xs" c="dimmed" ta="center">
-            Controle Share Videos · Uso Institucional
-          </Text>
+          {systemId("center")}
           <Text size="xs" c="dimmed" ta="center">
             Secretaria Municipal de Defesa Social de Londrina
           </Text>
@@ -41,9 +65,7 @@ const Footer = () => {
         <SimpleGrid cols={isMobile ? 2 : 3} m={0}>
           {!isMobile && <div></div>}
           <div>
-            <Text size="xs" c="dimmed" ta={isMobile ? "left" : "center"}>
-              Controle Share Videos · Uso Institucional
-            </Text>
+            {systemId(isMobile ? "left" : "center")}
             <Text size="xs" c="dimmed" ta={isMobile ? "left" : "center"}>
               Secretaria Municipal de Defesa Social de Londrina
             </Text>
