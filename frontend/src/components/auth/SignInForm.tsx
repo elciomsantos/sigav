@@ -296,15 +296,19 @@ if (response.data["loginToken"]) {
             </form>
           </Paper>
         </Container>
+        {/* Brasão abaixo do cartão, em tamanho contido para não repetir a
+            logomarca e manter o formulário como foco da tela. */}
         <img
-          src="/img/SIGAV.png"
-          alt="SIGAV"
+          src="/img/brasao_tela_fundo.png"
+          alt="Brasão SIGAV"
           style={{
             display: "block",
-            width: "100%",
-            maxWidth: 300,
+            width: "auto",
             height: "auto",
-            margin: "1.5rem auto 0",
+            maxWidth: 140,
+            maxHeight: 165,
+            objectFit: "contain",
+            margin: "1.25rem auto 0",
           }}
         />
       </div>
