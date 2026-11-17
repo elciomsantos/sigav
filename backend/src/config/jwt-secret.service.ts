@@ -292,20 +292,24 @@ export class JwtSecretService {
     }
     if (!Array.isArray(parsed)) return [];
 
-    const cutoff = Date.now() - JwtSecretService.MAX_AGE_MS;
+    // Um único instante para todas as entradas legadas: chamar Date.now()
+    // por entrada pode fazer o sort abaixo trocar a ordem delas quando a
+    // conversão cruza um milissegundo (falha intermitente em `test:coverage`).
+    const now = Date.now();
+    const cutoff = now - JwtSecretService.MAX_AGE_MS;
     return parsed
       .map((entry): { secret: string; rotatedAt: number } | null => {
         if (typeof entry === "string" && entry.length > 0) {
           // Legacy plain-string entry (no rotation timestamp) — treat as fresh
           // so it is never evicted until the next rotation writes timestamps.
-          return { secret: entry, rotatedAt: Date.now() };
+          return { secret: entry, rotatedAt: now };
         }
         if (entry && typeof entry === "object") {
           const e = entry as { s?: unknown; rot?: unknown };
           if (typeof e.s === "string" && e.s.length > 0) {
             return {
               secret: e.s,
-              rotatedAt: typeof e.rot === "number" ? e.rot : Date.now(),
+              rotatedAt: typeof e.rot === "number" ? e.rot : now,
             };
           }
         }
