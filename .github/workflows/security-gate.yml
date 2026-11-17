@@ -386,8 +386,11 @@ jobs:
 
       - name: Generate SBOM (frontend)
         working-directory: ./frontend
+        # eslint-config-next@16 ainda declara peer eslint <=9 para seus
+        # plugins internos; com ESLint 10 o `npm ls` interno do cyclonedx-npm
+        # retorna ELSPROBLEMS mesmo com a árvore instalada corretamente.
         run: |
-          cyclonedx-npm --output-file ../sbom-frontend.json
+          cyclonedx-npm --ignore-npm-errors --output-file ../sbom-frontend.json
 
       - name: Generate SBOM (root)
         run: |
