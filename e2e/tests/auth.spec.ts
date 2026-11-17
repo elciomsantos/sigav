@@ -11,7 +11,7 @@ test.describe("Autenticação (E2E)", () => {
 
   test("login com senha inválida exibe erro no campo de senha", async ({ page }) => {
     await page.goto(`${BASE_URL}/auth/signIn`);
-    await expect(page.getByRole("heading", { name: /Bem-vindo/ })).toBeVisible();
+    await expect(page.getByAltText("Logotipo SIGAV")).toBeVisible();
 
     await page.getByPlaceholder("Seu e-mail ou nome de usuário").fill(E2E_ADMIN.email);
     await page.getByPlaceholder("A sua senha").fill("senha-errada-123");

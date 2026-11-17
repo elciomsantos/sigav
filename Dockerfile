@@ -41,6 +41,10 @@ RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline
 FROM ${NODE_BASE_IMAGE} AS frontend-builder
 ARG API_URL
 ENV API_URL=${API_URL:-http://localhost:3000}
+# Versão exibida no rodapé (tag do git). O `.git` não entra no contexto, então
+# o valor é passado pelo build-arg; sem ele o next.config.js usa package.json.
+ARG APP_VERSION=""
+ENV APP_VERSION=${APP_VERSION}
 WORKDIR /opt/app/frontend
 COPY ./frontend .
 COPY --from=frontend-dependencies /opt/app/frontend/node_modules ./node_modules

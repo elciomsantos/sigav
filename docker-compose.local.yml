@@ -99,6 +99,7 @@ services:
       target: frontend-runner
       args:
         - API_URL=http://backend:8080
+        - APP_VERSION=${APP_VERSION:-}
     restart: unless-stopped
     networks:
       - local-network

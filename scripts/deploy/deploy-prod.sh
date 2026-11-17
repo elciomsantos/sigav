@@ -65,6 +65,7 @@ wait_for_health() {
 rollback() {
   log "ROLLBACK: voltando para ${PREV_REF}"
   git checkout --detach "${PREV_REF}" 2>/dev/null || git checkout --detach "origin/main"
+  export APP_VERSION="$(git describe --tags --always --dirty 2>/dev/null || git rev-parse --short HEAD)"
   docker compose -f "${COMPOSE_FILE}" build || true
   docker compose -f "${COMPOSE_FILE}" up -d --remove-orphans || true
   wait_for_health "${COMPOSE_FILE}" || log "AVISO: healthcheck falhou após rollback — intervenção manual necessária"
@@ -96,7 +97,9 @@ log "ref resolvido: ${TARGET_COMMIT}"
 # --- 3. Checkout do ref alvo (detached — deploy imutável) --------------------
 git checkout --detach "${TARGET_COMMIT}"
 TARGET_SHORT="$(git rev-parse --short HEAD)"
-log "checkout concluído: ${TARGET_SHORT}"
+# A versão do rodapé é gerada em build-time e vai para o frontend via build-arg.
+export APP_VERSION="$(git describe --tags --always --dirty 2>/dev/null || git rev-parse --short HEAD)"
+log "checkout concluído: ${TARGET_SHORT} (versão ${APP_VERSION})"
 
 # --- 4. Build + up -----------------------------------------------------------
 log "build das imagens (${COMPOSE_FILE})..."

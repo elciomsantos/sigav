@@ -12,7 +12,7 @@ export interface UploadFileSpec {
 
 export async function loginAsAdmin(page: Page) {
   await page.goto(`${BASE_URL}/auth/signIn`);
-  await expect(page.getByRole("heading", { name: /Bem-vindo/ })).toBeVisible();
+  await expect(page.getByAltText("Logotipo SIGAV")).toBeVisible();
   await page.getByPlaceholder("Seu e-mail ou nome de usuário").fill(E2E_ADMIN.email);
   await page.getByPlaceholder("A sua senha").fill(E2E_ADMIN.password);
   await page.getByRole("button", { name: "Iniciar sessão" }).click();
