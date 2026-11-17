@@ -21,6 +21,14 @@ const EXCLUDED = new Set([
   // @serwist/next de ^9 para ^8 (breaking change). Risco aceito; reavaliar
   // a cada bump do @serwist/next no dependabot (ver P2-02 / Fase 5 go-live).
   "GHSA-mrhx-c7xc-m3w5",
+  // picomatch <=4.0.7 (ReDoS via extglobs repetidos, CWE-1333): sem versão
+  // corrigida upstream (first_patched_version=null; 4.0.7 é a latest em
+  // 2026-11-17). Cadeia 100% dev-time/build-time (eslint-config-next ->
+  // @next/eslint-plugin-next -> fast-glob -> micromatch -> picomatch@2 e
+  // vitest/vite -> picomatch@4); padrões internos de linter/test runner, sem
+  // input controlável por atacante. `npm audit --omit=dev` = 0. Remover quando
+  // upstream publicar correção (>4.0.7).
+  "GHSA-fc5q-39xc-vjpf",
 ]);
 
 const file = process.argv[2];

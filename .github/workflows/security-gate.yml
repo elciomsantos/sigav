@@ -92,7 +92,8 @@ jobs:
       # anterior deixava o npm audit em modo informativo (só publicava
       # artefato). O gate roda em scripts/ci/npm-audit-gate.mjs com as
       # exclusões documentadas (braces GHSA-vfj7-8cjw-p6xm, zod
-      # GHSA-mrhx-c7xc-m3w5); falha em HIGH/CRITICAL fora delas.
+      # GHSA-mrhx-c7xc-m3w5 e picomatch GHSA-fc5q-39xc-vjpf); falha em
+      # HIGH/CRITICAL fora delas.
       - name: Run npm audit gate (backend)
         working-directory: ./backend
         run: |
@@ -127,7 +128,13 @@ jobs:
           # GHSA-mrhx-c7xc-m3w5 (zod <4.6.6): fix exige downgrade do
           # @serwist/next 9→8 (breaking); risco aceito, reavaliar a cada bump
           # do serwist (ver scripts/ci/npm-audit-gate.mjs).
-          OSV_EXCLUDED='GHSA-vfj7-8cjw-p6xm,GHSA-mrhx-c7xc-m3w5'
+          # GHSA-fc5q-39xc-vjpf (picomatch — ReDoS via extglobs repetidos):
+          # sem versao corrigida upstream (<=4.0.7, first_patched_version=null;
+          # 4.0.7 e a latest em 2026-11-17). Cadeia 100% dev-time/build-time
+          # (eslint/vitest/vite), padroes internos de linter/test runner sem
+          # input controlavel por atacante; `npm audit --omit=dev` = 0.
+          # Remover quando upstream publicar correcao (>4.0.7).
+          OSV_EXCLUDED='GHSA-vfj7-8cjw-p6xm,GHSA-mrhx-c7xc-m3w5,GHSA-fc5q-39xc-vjpf'
           CRITICAL_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "CRITICAL") | select(.id as $id | $ex | split(",") | index($id) | not)] | length' osv-results.json 2>/dev/null || echo 0)
           HIGH_COUNT=$(jq --arg ex "$OSV_EXCLUDED" '[.results[].packages[].vulnerabilities[] | select(.severity == "HIGH") | select(.id as $id | $ex | split(",") | index($id) | not)] | length' osv-results.json 2>/dev/null || echo 0)
           
