@@ -176,6 +176,9 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      # NestJS 12 é ESM-only; o Jest 30 precisa de require(esm) nativo.
+      NODE_OPTIONS: --experimental-vm-modules
     steps:
       - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # v5
 

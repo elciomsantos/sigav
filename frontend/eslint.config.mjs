@@ -1,13 +1,9 @@
 import next from "eslint-config-next";
-import eslintPluginReact from "eslint-plugin-react";
 import prettier from "eslint-config-prettier";
 
 export default [
   ...next,
   {
-    plugins: {
-      react: eslintPluginReact,
-    },
     rules: {
       quotes: ["warn", "double", { allowTemplateLiterals: true }],
       "react-hooks/exhaustive-deps": ["off"],
