@@ -83,12 +83,7 @@ export class AuthController {
 
   @Post("signIn")
   @Public()
-  @Throttle({
-    default: {
-      limit: 5,
-      ttl: 60_000,
-    },
-  })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   @HttpCode(200)
   async signIn(
     @Body() dto: AuthSignInDTO,
@@ -113,12 +108,7 @@ export class AuthController {
 
   @Post("signIn/totp")
   @Public()
-  @Throttle({
-    default: {
-      limit: 5,
-      ttl: 60_000,
-    },
-  })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   @HttpCode(200)
   async signInTotp(
     @Body() dto: AuthSignInTotpDTO,
@@ -138,24 +128,14 @@ export class AuthController {
   // SEC-1.2/14.6: cadastro de TOTP pré-login (contas administrativas sem 2FA).
   @Post("totp/enroll")
   @Public()
-  @Throttle({
-    default: {
-      limit: 5,
-      ttl: 60_000,
-    },
-  })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async enrollTotp(@Body() dto: EnrollTotpDTO) {
     return this.authTotpService.enrollTotp(dto.loginToken, dto.password);
   }
 
   @Post("totp/enroll/verify")
   @Public()
-  @Throttle({
-    default: {
-      limit: 5,
-      ttl: 60_000,
-    },
-  })
+  @Throttle({ default: AUTH_LOGIN_THROTTLE })
   async enrollVerifyTotp(
     @Body() dto: EnrollVerifyTotpDTO,
     @Res({ passthrough: true }) response: Response,
