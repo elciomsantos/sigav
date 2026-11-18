@@ -3,15 +3,15 @@ import { E2E_ADMIN, BASE_URL } from "../lib/env";
 import { loginAsAdmin } from "../lib/helpers";
 
 test.describe("Autenticação (E2E)", () => {
-  test("login com credenciais válidas redireciona para /upload", async ({ page }) => {
+  test("login com credenciais válidas redireciona para a Home", async ({ page }) => {
     await loginAsAdmin(page);
-    await expect(page).toHaveURL(/\/upload/);
-    await expect(page.getByRole("button", { name: "Carregar Videos" })).toBeVisible();
+    await expect(page).toHaveURL(`${BASE_URL}/`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("icone da navbar abre a home para usuario autenticado", async ({ page }) => {
+  test("link Home da navbar abre a home para usuario autenticado", async ({ page }) => {
     await loginAsAdmin(page);
-    await page.locator('a[href="/"]').first().click();
+    await page.getByRole("link", { name: "Início", exact: true }).click();
     await expect(page).toHaveURL(`${BASE_URL}/`);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.getByRole("button", { name: "Carregar Videos" })).toHaveCount(0);
