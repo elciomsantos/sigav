@@ -53,6 +53,10 @@ const Header = () => {
 
   const authenticatedLinks: NavLink[] = [
     {
+      link: "/",
+      label: t("navbar.home"),
+    },
+    {
       link: "/upload",
       label: t("navbar.upload"),
     },
@@ -82,6 +86,10 @@ const Header = () => {
 
   const mobileRootLinks: NavLink[] = user
     ? [
+        {
+          link: "/",
+          label: t("navbar.home"),
+        },
         {
           link: "/upload",
           label: t("navbar.upload"),
