@@ -18,7 +18,7 @@
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js",
     "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js",
     "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js --coverage",
-    "test:e2e": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --testPathPatterns=auth-share && cross-env NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --testPathPatterns=security",
+    "test:e2e": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --testPathPatterns=auth-share && cross-env NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --testPathPatterns=security && cross-env NODE_OPTIONS=--experimental-vm-modules jest --config test/jest-e2e.json --testPathPatterns=api-version",
     "test:system": "npm run test:e2e",
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate"
