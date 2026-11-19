@@ -3,7 +3,7 @@ marp: true
 theme: default
 paginate: true
 size: 16:9
-header: "Controle Share Videos v2.7.0"
+header: "SIGAV v2.7.0 — Sistema de Gestão e Compartilhamento de Vídeos"
 footer: "Apresentação técnica — Analista de TI"
 style: |
   section { font-size: 24px; }
@@ -16,9 +16,9 @@ style: |
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-# Controle Share Videos v2.7.0
+# SIGAV v2.7.0
 
-## Compartilhamento seguro de arquivos para uso interno restrito
+## Sistema de Gestão e Compartilhamento de Vídeos — uso interno restrito
 
 **Apresentação técnica para o Analista de TI**
 Funcionalidades · Gerenciamento de segurança · Conexões e infraestrutura
@@ -71,7 +71,7 @@ Dificuldades eliminadas:
 | Camada | Tecnologia |
 |---|---|
 | Frontend | Next.js 16 (React 19) + Mantine 9 — PWA offline-first (Serwist) |
-| Backend | NestJS 11 (Node.js 24 + TypeScript) — API REST versionada `/api/v{N}` |
+| Backend | NestJS 12 (Node.js 24 + TypeScript 6) — API REST versionada `/api/v{N}` |
 | Banco de dados | SQLite + WAL (Prisma ORM — queries 100% parametrizadas) |
 | Reverse proxy / Edge | Caddy 2.9 — TLS automático (Let's Encrypt), CSP estrito, rate limit |
 | Armazenamento | Local no servidor (sem S3) + compartilhamento Samba SMB3 `[videos]` |
@@ -411,7 +411,7 @@ git pull --ff-only origin main && docker compose up -d --build
 | v1.2 | SRE | Alertas ✅, distributed tracing (OpenTelemetry), chaos testing |
 | v1.3 | Escala | Redis opcional, PostgreSQL/MySQL se necessário |
 | v1.4 | Cloud | Storage S3/MinIO (interface já existe), multi-região |
-| v2.0 | Modernização | Avaliar Next.js App Router, NestJS 12+, Prisma 8+ |
+| v2.0 | Modernização | Migrar para Next.js App Router e Prisma 8+ (NestJS 12 já adotado) |
 
 ---
 
@@ -434,7 +434,7 @@ git pull --ff-only origin main && docker compose up -d --build
 
 # Obrigado!
 
-**Controle Share Videos v2.7.0**
+**SIGAV v2.7.0**
 Compartilhamento seguro · dados soberanos on-premise
 
 Dúvidas técnicas: consultar `README.md` e `docs/VISAO-GERAL.md`

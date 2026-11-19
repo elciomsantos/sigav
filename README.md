@@ -1,7 +1,7 @@
 <div align="center">
   <img src="/frontend/public/img/images/sigav_sem_fundo.png" alt="Logo" width="300">
 
-  <h1>Sistema de Gestão e Compartilhamento de Videos</h1>
+  <h1>SIGAV — Sistema de Gestão e Compartilhamento de Vídeos</h1>
 
   <p align="center">
 
@@ -12,7 +12,7 @@
 
 # SIGAV
 
-Sistema de compartilhamento seguro de arquivos para uso interno restrito, em PT-BR. Fork independente do Pingvin Share X v1.21.1, adaptado para upload exclusivamente pelo dono autenticado e armazenamento apenas local (servidor Debian 13).
+**SIGAV — Sistema de Gestão e Compartilhamento de Vídeos**: compartilhamento seguro de arquivos para uso interno restrito, em PT-BR. Fork independente do Pingvin Share X v1.21.1, adaptado para upload exclusivamente pelo dono autenticado e armazenamento apenas local (servidor Debian 13).
 
 > **Documentação:** ver `docs/VISAO-GERAL.md` (visão arquitetural),
 > `docs/operacional/DEPLOY.md` (guia de implantação),
@@ -562,7 +562,7 @@ projetos e os pins de GitHub Actions atualizados semanalmente.
 | **v1.2** (médio) | SRE | Alertas Prometheus/Grafana, distributed tracing (OpenTelemetry), runbooks completos, chaos testing |
 | **v1.3** (médio-longo) | Escala | Redis cache opcional, migração PostgreSQL/MySQL se SQLite contencionar, otimizações de query |
 | **v1.4** (longo) | Cloud | Storage S3/MinIO via `IUploadRepository` (interface já existe), multi-região |
-| **v2.0** (longo) | Modernização | Avaliar Next.js App Router, NestJS 12+, Prisma 8+, arquitetura modular |
+| **v2.0** (longo) | Modernização | Migrar para Next.js App Router e Prisma 8+, evoluir arquitetura modular (NestJS 12 já adotado) |
 
 ---
 

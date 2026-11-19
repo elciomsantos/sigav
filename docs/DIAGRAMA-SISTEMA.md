@@ -1,4 +1,4 @@
-# Diagrama do Sistema — Controle Share Videos
+# Diagrama do Sistema — SIGAV
 
 > Renderização: GitHub exibe Mermaid nativamente. Duas visões:
 > **1. Implantação (componentes)** e **2. Fluxo de compartilhamento**.

@@ -9,7 +9,7 @@
 
 ## Visao Geral
 
-Este runbook documenta os procedimentos de rollback para todos os componentes do sistema controle-share-videos.
+Este runbook documenta os procedimentos de rollback para todos os componentes do sistema SIGAV (Sistema de Gestão e Compartilhamento de Vídeos).
 
 **RTO Alvo:** < 10 minutos
 **RPO:** 1 hora (DB) / 24 horas (arquivos)

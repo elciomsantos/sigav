@@ -8,7 +8,7 @@
 
 ## 1. Visão Geral
 
-Este runbook define o processo de resposta a incidentes de segurança para o sistema **controle-share-videos**. Baseado no framework NIST SP 800-61 Rev. 2.
+Este runbook define o processo de resposta a incidentes de segurança para o sistema **SIGAV** (Sistema de Gestão e Compartilhamento de Vídeos). Baseado no framework NIST SP 800-61 Rev. 2.
 
 ### 1.1 Objetivos
 

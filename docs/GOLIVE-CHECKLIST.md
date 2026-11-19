@@ -1,4 +1,4 @@
-# Checklist de Go-Live — Controle Share Videos v1.0
+# Checklist de Go-Live — SIGAV v2.7.0
 
 **Criado:** 2026-08-22 · **Base:** estado pós-Fase 4 (issues #1–#40 fechados), pentest interno de shares e auditoria de SQL injection.
 **Regra:** item só pode ser marcado com evidência anexada (link, log, print ou hash). Sem evidência = não feito.
