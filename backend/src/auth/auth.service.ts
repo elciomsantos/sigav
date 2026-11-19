@@ -7,7 +7,7 @@ import { RequestContextLogger } from "../common/request-context/request-context"
 import { DuplicatedFieldException } from "../common/duplicated-field.exception";
 import { Prisma, User } from "../../prisma/generated/prisma/client";
 import argon from "argon2";
-import { Request, Response } from "express";
+import { Response } from "express";
 import dayjs from "dayjs";
 import { I18nService } from "nestjs-i18n";
 import { ARGON2_OPTIONS } from "../constants";
@@ -147,11 +147,6 @@ export class AuthService {
     return this.loginService.signIn(dto, ip);
   }
 
-  /** Delega ao LoginService (emissão de sessão para usuário autenticado). */
-  async generateToken(user: User) {
-    return this.loginService.generateToken(user);
-  }
-
   async requestResetPassword(email: string) {
     return this.verificationService.requestResetPassword(email);
   }
@@ -275,16 +270,6 @@ export class AuthService {
     return this.refreshService.refreshAccessToken(refreshToken);
   }
 
-  /** Back-compat: delega criação de refresh token ao TokenService. */
-  createRefreshToken(userId: string, tx?: Prisma.TransactionClient) {
-    return this.tokenService.createRefreshToken(userId, tx);
-  }
-
-  /** Back-compat: delega criação de login token ao TokenService. */
-  async createLoginToken(userId: string) {
-    return this.tokenService.createLoginToken(userId);
-  }
-
   /** Back-compat: delega escrita de cookies ao TokenService. */
   addTokensToResponse(
     response: Response,
@@ -298,13 +283,4 @@ export class AuthService {
     );
   }
 
-  /** Back-compat: delega leitura do usuário corrente ao TokenService. */
-  async getIdOfCurrentUser(request: Request): Promise<string | null> {
-    return this.tokenService.getUserIdFromRequest(request);
-  }
-
-  /** Back-compat: delega verificação de senha ao LoginService. */
-  async verifyPassword(user: User, password: string) {
-    return this.loginService.verifyPassword(user, password);
-  }
 }

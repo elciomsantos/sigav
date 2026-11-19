@@ -9,13 +9,11 @@ describe("AuthService (orquestrador)", () => {
   let config: { getBoolean: jest.Mock; getTimespan: jest.Mock };
   let emailService: { sendVerificationEmail: jest.Mock };
   let i18n: { t: jest.Mock };
-  let loginService: { signIn: jest.Mock; verifyPassword: jest.Mock };
+  let loginService: { signIn: jest.Mock };
   let tokenService: {
     createSession: jest.Mock;
     createRefreshToken: jest.Mock;
-    createLoginToken: jest.Mock;
     addTokensToResponse: jest.Mock;
-    getUserIdFromRequest: jest.Mock;
   };
   let refreshService: {
     refreshAccessToken: jest.Mock;
@@ -43,14 +41,11 @@ describe("AuthService (orquestrador)", () => {
     i18n = { t: jest.fn((key: string) => `t:${key}`) };
     loginService = {
       signIn: jest.fn(),
-      verifyPassword: jest.fn(),
     };
     tokenService = {
       createSession: jest.fn(() => ({ accessToken: "access-token" })),
       createRefreshToken: jest.fn(),
-      createLoginToken: jest.fn(),
       addTokensToResponse: jest.fn(),
-      getUserIdFromRequest: jest.fn(),
     };
     refreshService = {
       refreshAccessToken: jest.fn(),
@@ -108,14 +103,6 @@ describe("AuthService (orquestrador)", () => {
       refreshTokenId: "id",
     });
     expect(refreshService.refreshAccessToken).toHaveBeenCalledWith("rt");
-  });
-
-  it("delega createLoginToken ao TokenService", async () => {
-    tokenService.createLoginToken.mockResolvedValue("new-login-token");
-    await expect(service.createLoginToken("u1")).resolves.toBe(
-      "new-login-token",
-    );
-    expect(tokenService.createLoginToken).toHaveBeenCalledWith("u1");
   });
 
   it("delega signOut ao RefreshService", async () => {
