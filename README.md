@@ -1,11 +1,10 @@
 <div align="center">
-  <img src="/frontend/public/img/images/sigav_sem_fundo.png" alt="Logo" width="300">
+  <img src="/frontend/public/img/images/corporativo.png" alt="Logo" width="300">
 
   <h1>SIGAV — Sistema de Gestão e Compartilhamento de Vídeos</h1>
 
   <p align="center">
 
-  **SIGAV** — compartilhamento seguro de arquivos para uso interno restrito.
 
   </p>
 </div>
