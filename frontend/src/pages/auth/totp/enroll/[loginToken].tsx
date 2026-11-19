@@ -12,7 +12,7 @@ const TotpEnroll = () => {
       <Meta title={t("totp.enroll.title")} />
       <TotpEnrollForm
         loginToken={router.query.loginToken as string}
-        redirectPath={(router.query.redirect as string) || "/upload"}
+        redirectPath={(router.query.redirect as string) || "/"}
       />
     </>
   );

@@ -27,7 +27,10 @@ export async function loginAsAdmin(page: Page) {
 
   // Aguarda o login concluir (POST + refreshUser + redirect). Garante que os
   // cookies de sessão já estejam gravados antes de navegações subsequentes.
-  await expect(page.getByRole("button", { name: "Carregar Videos" })).toBeVisible({
+  // O destino padrão do login é a Home; os testes de upload navegam para
+  // /upload explicitamente através de uploadFiles().
+  await expect(page).toHaveURL(`${BASE_URL}/`, { timeout: 15_000 });
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({
     timeout: 15_000,
   });
 }

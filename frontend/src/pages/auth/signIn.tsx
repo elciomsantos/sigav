@@ -22,10 +22,8 @@ const SignIn = ({ redirectPath }: { redirectPath?: string | null }) => {
   // Sanitiza uma única vez: query ?redirect= nunca vai direto ao
   // router.replace (open redirect via "//host" — issue #41).
   const requestedRedirect = safeRedirectPath(redirectPath ?? undefined);
-  // Sem ?redirect= explícito o pós-login vai direto para a aplicação. Passar
-  // por "/" faria a home aparecer por um instante antes da navegação.
-  const safeRedirect =
-    requestedRedirect === "/" ? "/upload" : requestedRedirect;
+  // Sem ?redirect= explícito, o pós-login vai para a Home.
+  const safeRedirect = requestedRedirect;
 
   const [isLoading, setIsLoading] = useState(requestedRedirect !== "/");
 

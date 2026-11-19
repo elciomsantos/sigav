@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/frontend/public/img/images/logo-programer.png" alt="Logo" width="300">
+  <img src="/frontend/public/img/images/logo-programer.png" alt="Logo" width="200">
 
   <h1>Sistema de controle e compartilhamento de vídeos</h1>
 
@@ -165,7 +165,7 @@ Recriar o ambiente do zero (apaga o banco SQLite):
 
 ```bash
 docker compose --env-file .env.local -f docker-compose.local.yml down -v
-docker compose --env-file .env.local -f docker-compose.local.yml up --build
+
 ```
 
 > O banco fica no volume nomeado `controle-videos-local-backend-data` (não em `data/controle-videos.db`); `-v` remove também os volumes de imagens e do Caddy.

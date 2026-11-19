@@ -53,6 +53,10 @@ const Header = () => {
 
   const authenticatedLinks: NavLink[] = [
     {
+      link: "/",
+      label: t("navbar.home"),
+    },
+    {
       link: "/upload",
       label: t("navbar.upload"),
     },
@@ -82,6 +86,10 @@ const Header = () => {
 
   const mobileRootLinks: NavLink[] = user
     ? [
+        {
+          link: "/",
+          label: t("navbar.home"),
+        },
         {
           link: "/upload",
           label: t("navbar.upload"),
@@ -268,7 +276,11 @@ const Header = () => {
                 width={38}
                 style={{ objectFit: "contain" }}
               />
-              <Text fw={600}>{config.get("general.appName")}</Text>
+              <img
+                src="/img/sigav_sem_fundo.png"
+                alt={config.get("general.appName")}
+                style={{ height: 28, width: "auto", objectFit: "contain" }}
+              />
             </Group>
           </Link>
           {/* visibleFrom/hiddenFrom geram as media queries via MantineProvider —

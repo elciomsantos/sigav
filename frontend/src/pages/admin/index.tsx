@@ -1,5 +1,4 @@
 import {
-  Center,
   Grid,
   Paper,
   Stack,
@@ -114,11 +113,6 @@ const Admin = () => {
           </Grid>
         </Paper>
 
-        <Center>
-          <Text size="xs" color="dimmed">
-            <FormattedMessage id="admin.version" /> {process.env.VERSION}
-          </Text>
-        </Center>
       </Stack>
     </>
   );
