@@ -259,11 +259,14 @@ const uploadFile = async (
   chunkIndex: number,
   totalChunks: number,
   onProgress?: (progress: number) => void,
+  signal?: AbortSignal,
 ): Promise<FileUploadResponse> => {
   if (!isValidId(shareId)) throw new Error("Invalid Share ID");
   return (
     await api.post(`shares/${shareId}/files`, chunk, {
       headers: { "Content-Type": "application/octet-stream" },
+      // Permite abortar o chunk em andamento quando o usuário cancela.
+      signal,
       params: {
         id: file.id,
         name: file.name,

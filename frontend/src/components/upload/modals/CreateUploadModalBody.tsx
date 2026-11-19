@@ -45,10 +45,12 @@ const CreateUploadModalBody = ({
   uploadCallback,
   files,
   options,
+  onCancel,
 }: {
   files: FileUpload[];
   uploadCallback: (createShare: CreateShare, files: FileUpload[]) => void;
   options: CreateUploadModalOptions;
+  onCancel?: () => void;
 }) => {
   const modals = useModals();
   const t = useTranslate();
@@ -329,9 +331,18 @@ const CreateUploadModalBody = ({
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
-          <Button type="submit" data-autofocus>
-            <FormattedMessage id="common.button.share" />
-          </Button>
+          <Group justify="flex-end">
+            <Button
+              type="button"
+              variant="default"
+              onClick={onCancel ?? (() => modals.closeAll())}
+            >
+              <FormattedMessage id="common.button.cancel" />
+            </Button>
+            <Button type="submit" data-autofocus>
+              <FormattedMessage id="common.button.share" />
+            </Button>
+          </Group>
         </Stack>
       </form>
     </>

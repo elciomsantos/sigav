@@ -14,6 +14,7 @@ const showCreateUploadModal = (
   options: CreateUploadModalOptions,
   files: FileUpload[],
   uploadCallback: (createShare: CreateShare, files: FileUpload[]) => void,
+  onCancel?: () => void,
 ) => {
   const t = translateOutsideContext();
 
@@ -26,6 +27,7 @@ const showCreateUploadModal = (
           options={options}
           files={files}
           uploadCallback={uploadCallback}
+          onCancel={onCancel}
         />
       ),
     });
@@ -39,6 +41,7 @@ const showCreateUploadModal = (
         options={options}
         files={files}
         uploadCallback={uploadCallback}
+        onCancel={onCancel}
       />
     ),
   });

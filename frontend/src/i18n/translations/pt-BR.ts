@@ -379,6 +379,8 @@ export default {
   "upload.notify.confirm-leave": "Você tem certeza que deseja sair desta página? Seu envio será cancelado.",
   "upload.notify.count-failed-honest": "Falha ao enviar {count} arquivo(s). Toque para ver detalhes.",
   "upload.notify.duplicate-skipped": "O arquivo \"{name}\" foi ignorado por ser duplicado.",
+  "upload.notify.cancelled": "Carregamento cancelado. Nenhum arquivo foi enviado.",
+  "upload.button.cancel": "Cancelar carregamento",
   "upload.button.discard": "Descartar",
   "upload.complete.error.title": "Falha ao finalizar compartilhamento",
   "upload.complete.error.description": "Não foi possível completar o compartilhamento. Os arquivos podem estar órfãos.",
