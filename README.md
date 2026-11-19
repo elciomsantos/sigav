@@ -1,16 +1,16 @@
 <div align="center">
-  <img src="/frontend/public/img/images/logo-programer.png" alt="Logo" width="200">
+  <img src="/frontend/public/img/images/sigav_sem_fundo.png" alt="Logo" width="300">
 
-  <h1>Sistema de controle e compartilhamento de vídeos</h1>
+  <h1>Sistema de Gestão e Compartilhamento de Videos</h1>
 
   <p align="center">
 
-  **Controle Share Videos v2.7.0** — compartilhamento seguro de arquivos para uso interno restrito.
+  **SIGAV** — compartilhamento seguro de arquivos para uso interno restrito.
 
   </p>
 </div>
 
-# Controle Share Videos
+# SIGAV
 
 Sistema de compartilhamento seguro de arquivos para uso interno restrito, em PT-BR. Fork independente do Pingvin Share X v1.21.1, adaptado para upload exclusivamente pelo dono autenticado e armazenamento apenas local (servidor Debian 13).
 

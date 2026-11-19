@@ -10,7 +10,12 @@ const Meta = ({
 }) => {
   const config = useConfig();
 
-  const metaTitle = `${title} - ${config.get("general.appName")}`;
+  const appName = config.get("general.appName");
+  const systemName = "SIGAV";
+  const metaTitle =
+    title === "Home"
+      ? `${systemName} - ${appName}`
+      : `${title} - ${systemName}`;
 
   return (
     <Head>
