@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Container,
   Group,
@@ -17,7 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { TbEdit, TbPlusMinus, TbShieldLock } from "react-icons/tb";
+import { TbEdit, TbPlusMinus } from "react-icons/tb";
 import Meta from "../../../components/Meta";
 import DownloadAllButton from "../../../components/share/DownloadAllButton";
 import FileList from "../../../components/share/FileList";
@@ -206,15 +205,17 @@ const Share = ({ shareId }: { shareId: string }) => {
         }}
       >
         <Box mb="xl" style={{ textAlign: "center" }}>
-          <Badge
-            variant="light"
-            size="lg"
-            radius="xl"
-            tt="none"
-            leftSection={<TbShieldLock size={14} />}
-          >
-            {config.get("general.appName")}
-          </Badge>
+          <img
+            src="/img/images/Logo_sigav.png"
+            alt="SIGAV"
+            style={{
+              height: "auto",
+              width: isMobile ? 200 : 280,
+              maxWidth: "100%",
+              objectFit: "contain",
+              margin: "0 auto",
+            }}
+          />
           <Title
             order={1}
             style={{
@@ -228,7 +229,7 @@ const Share = ({ shareId }: { shareId: string }) => {
             <FormattedMessage id="home.title" />
           </Title>
           <Text c="dimmed" mt="md" size="lg" style={{ marginLeft: "auto", marginRight: "auto", maxWidth: 480 }}>
-            <FormattedMessage id="home.description" />
+            <FormattedMessage id="share.hero.description" />
           </Text>
           <Text
             mt="md"

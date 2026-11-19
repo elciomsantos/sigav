@@ -445,6 +445,7 @@ export default {
   // /share/[id]
   "share.title": "Compartilhar {shareId}",
   "share.description": "Veja o que eu compartilhei com você!",
+  "share.hero.description": "Registros disponibilizados de forma segura e controlada para pessoas e autoridades autorizadas.",
   "share.fileCount": "{count, plural, one {}=1 {# arquivo} other {# arquivos}} · {size} (arquivo zip pode ser menor devido à compressão)",
   "share.file.edit": "Editar",
   "share.file.remove": "Remover",
