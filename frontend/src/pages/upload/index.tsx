@@ -298,7 +298,7 @@ const Upload = ({
         // cabeçalho e o rodapé. Um minHeight: 100vh aqui somava os 146px do
         // chrome e criava barra de rolagem na tela.
         flexGrow: 1,
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('/img/tela-fundo.png')",
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('/img/pasta_amarela.png')",
         backgroundSize: "40% auto",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
