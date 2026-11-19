@@ -2,14 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import checkDiskSpace from "check-disk-space";
 import { DATA_DIRECTORY } from "../constants";
 import { SystemInfoDTO } from "./dto/systemInfo.dto";
-import { ConfigService } from "../config/config.service";
 import * as path from "path";
 
 @Injectable()
 export class SystemService {
   private readonly logger = new Logger(SystemService.name);
-
-  constructor(private configService: ConfigService) {}
 
   async getSystemInfo(): Promise<SystemInfoDTO | null> {
     const resolvedPath = path.resolve(DATA_DIRECTORY, "uploads");

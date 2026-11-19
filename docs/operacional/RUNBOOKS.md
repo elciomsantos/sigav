@@ -336,7 +336,7 @@ docker exec controle-share-videos-backend env | grep -i smtp
 | `smtp.port` | ✅ | `587` (STARTTLS) ou `465` (SSL) |
 | `smtp.username` | ✅ | `usuario@dominio.com` |
 | `smtp.password` | ✅ | `app-password` (NÃO a senha da conta) |
-| `smtp.email` | ✅ | `Controle Share <no-reply@dominio.com>` |
+| `smtp.email` | ✅ | `SIGAV <no-reply@dominio.com>` |
 
 **Problemas comuns:**
 

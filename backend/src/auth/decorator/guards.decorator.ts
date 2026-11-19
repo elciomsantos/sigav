@@ -34,4 +34,3 @@ export const AdminOrAuditor = () => applyDecorators(
  * Re-export para conveniência
  */
 export { Public } from "./public.decorator";
-export { Roles } from "./roles.decorator";

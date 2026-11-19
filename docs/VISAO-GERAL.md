@@ -1,8 +1,9 @@
 # 01 - Visão Geral do Projeto
 
-> **Sistema de Compartilhamento Seguro de Arquivos — Controle Share Videos**
+> **Sistema de Gestão e Compartilhamento de Vídeos — SIGAV**
 > Documento de Arquitetura - Capítulo 01
 
+**Nome do sistema:** SIGAV — Sistema de Gestão e Compartilhamento de Vídeos
 **Versão:** 2.7.0
 **Status:** Em Produção (Docker)
 **Base histórica:** Fork independente do Pingvin Share X v1.21.1, renomeado e adaptado para uso interno restrito PT-BR
@@ -15,7 +16,7 @@
 
 ## 1.1 Objetivo
 
-Este documento apresenta a visão geral do **Controle Share Videos**, descrevendo seus objetivos, escopo, arquitetura, tecnologias empregadas, requisitos de infraestrutura e princípios de funcionamento.
+Este documento apresenta a visão geral do **SIGAV (Sistema de Gestão e Compartilhamento de Vídeos)**, descrevendo seus objetivos, escopo, arquitetura, tecnologias empregadas, requisitos de infraestrutura e princípios de funcionamento.
 
 Seu propósito é fornecer uma compreensão ampla do projeto para desenvolvedores, administradores de sistemas, analistas e demais envolvidos no ciclo de vida da aplicação.
 
@@ -25,7 +26,7 @@ Seu propósito é fornecer uma compreensão ampla do projeto para desenvolvedore
 
 O sistema tem como finalidade gerenciar e compartilhar **arquivos de qualquer tipo** (não apenas vídeos) armazenados **exclusivamente de forma local** no servidor Debian 13 (disco local), permitindo a distribuição controlada por meio de links seguros com autenticação, expiração, limites de download e senha.
 
-Todo o gerenciamento é centralizado em uma interface web administrativa desenvolvida em **Next.js 16 (React 19) + Mantine 9**, consumindo API REST construída com **NestJS 11 (Node.js 24 + TypeScript 6)**.
+Todo o gerenciamento é centralizado em uma interface web administrativa desenvolvida em **Next.js 16 (React 19) + Mantine 9**, consumindo API REST construída com **NestJS 12 (Node.js 24 + TypeScript 6)**.
 
 O sistema garante:
 
@@ -169,9 +170,9 @@ Permissões:
 
 ## Backend
 
-* **NestJS 11** (Node.js 24 LTS, TypeScript 6 strict)
+* **NestJS 12** (Node.js 24 LTS, TypeScript 6 strict)
 * **Prisma ORM 7** com adapter `@prisma/adapter-better-sqlite3`
-* **@nestjs/passport** + `passport-jwt` + `passport-local` (estratégias JWT access/refresh + local)
+* **Autenticação sem Passport** — sessões opacas server-side (`SessionService` + guards), sem `@nestjs/passport` / `passport-jwt` / `passport-local` (removidos)
 * **Argon2id** (`argon2@0.45.1`) para hash de senhas (memoryCost=128MB, timeCost=4, parallelism=2)
 * **TOTP** via `otplib@13.3.0` + `qrcode-svg` (2FA opcional por usuário; **obrigatório para admins**)
 * **@nestjs/jwt** para tokens assinados (RS256/HS256 configurável) — **legado**, sessões usam token opaco server-side
@@ -205,8 +206,8 @@ Permissões:
 
 * **Next.js 16** (Pages Router, standalone output, webpack build)
 * **React 19** + **React DOM 19**
-* **Mantine 9** (core, hooks, form, modals, notifications, dropzone)
-* **@mantine/dropzone** upload drag-and-drop com progresso chunked
+* **Mantine 9** (core, hooks, form, modals, notifications)
+* **Dropzone customizado** (`components/upload/Dropzone.tsx`) upload drag-and-drop com progresso chunked (sem `@mantine/dropzone`)
 * **Axios** cliente HTTP com interceptors (auth, refresh token automático)
 * **react-intl** i18n (PT-BR único ativo, infra mantida)
 * **Serwist 9** (Workbox) — PWA, Service Worker, cache offline
@@ -251,7 +252,7 @@ Permissões:
 * **Composer** (N/A — Node.js usa npm)
 * **Git** (versionamento)
 * **OpenSSL** (certificados, geração de segredos)
-* **ESLint 9** (flat config, por workspace: root, backend, frontend)
+* **ESLint 9 (backend) / 10 (frontend)** (flat config, por workspace: root, backend, frontend)
 * **Prettier** (formatação)
 * **TypeScript 6** (strict mode, path aliases)
 * **Newman** (testes de API pós-deploy via Postman collection)
@@ -326,7 +327,7 @@ Essa separação facilita manutenção, testes, evolução independente e deploy
 ## 9.1 Upload e Criação de Share (Usuário Autenticado)
 
 1. Usuário acessa `/upload` (PWA instalável, funciona offline para shell)
-2. Arrasta arquivos no `@mantine/dropzone` → upload **chunked** (config `share.chunkSize`, default 10MB)
+2. Arrasta arquivos no dropzone customizado (`components/upload/Dropzone.tsx`) → upload **chunked** (config `share.chunkSize`, default 10MB)
 3. Backend recebe chunks em `POST /api/shares/:shareId/files` (raw body, `application/octet-stream`)
 4. Chunks salvos em `/opt/app/data/uploads/_temp/<shareId>/` como `.tmp-chunk-N`
 5. Usuário finaliza share → `POST /api/shares/:shareId/complete`
@@ -569,13 +570,13 @@ O sistema opera continuamente com mecanismos de resiliência:
 
 # 17. Considerações Finais
 
-Este documento reflete a **implementação real** do Controle Share Videos (versão 2.x), um fork independente do Pingvin Share X adaptado para uso interno restrito com foco em segurança, auditoria e soberania de dados.
+Este documento reflete a **implementação real** do SIGAV — Sistema de Gestão e Compartilhamento de Vídeos (versão 2.x), um fork independente do Pingvin Share X adaptado para uso interno restrito com foco em segurança, auditoria e soberania de dados.
 
 A stack tecnológica consolidada é:
 
 | Camada | Tecnologia |
 |--------|------------|
-| API Backend | NestJS 11 + TypeScript 6 + Prisma 7 |
+| API Backend | NestJS 12 + TypeScript 6 + Prisma 7 |
 | Frontend | Next.js 16 + React 19 + Mantine 9 |
 | Banco | SQLite (better-sqlite3, WAL) / PostgreSQL / MySQL via Prisma |
 | Proxy / TLS | Caddy 2 (auto-HTTPS, Let's Encrypt) |

@@ -1,7 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, isCancel } from "axios";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -15,6 +15,7 @@ import { FileListItem, FileUpload, FileRecord } from "../../types/File.type";
 import toast from "../../utils/toast.util";
 import { getNormalizedFileName, filterDuplicateFiles } from "../../utils/file.util";
 import { createUploadLimiter } from "../../utils/concurrency";
+import { waitWithAbort } from "../../utils/abort.util";
 
 const promiseLimit = createUploadLimiter();
 const EDITABLE_ERROR_TOAST_ID = "editable-upload-error-toast";
@@ -40,6 +41,12 @@ const EditableUpload = ({
   const [uploadingFiles, setUploadingFiles] = useState<FileUpload[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [errorToastShown, setErrorToastShown] = useState(false);
+
+  // Cancelamento do save: aborta chunks em voo e desfaz as mudanças no share.
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const cancelledRef = useRef(false);
+  const savePromiseRef = useRef<Promise<void> | null>(null);
+  const uploadedFileIdsRef = useRef<Set<string>>(new Set());
 
   const existingAndUploadedFiles: FileListItem[] = useMemo(
     () => [...uploadingFiles, ...existingFiles],
@@ -75,12 +82,18 @@ const EditableUpload = ({
   }, [existingFiles, uploadingFiles]);
 
   const uploadFiles = async (files: FileUpload[]) => {
+    if (cancelledRef.current) return;
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
+    const signal = controller.signal;
+
     const fileUploadPromises = files.map(async (file, fileIndex) =>
       // Limit the number of concurrent uploads to 3
       promiseLimit(async () => {
         let fileId: string | undefined;
 
         const setFileProgress = (progress: number) => {
+          if (signal.aborted) return;
           setUploadingFiles((files) =>
             files.map((file, callbackIndex) =>
               fileIndex == callbackIndex
@@ -98,6 +111,7 @@ const EditableUpload = ({
         if (chunks == 0) chunks++;
 
         for (let chunkIndex = 0; chunkIndex < chunks; chunkIndex++) {
+          if (signal.aborted) return;
           const from = chunkIndex * chunkSize.current;
           const to = from + chunkSize.current;
           const blob = file.file!.slice(from, to);
@@ -114,13 +128,18 @@ const EditableUpload = ({
                 chunkIndex,
                 chunks,
                 (progress) => setFileProgress(progress),
+                signal,
               )
               .then((response) => {
                 fileId = response.id;
+                // Registrado para remover o arquivo parcial se o usuário cancelar.
+                uploadedFileIdsRef.current.add(response.id);
               });
 
+            if (signal.aborted) return;
             setFileProgress(((chunkIndex + 1) / chunks) * 100);
           } catch (e) {
+            if (signal.aborted || isCancel(e)) return;
             if (
               e instanceof AxiosError &&
               e.response?.data.error == "unexpected_chunk_index"
@@ -130,8 +149,12 @@ const EditableUpload = ({
               continue;
             } else {
               setFileProgress(-1);
-              // Retry after 5 seconds
-              await new Promise((resolve) => setTimeout(resolve, 5000));
+              // Retry after 5 seconds, interrompível pelo cancelamento
+              try {
+                await waitWithAbort(5000, signal);
+              } catch {
+                return;
+              }
               chunkIndex = -1;
 
               continue;
@@ -167,48 +190,117 @@ const EditableUpload = ({
   };
 
   const save = async () => {
-    setIsUploading(true);
-    try {
+    cancelledRef.current = false;
+    uploadedFileIdsRef.current.clear();
+
+    const run = async () => {
+      setIsUploading(true);
       try {
-        await revertComplete();
-        await uploadFiles(uploadingFiles);
+        try {
+          await revertComplete();
+          if (cancelledRef.current) return;
+          await uploadFiles(uploadingFiles);
 
-        const hasFailed = uploadingFiles.some(
-          (file) => file.uploadingProgress == -1,
-        );
+          // Cancelado: não remover arquivos nem recompletar o share.
+          if (cancelledRef.current) return;
 
-        if (!hasFailed) {
-          await removeFiles();
+          const hasFailed = uploadingFiles.some(
+            (file) => file.uploadingProgress == -1,
+          );
+
+          if (!hasFailed) {
+            await removeFiles();
+          }
+
+          if (cancelledRef.current) return;
+
+          await completeShare();
+
+          if (cancelledRef.current) return;
+
+          if (!hasFailed) {
+            toast.success(t("share.edit.notify.save-success"));
+            router.back();
+          }
+        } catch {
+          if (cancelledRef.current) return;
+          const retry = () => save();
+          showBlockingErrorModal(modals, {
+            title: t("upload.save.error.title"),
+            description: t("upload.save.error.description"),
+            actions: [
+              {
+                label: t("common.button.retry"),
+                color: "blue",
+                variant: "filled",
+                onClick: retry,
+              },
+              {
+                label: t("common.button.go-back"),
+                onClick: () => router.back(),
+              },
+            ],
+          });
         }
-
-        await completeShare();
-
-        if (!hasFailed) {
-          toast.success(t("share.edit.notify.save-success"));
-          router.back();
-        }
-      } catch {
-        const retry = () => save();
-        showBlockingErrorModal(modals, {
-          title: t("upload.save.error.title"),
-          description: t("upload.save.error.description"),
-          actions: [
-            {
-              label: t("common.button.retry"),
-              color: "blue",
-              variant: "filled",
-              onClick: retry,
-            },
-            {
-              label: t("common.button.go-back"),
-              onClick: () => router.back(),
-            },
-          ],
-        });
+      } finally {
+        setIsUploading(false);
       }
+    };
+
+    const promise = run();
+    savePromiseRef.current = promise;
+    try {
+      await promise;
     } finally {
-      setIsUploading(false);
+      savePromiseRef.current = null;
     }
+  };
+
+  /**
+   * Aborta o save em andamento: descarta os arquivos novos, desfaz exclusões,
+   * remove do servidor os arquivos parciais e devolve o share ao estado
+   * concluído (revertComplete já tinha sido chamado por save()).
+   */
+  const cancelUpload = async () => {
+    cancelledRef.current = true;
+    uploadAbortRef.current?.abort();
+    uploadAbortRef.current = null;
+
+    setIsUploading(false);
+    setUploadingFiles([]);
+    setExistingFiles(savedFiles);
+    setErrorToastShown(false);
+    notifications.hide(EDITABLE_ERROR_TOAST_ID);
+    modals.closeAll();
+
+    // Espera os chunks em voo terminarem antes de mexer no servidor.
+    if (savePromiseRef.current) {
+      try {
+        await savePromiseRef.current;
+      } catch {
+        // O save já trata seus próprios erros.
+      }
+    }
+
+    const partialIds = [...uploadedFileIdsRef.current];
+    uploadedFileIdsRef.current.clear();
+
+    if (partialIds.length > 0) {
+      await Promise.all(
+        partialIds.map((id) =>
+          shareService.removeFile(shareId, id).catch(() => {
+            // Arquivo pode não existir mais; nada a fazer.
+          }),
+        ),
+      );
+    }
+
+    try {
+      await completeShare();
+    } catch {
+      // Share pode já estar completo; nada a fazer.
+    }
+    toast.success(t("upload.notify.cancelled"));
   };
 
   const appendFiles = (appendingFiles: FileUpload[]) => {
@@ -223,6 +315,7 @@ const EditableUpload = ({
   };
 
   useEffect(() => {
+    if (cancelledRef.current) return;
     // Check if there are any files that failed to upload
     const fileErrorCount = uploadingFiles.filter(
       (file) => file.uploadingProgress == -1,
@@ -251,6 +344,16 @@ const EditableUpload = ({
   return (
     <>
       <Group justify="flex-end" mb={20}>
+        {!isUploading && uploadingFiles.length > 0 && (
+          <Button variant="default" onClick={() => setUploadingFiles([])}>
+            {t("upload.button.discard")}
+          </Button>
+        )}
+        {isUploading && (
+          <Button variant="light" color="red" onClick={cancelUpload}>
+            {t("upload.button.cancel")}
+          </Button>
+        )}
         <Button loading={isUploading} disabled={!dirty} onClick={() => save()}>
           <FormattedMessage id="common.button.save" />
         </Button>

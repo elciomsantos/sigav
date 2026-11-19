@@ -42,9 +42,9 @@ patched version before publicly disclosing the issue.
 
 # Security Architecture Overview
 
-This document summarizes the security posture of Controle Share Videos v1.0
-(fork of Pingvin Share X), based on the comprehensive audit in
-`docs/auditoria/SECURITY_REPORT.md`.
+This document summarizes the security posture of SIGAV — Sistema de Gestão e
+Compartilhamento de Vídeos (v2.7.0; fork of Pingvin Share X), based on the
+comprehensive audit in `docs/auditoria/SECURITY_REPORT.md`.
 
 ## Security Score: **9.0 / 10**
 

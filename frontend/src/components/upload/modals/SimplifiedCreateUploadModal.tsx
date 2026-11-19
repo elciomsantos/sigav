@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  Group,
   Stack,
   Textarea,
   TextInput,
@@ -24,9 +25,11 @@ const SimplifiedCreateUploadModal = ({
   uploadCallback,
   files,
   options,
+  onCancel,
 }: {
   files: FileUpload[];
   uploadCallback: (createShare: CreateShare, files: FileUpload[]) => void;
+  onCancel?: () => void;
   options: {
     isUserSignedIn: boolean;
     enableEmailRecepients: boolean;
@@ -160,9 +163,18 @@ const SimplifiedCreateUploadModal = ({
               }}
             />
           )}
-          <Button type="submit" data-autofocus>
-            <FormattedMessage id="common.button.share" />
-          </Button>
+          <Group justify="flex-end">
+            <Button
+              type="button"
+              variant="default"
+              onClick={onCancel ?? (() => modals.closeAll())}
+            >
+              <FormattedMessage id="common.button.cancel" />
+            </Button>
+            <Button type="submit" data-autofocus>
+              <FormattedMessage id="common.button.share" />
+            </Button>
+          </Group>
         </Stack>
       </form>
     </Stack>

@@ -83,5 +83,3 @@ export const showBlockingErrorModal = (
     ),
   });
 };
-
-export default showBlockingErrorModal;

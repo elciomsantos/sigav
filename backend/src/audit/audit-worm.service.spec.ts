@@ -6,6 +6,7 @@ import { Prisma } from "../../prisma/generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { MetricsService } from "../metrics/metrics.service";
 import { AuditWormService } from "./audit-worm.service";
+import { AuditEvent } from "./audit-events";
 
 const GENESIS = "0".repeat(64);
 
@@ -230,7 +231,7 @@ describe("AuditWormService", () => {
     it("valida chain íntegra e exporta gauge 0", async () => {
       const svc = createService();
       await svc.record("LOGIN_SUCCESS", { userId: "u1" });
-      await svc.record("SHARE_ACCESS", { userId: "u1" });
+      await svc.record(AuditEvent.SHARE_ACCESS, { userId: "u1" });
 
       const result = await svc.verifyIntegrity();
 
@@ -314,7 +315,9 @@ describe("AuditWormService", () => {
       await svc.verifyIntegrity();
 
       expect(rows).toHaveLength(totalBefore + 1);
-      expect(rows[rows.length - 1].eventType).toBe("AUDIT_INTEGRITY_CHECK");
+      expect(rows[rows.length - 1].eventType).toBe(
+        AuditWormService.INTEGRITY_EVENT,
+      );
     });
   });
 

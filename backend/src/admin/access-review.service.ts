@@ -10,6 +10,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { JwtSecretService } from "../config/jwt-secret.service";
 import { EmailService } from "../email/email.service";
 import { AuditService } from "../audit/audit.service";
+import { AuditEvent } from "../audit/audit-events";
 import { MetricsService } from "../metrics/metrics.service";
 
 /**
@@ -253,7 +254,7 @@ export class AccessReviewService {
     });
 
     // Fora da transação: record nunca lança e já encadeia no WORM (#10).
-    await this.auditService.record("ACCESS_REVIEW_CERTIFIED", {
+    await this.auditService.record(AuditEvent.ACCESS_REVIEW_CERTIFIED, {
       userId: target.id,
       resource: "user-access",
       result: dto.certified ? "certified" : "rejected",
@@ -332,7 +333,7 @@ export class AccessReviewService {
         }
       }
 
-      await this.auditService.record("ACCESS_REVIEW_QUARTERLY_REMINDER", {
+      await this.auditService.record(AuditEvent.ACCESS_REVIEW_QUARTERLY_REMINDER, {
         resource: "user-access",
         result: sent > 0 ? "success" : "failure",
         metadata: { ...summary, recipients: admins.length, sent },

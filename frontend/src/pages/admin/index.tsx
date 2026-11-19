@@ -13,6 +13,7 @@ import {
   TbHistory,
   TbLink,
   TbSettings,
+  TbShieldCheck,
   TbShieldLock,
   TbUsers,
 } from "react-icons/tb";
@@ -63,6 +64,12 @@ const Admin = () => {
       title: t("admin.button.config"),
       icon: TbSettings,
       route: "/admin/config/general",
+      roles: ["admin"],
+    },
+    {
+      title: t("admin.button.accessReview"),
+      icon: TbShieldCheck,
+      route: "/admin/access-review",
       roles: ["admin"],
     },
   ];

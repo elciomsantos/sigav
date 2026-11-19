@@ -3,7 +3,6 @@ import { ConfigModule } from "../../config/config.module";
 import { DownloadLogModule } from "../../download-log/download-log.module";
 import { ShareValidationService } from "./share-validation.service";
 import { ShareTokenService } from "./share-token.service";
-import { ShareLimitService } from "./share-limit.service";
 import { StreamViewCounterService } from "./stream-view-counter.service";
 
 @Global()
@@ -12,13 +11,11 @@ import { StreamViewCounterService } from "./stream-view-counter.service";
   providers: [
     ShareValidationService,
     ShareTokenService,
-    ShareLimitService,
     StreamViewCounterService,
   ],
   exports: [
     ShareValidationService,
     ShareTokenService,
-    ShareLimitService,
     StreamViewCounterService,
   ],
 })

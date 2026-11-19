@@ -239,7 +239,7 @@ export async function configureApp(
   app.setGlobalPrefix("api");
 }
 
-export async function createApp() {
+async function createApp() {
   const logLevels = generateNestJsLogLevels();
   Logger.log(`Showing ${logLevels.join(", ")} messages`);
 

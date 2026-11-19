@@ -1,4 +1,3 @@
-import React from "react";
 import { Button, Stack, Text, Title } from "@mantine/core";
 import Meta from "../components/Meta";
 import useTranslate from "../hooks/useTranslate.hook";
@@ -31,7 +30,7 @@ export default function Error() {
           />
         </Text>
         <Button mt="xl" onClick={() => router.push("/")}>
-          {"Go Home"}
+          <FormattedMessage id="error.button.back" />
         </Button>
       </Stack>
     </>

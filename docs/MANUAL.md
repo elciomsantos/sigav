@@ -1,4 +1,4 @@
-# Manual de Operação — Controle Share Videos
+# Manual de Operação — SIGAV
 
 Este documento reúne os comandos principais para desenvolvimento, teste de hardening, produção e manutenção Docker.
 

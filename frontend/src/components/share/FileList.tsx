@@ -170,7 +170,7 @@ const FileList = ({
                                   }
                                 } else {
                                   toast.error(
-                                    t("share.notify.copy-not-supported"),
+                                    t("share.notify.copy-not-supported-error"),
                                   );
                                 }
                               } catch (err) {

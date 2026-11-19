@@ -1,4 +1,4 @@
-# DEPLOY — Controle Share Videos
+# DEPLOY — SIGAV
 
 > Guia de implantação em produção. Coberto por `docs/auditoria/AUDIT_REPORT.md` (nota 7.5/10).
 > Versão do documento: 1.0 · Atualizado em 2026-08-12

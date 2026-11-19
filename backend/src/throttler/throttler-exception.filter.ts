@@ -7,7 +7,7 @@ import { Response } from "express";
 export class ThrottlerExceptionFilter implements ExceptionFilter<ThrottlerException> {
   constructor(private readonly i18n?: I18nService) {}
 
-  async catch(exception: ThrottlerException, host: ArgumentsHost) {
+  async catch(_exception: ThrottlerException, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
 
     const retryAfter = 60;

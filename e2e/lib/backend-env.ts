@@ -11,7 +11,6 @@ const DATABASE_URL = `file:${E2E_DB_PATH}`;
 
 process.env.DATABASE_URL = DATABASE_URL;
 process.env.DATA_DIRECTORY = E2E_DATA_DIR;
-process.env.SHARE_DIRECTORY = path.join(E2E_DATA_DIR, "shares");
 process.env.CONFIG_FILE = path.join(E2E_DATA_DIR, "no-config.yaml");
 process.env.NODE_ENV = "test";
 process.env.BACKEND_PORT = String(BACKEND_PORT);

@@ -1,6 +1,7 @@
+import { Button } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AxiosError, isCancel } from "axios";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Meta from "../../components/Meta";
 import Dropzone from "../../components/upload/Dropzone";
@@ -20,6 +21,7 @@ import { useRouter } from "next/router";
 import { getNormalizedFileName, filterDuplicateFiles } from "../../utils/file.util";
 import isAdminOrAuditor from "../../utils/userRole.util";
 import { createUploadLimiter } from "../../utils/concurrency";
+import { waitWithAbort } from "../../utils/abort.util";
 
 const promiseLimit = createUploadLimiter();
 const UPLOAD_ERROR_TOAST_ID = "upload-error-toast";
@@ -42,6 +44,10 @@ const Upload = ({
   const [errorToastShown, setErrorToastShown] = useState(false);
   const [createdShare, setCreatedShare] = useState<Share | null>(null);
   const [pendingGeneratedPassword, setPendingGeneratedPassword] = useState<string | undefined>(undefined);
+
+  // Cancelamento real: aborta os chunks em voo e interrompe os loops de retry.
+  const uploadAbortRef = useRef<AbortController | null>(null);
+  const cancelledRef = useRef(false);
 
   useConfirmLeave({
     message: t("upload.notify.confirm-leave"),
@@ -81,6 +87,11 @@ const Upload = ({
   const autoOpenCreateUploadModal = config.get("share.autoOpenShareModal");
 
   const uploadFiles = async (share: CreateShare, filesToUpload: FileUpload[]) => {
+    cancelledRef.current = false;
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
+    const signal = controller.signal;
+
     setisUploading(true);
     setErrorToastShown(false);
 
@@ -92,6 +103,7 @@ const Upload = ({
         ...share,
         size: totalSize,
       });
+      if (signal.aborted) return;
       createdShareId = result.id;
       setCreatedShare(result);
       setPendingGeneratedPassword((result as any).generatedPassword);
@@ -101,6 +113,7 @@ const Upload = ({
       // usuário não tinha nenhum feedback do estado do carregamento.
       modals.closeAll();
     } catch (e) {
+      if (isCancel(e) || cancelledRef.current) return;
       toast.axiosError(e);
       setisUploading(false);
       return;
@@ -111,6 +124,7 @@ const Upload = ({
         let fileId;
 
         const setFileProgress = (progress: number) => {
+          if (signal.aborted) return;
           setFiles((files) =>
             files.map((file, callbackIndex) =>
               fileIndex == callbackIndex
@@ -127,6 +141,7 @@ const Upload = ({
         if (chunks == 0) chunks++;
 
         for (let chunkIndex = 0; chunkIndex < chunks; chunkIndex++) {
+          if (signal.aborted) return;
           const from = chunkIndex * chunkSize.current;
           const to = from + chunkSize.current;
           const blob = file.file!.slice(from, to);
@@ -143,13 +158,16 @@ const Upload = ({
                 chunkIndex,
                 chunks,
                 (progress) => setFileProgress(progress),
+                signal,
               )
               .then((response) => {
                 fileId = response.id;
               });
 
+            if (signal.aborted) return;
             setFileProgress(((chunkIndex + 1) / chunks) * 100);
           } catch (e) {
+            if (signal.aborted || isCancel(e)) return;
             if (
               e instanceof AxiosError &&
               e.response?.data.error == "unexpected_chunk_index"
@@ -158,7 +176,11 @@ const Upload = ({
               continue;
             } else {
               setFileProgress(-1);
-              await new Promise((resolve) => setTimeout(resolve, 5000));
+              try {
+                await waitWithAbort(5000, signal);
+              } catch {
+                return;
+              }
               chunkIndex = -1;
               continue;
             }
@@ -168,6 +190,38 @@ const Upload = ({
     );
 
     await Promise.all(fileUploadPromises);
+  };
+
+  /** Aborta os chunks em voo e descarta o compartilhamento criado no servidor. */
+  const cancelUpload = async () => {
+    cancelledRef.current = true;
+    uploadAbortRef.current?.abort();
+    uploadAbortRef.current = null;
+
+    const shareIdToRemove = createdShare?.id;
+
+    setisUploading(false);
+    setFiles([]);
+    setCreatedShare(null);
+    setPendingGeneratedPassword(undefined);
+    setErrorToastShown(false);
+    notifications.hide(UPLOAD_ERROR_TOAST_ID);
+    modals.closeAll();
+
+    if (shareIdToRemove) {
+      try {
+        await shareService.remove(shareIdToRemove);
+      } catch {
+        // O share pode não ter sido criado ou já ter sido removido.
+      }
+    }
+    toast.success(t("upload.notify.cancelled"));
+  };
+
+  /** Usuário desistiu ainda no modal: fecha e limpa os arquivos selecionados. */
+  const discardSelection = () => {
+    modals.closeAll();
+    setFiles([]);
   };
 
   const showCreateUploadModalCallback = (filesToUpload: FileUpload[]) => {
@@ -189,6 +243,7 @@ const Upload = ({
       },
       filesToUpload,
       uploadFiles,
+      discardSelection,
     );
   };
 
@@ -209,6 +264,7 @@ const Upload = ({
   };
 
   useEffect(() => {
+    if (cancelledRef.current) return;
     const fileErrorCount = files.filter(
       (file) => file.uploadingProgress == -1,
     ).length;
@@ -236,6 +292,7 @@ const Upload = ({
 
   useEffect(() => {
     if (
+      !cancelledRef.current &&
       files.length > 0 &&
       files.every((file) => file.uploadingProgress >= 100) &&
       files.every((file) => file.uploadingProgress !== -1) &&
@@ -258,6 +315,7 @@ const Upload = ({
             setPendingGeneratedPassword(undefined);
             setCreatedShare(null);
             setFiles([]);
+            uploadAbortRef.current = null;
           })
           .catch((e: any) => {
             const discard = () =>
@@ -298,7 +356,7 @@ const Upload = ({
         // cabeçalho e o rodapé. Um minHeight: 100vh aqui somava os 146px do
         // chrome e criava barra de rolagem na tela.
         flexGrow: 1,
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('/img/tela-fundo.png')",
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15)), url('/img/pasta_amarela.png')",
         backgroundSize: "40% auto",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
@@ -318,6 +376,23 @@ const Upload = ({
           files={files}
           setFiles={(newFiles) => setFiles(newFiles as FileUpload[])}
         />
+      )}
+      {isUploading && (
+        <Button mt="md" variant="light" color="red" onClick={cancelUpload}>
+          {t("upload.button.cancel")}
+        </Button>
+      )}
+      {!isUploading && files.length > 0 && !autoOpenCreateUploadModal && (
+        <Button
+          mt="md"
+          variant="default"
+          onClick={() => {
+            setFiles([]);
+            setCreatedShare(null);
+          }}
+        >
+          {t("upload.button.discard")}
+        </Button>
       )}
     </div>
   );

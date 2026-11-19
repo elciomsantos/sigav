@@ -22,14 +22,14 @@ const Intro = () => {
           <Center>
             <Title order={2}>Guarda Municipal de Londrina</Title>
           </Center>
-          <Text>Sistema de Controle e compartilhamento de Videos!</Text>
+          <Text>SIGAV — Sistema de Gestão e Compartilhamento de Vídeos</Text>
           <Text mt="lg">Faça login no sistema para continuar</Text>
           <Stack>
             <Button href="/admin/config/general" component={Link}>
-              Customize configuration
+              Personalizar configuração
             </Button>
             <Button href="/" component={Link} variant="light">
-              Explore Controle Share Videos
+              Explorar SIGAV
             </Button>
           </Stack>
         </Stack>

@@ -135,8 +135,7 @@ const FilePreview = ({
         rel="noopener noreferrer"
         href={`/api/shares/${shareId}/files/${fileId}?download=false`}
       >
-        View original file
-        {/* Add translation? */}
+        <FormattedMessage id="share.file.viewOriginal" />
       </Button>
     </Stack>
   );

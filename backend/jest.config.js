@@ -21,7 +21,6 @@ module.exports = {
     "src/share/share-archive.service.ts",
     "src/share/domain/share-validation.service.ts",
     "src/share/domain/share-token.service.ts",
-    "src/share/domain/share-limit.service.ts",
   ],
   coverageDirectory: "./coverage",
   coverageThreshold: {
