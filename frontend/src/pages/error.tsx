@@ -30,7 +30,7 @@ export default function Error() {
           />
         </Text>
         <Button mt="xl" onClick={() => router.push("/")}>
-          {"Go Home"}
+          <FormattedMessage id="error.button.back" />
         </Button>
       </Stack>
     </>

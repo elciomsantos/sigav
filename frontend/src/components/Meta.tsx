@@ -24,7 +24,8 @@ const Meta = ({
       <meta
         name="og:description"
         content={
-          description ?? "An open-source and self-hosted sharing platform."
+          description ??
+          "SIGAV — Sistema de Gestão e Compartilhamento de Vídeos"
         }
       />
       <meta name="twitter:title" content={metaTitle} />
