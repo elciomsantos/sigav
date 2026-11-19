@@ -4,7 +4,7 @@ import { useModals } from "@mantine/modals";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
-import Head from "next/head";
+import Meta from "../../components/Meta";
 import { safeRedirectPath } from "../../utils/router.util";
 import { TbAlertCircle, TbCheck } from "react-icons/tb";
 import useTranslate from "../../hooks/useTranslate.hook";
@@ -104,9 +104,7 @@ const ChangePassword = () => {
 
   return (
     <>
-      <Head>
-        <title>{t("account.changePassword.title")}</title>
-      </Head>
+      <Meta title={t("account.changePassword.title")} />
       <Stack style={{ maxWidth: 400, margin: "auto", marginTop: "xl" }}>
         <Title order={2} ta="center">
           {t("account.changePassword.title")}
