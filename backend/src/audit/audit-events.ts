@@ -21,6 +21,8 @@ export const AuditEvent = {
   ROLE_CHANGED: "ROLE_CHANGED",
   SHARE_CREATED: "SHARE_CREATED",
   SHARE_REVOKED: "SHARE_REVOKED",
+  // §29.4: acesso/download são cobertos pelo DownloadLog (sem duplicação no
+  // AuditLog). Mantidos no vocabulário por compatibilidade de dashboards.
   SHARE_ACCESS: "SHARE_ACCESS",
   SHARE_DOWNLOAD: "SHARE_DOWNLOAD",
   REFRESH_TOKEN_REUSE_DETECTED: "REFRESH_TOKEN_REUSE_DETECTED",

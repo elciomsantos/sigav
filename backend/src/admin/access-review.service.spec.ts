@@ -4,6 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { JwtSecretService } from "../config/jwt-secret.service";
 import { EmailService } from "../email/email.service";
 import { AuditService } from "../audit/audit.service";
+import { AuditEvent } from "../audit/audit-events";
 import { MetricsService } from "../metrics/metrics.service";
 import { AccessReviewService } from "./access-review.service";
 
@@ -186,7 +187,7 @@ describe("AccessReviewService", () => {
       });
 
       expect(auditService.record).toHaveBeenCalledWith(
-        "ACCESS_REVIEW_CERTIFIED",
+        AuditEvent.ACCESS_REVIEW_CERTIFIED,
         expect.objectContaining({
           userId: "u2",
           result: "certified",
@@ -276,7 +277,7 @@ describe("AccessReviewService", () => {
         }),
       );
       expect(auditService.record).toHaveBeenCalledWith(
-        "ACCESS_REVIEW_QUARTERLY_REMINDER",
+        AuditEvent.ACCESS_REVIEW_QUARTERLY_REMINDER,
         expect.objectContaining({
           result: "success",
           metadata: expect.objectContaining({ sent: 2, recipients: 2 }),
@@ -294,7 +295,7 @@ describe("AccessReviewService", () => {
 
       await expect(service.sendQuarterlyReviewReminder()).resolves.toBeUndefined();
       expect(auditService.record).toHaveBeenCalledWith(
-        "ACCESS_REVIEW_QUARTERLY_REMINDER",
+        AuditEvent.ACCESS_REVIEW_QUARTERLY_REMINDER,
         expect.objectContaining({
           result: "success",
           metadata: expect.objectContaining({ recipients: 2, sent: 1 }),

@@ -8,6 +8,7 @@ import { DATA_DIRECTORY } from "../constants";
 import { MetricsService } from "../metrics/metrics.service";
 import { PrismaService } from "../prisma/prisma.service";
 import {
+  AuditEvent,
   AuditEventType,
   AuditRecordInput,
 } from "./audit-events";
@@ -32,7 +33,7 @@ import {
 @Injectable()
 export class AuditWormService implements OnModuleInit {
   static readonly GENESIS_HASH = "0".repeat(64);
-  static readonly INTEGRITY_EVENT = "AUDIT_INTEGRITY_CHECK";
+  static readonly INTEGRITY_EVENT = AuditEvent.AUDIT_INTEGRITY_CHECK;
 
   private readonly logger = new Logger(AuditWormService.name);
   private readonly verifyBatchSize = 500;
