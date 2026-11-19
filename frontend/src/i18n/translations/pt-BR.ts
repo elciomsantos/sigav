@@ -21,11 +21,9 @@ export default {
   "home.bullet.c.name": "Compartilhamento Controlado",
   "home.bullet.c.description": "Acesso aos arquivos protegido por senha, com controle sobre visualizações e downloads.",
   "home.button.start": "Começar",
-  "home.button.source": "Código-fonte",
   // END /
 
   // /auth/signin
-  "signin.title": "Bem-vindo de volta",
   "signin.description": "Ainda não tem uma conta?",
   "signin.button.signup": "Registo",
   "signin.input.email-or-username": "E-mail ou nome de usuário",
@@ -72,7 +70,6 @@ export default {
   "verify.info.note": "Se não receber o e-mail em alguns minutos, verifique a pasta de spam.",
   "verify.info.resend.button": "Reenviar e-mail de verificação",
   "verify.info.resend.success": "E-mail de verificação reenviado com sucesso.",
-  "verify.info.resend.error": "Falha ao reenviar e-mail de verificação.",
   // END /auth/signup
 
   // /auth/totp
@@ -83,10 +80,8 @@ export default {
   // /auth/totp/enroll (cadastro obrigatório de 2FA p/ admins)
   "totp.enroll.title": "Habilitar autenticação de dois fatores",
   "totp.enroll.description": "Como administrador, você deve configurar a autenticação de dois fatores (TOTP) antes de continuar.",
-  "totp.enroll.step1.title": "Confirme sua senha",
   "totp.enroll.step1.button": "Continuar",
   "totp.enroll.step2.title": "Adicione o seu autenticador",
-  "totp.enroll.step2.manual": "Inserir manualmente",
   "totp.enroll.step3.title": "Valide o seu código",
   "totp.enroll.button.verify": "Verificar e entrar",
   "totp.enroll.recovery.title": "Códigos de recuperação",
@@ -99,7 +94,6 @@ export default {
   "reauthenticate.modal.title": "Confirme sua identidade",
   "reauthenticate.modal.description": "Por segurança, confirme sua identidade para continuar.",
   "reauthenticate.input.password": "Senha",
-  "reauthenticate.input.totp": "Código TOTP",
   "reauthenticate.button.confirm": "Confirmar",
   "reauthenticate.notify.success": "Identidade confirmada",
   // END reautenticação
@@ -131,15 +125,12 @@ export default {
   "account.modal.totp.title": "Habilitar TOTP",
   "account.modal.totp.step1": "Passo 1: Adicionar o seu autenticador",
   "account.modal.totp.step2": "Passo 2: Valide o seu código",
-  "account.modal.totp.enterManually": "Inserir manualmente",
   "account.modal.totp.code": "Código",
   "common.button.clickToCopy": "Clique para copiar",
   "common.button.showQRCode": "Show QR code",
   "account.modal.totp.verify": "Verificar",
   "account.notify.totp.disable": "TOTP desabilitado com sucesso",
   "account.notify.totp.enable": "TOTP habilitado com sucesso",
-  "account.card.language.title": "Idioma",
-  "account.card.language.description": "O projeto é traduzido pela comunidade. Alguns idiomas podem estar incompletos.",
   "account.card.color.title": "Esquema de cores",
   // ThemeSwitcher.tsx
   "account.theme.dark": "Escuro",
@@ -155,7 +146,6 @@ export default {
   "account.shares.title.empty": "Está vazio aqui 👀",
   "account.shares.description.empty": "Você não tem nenhum compartilhamento.",
   "account.shares.button.create": "Crie um",
-  "account.shares.info.title": "Informações do compartilhamento",
   "account.shares.button.edit": "Add/Remove Files",
   "account.shares.table.id": "ID",
   "account.shares.table.name": "Nome",
@@ -189,14 +179,12 @@ export default {
   "admin.button.auditLogs": "auditoria de eventos",
   "admin.button.config": "Configuração",
   "admin.button.accessReview": "Revisão de acesso",
-  "admin.version": "Versão",
   // END /admin
 
   // /admin/users
   "admin.users.title": "Gerenciamento de usuários",
   "admin.users.table.username": "Nome de usuário",
   "admin.users.table.email": "E-mail",
-  "admin.users.table.admin": "Admin",
   "admin.users.table.role": "Perfil",
   "admin.users.table.status": "Status",
   "admin.users.table.status.active": "Ativo",
@@ -210,9 +198,6 @@ export default {
   "admin.users.notify.deactivate.success": "Usuário desativado com sucesso",
   "admin.users.notify.activate.success": "Usuário ativado com sucesso",
   "admin.users.edit.update.title": "Editar usuário: {username}",
-  "admin.users.edit.update.admin-privileges": "Privilégios de administrador",
-  "admin.users.edit.update.custom-share-size-limit": "Custom share size limit",
-  "admin.users.edit.update.custom-share-size-limit.description": "Override the global upload limit for this user",
   "admin.users.edit.update.change-password.title": "Alterar senha",
   "admin.users.edit.update.change-password.field": "Nova senha",
   "admin.users.edit.update.change-password.button": "Salvar nova senha",
@@ -227,10 +212,6 @@ export default {
   "admin.users.modal.create.password": "Senha",
   "admin.users.modal.create.manual-password": "Definir senha manualmente",
   "admin.users.modal.create.manual-password.description": "Se não estiver marcado, o usuário receberá um e-mail com um link para definir sua senha.",
-  "admin.users.modal.create.custom-share-size-limit": "Custom share size limit",
-  "admin.users.modal.create.custom-share-size-limit.description": "Override the global upload limit for this user",
-  "admin.users.modal.create.admin": "Privilégios de administrador",
-  "admin.users.modal.create.admin.description": "Se marcado, o usuário poderá acessar o painel de administração.",
   "admin.users.modal.create.role": "Perfil",
   "admin.users.modal.create.role.placeholder": "Selecione um perfil",
   "admin.users.modal.create.role.admin": "Administrador",
@@ -249,15 +230,8 @@ export default {
   // /admin/shares
   "admin.shares.title": "Gerenciamento de compartilhamentos",
   "admin.shares.diskUsage": "Disk Usage",
-  "admin.shares.table.id": "ID do Compartilhamento",
   "admin.shares.table.username": "Criador",
-  "admin.shares.table.visitors": "Visitantes",
-  "admin.shares.table.expires": "Expira em",
   "admin.shares.table.deletes": "Deletes on",
-  "admin.shares.table.views": "Visualizações",
-  "admin.shares.table.maxViews": "Máx. Visualizações",
-  "admin.shares.table.downloads": "Downloads",
-  "admin.shares.table.maxDownloads": "Máx. Downloads",
   "admin.shares.edit.delete.title": "Excluir o compartilhamento {id}",
   "admin.shares.edit.delete.description": "Tem certeza que deseja excluir este compartilhamento?",
   // END /admin/shares
@@ -403,27 +377,16 @@ export default {
   // /upload
   "upload.title": "Carregar",
   "upload.notify.confirm-leave": "Você tem certeza que deseja sair desta página? Seu envio será cancelado.",
-  "upload.notify.generic-error": "Ocorreu um erro ao terminar seu compartilhamento.",
-  "upload.notify.count-failed": "Falha ao enviar {count} arquivos. Tentando novamente.",
   "upload.notify.count-failed-honest": "Falha ao enviar {count} arquivo(s). Toque para ver detalhes.",
   "upload.notify.duplicate-skipped": "O arquivo \"{name}\" foi ignorado por ser duplicado.",
-  "upload.error.title": "Não foi possível criar o compartilhamento",
-  "upload.error.description": "Ocorreu um erro ao finalizar o compartilhamento. Tente novamente.",
-  "upload.button.retry-create": "Tentar novamente",
   "upload.button.discard": "Descartar",
   "upload.complete.error.title": "Falha ao finalizar compartilhamento",
   "upload.complete.error.description": "Não foi possível completar o compartilhamento. Os arquivos podem estar órfãos.",
   "upload.save.error.title": "Falha ao salvar alterações",
   "upload.save.error.description": "Não foi possível salvar as alterações no compartilhamento.",
   // Dropzone.tsx
-  "upload.dropzone.title": "Carregar arquivos",
-  "upload.dropzone.description": "Arraste arquivos aqui para começar o compartilhamento ou use Ctrl+V para anexar conteúdo da área de transferência. Aceitamos arquivos de até {maxSize} no total.",
   "upload.dropzone.notify.file-too-big": "Seus arquivos excedem o tamanho máximo do compartilhamento {maxSize}.",
-  "upload.dropzone.notify.video-only": "Apenas arquivos de vídeo são permitidos.",
   "upload.button.folder.append": "Adicionar mais",
-  // FileList.tsx
-  "upload.filelist.name": "Nome",
-  "upload.filelist.size": "Tamanho",
   // showCreateUploadModal.tsx
   "upload.modal.title": "Criar Compartilhamento",
   "upload.modal.link.error.invalid": "Pode conter apenas letras, números, sublinhados e hífens",
@@ -451,11 +414,9 @@ export default {
   "upload.modal.accordion.name-and-description.name.placeholder": "Nome",
   "upload.modal.accordion.name-and-description.description.placeholder": "Nota para os destinatários deste compartilhamento",
   "upload.modal.accordion.file-descriptions.title": "Descrições dos arquivos",
-  "upload.modal.accordion.file-descriptions.placeholder": "Descrição deste arquivo",
   "upload.modal.accordion.file-descriptions.sei-placeholder": "Número processo SEI ou B.O",
   "upload.modal.accordion.email.title": "Destinatários de e-mail",
   "upload.modal.accordion.email.placeholder": "Insira os destinatários do e-mail",
-  "upload.modal.accordion.email.invalid-email": "Endereço de e-mail inválido",
   "upload.modal.accordion.security.title": "Opções de segurança",
   "upload.modal.accordion.security.password.label": "Proteção por senha",
   "upload.modal.accordion.security.password.placeholder": "Sem senha",
@@ -507,7 +468,6 @@ export default {
   "share.button.download-all": "Transferir tudo",
   "share.notify.download-all-preparing": "O compartilhamento está sendo preparado. Tente novamente em alguns minutos.",
   "share.notify.copied-contents": "Conteúdo do arquivo copiado para a área de transferência",
-  "share.notify.copy-too-big-error": "Arquivo grande demais para copiar para a área de transferência",
   "share.notify.copy-not-supported-error": "Copiar para a área de transferência requer conexão HTTPS",
   "share.modal.file-link": "Link do arquivo",
   "share.table.name": "Nome",
@@ -520,7 +480,6 @@ export default {
   // /share/[id]/edit
   "share.edit.title": "Editar {shareId}",
   "share.edit.append-upload": "Anexar arquivo",
-  "share.edit.notify.generic-error": "Ocorreu um erro ao terminar seu compartilhamento.",
   "share.edit.notify.save-success": "Compartilhamento atualizado com sucesso",
   // END /share/[id]/edit
 
@@ -740,7 +699,6 @@ export default {
   "common.text.link": "Vincular",
   "common.text.navigate-to-link": "Visitar Link",
   "common.text.or": "ou",
-  "common.text.redirecting": "Redirecionando...",
   "common.button.go-back": "Voltar",
   "common.button.go-home": "Voltar para o Início",
   "common.button.ok": "OK",
@@ -758,7 +716,6 @@ export default {
   "common.error.too-short": "Deve ter no mínimo {length} caracteres",
   "common.error.too-long": "Deve ter no máximo {length} caracteres",
   "common.error.number-too-small": "Deve ser pelo menos {min}",
-  "common.error.number-too-large": "Deve ser no máximo {max}",
   "common.error.exact-length": "Deve ter exatamente {length} caracteres",
   "common.error.invalid-number": "Tem que ser um número",
   "common.error.field-required": "Este campo é obrigatório",
