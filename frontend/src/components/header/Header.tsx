@@ -276,7 +276,11 @@ const Header = () => {
                 width={38}
                 style={{ objectFit: "contain" }}
               />
-              <Text fw={600}>{config.get("general.appName")}</Text>
+              <img
+                src="/img/sigav_sem_fundo.png"
+                alt={config.get("general.appName")}
+                style={{ height: 28, width: "auto", objectFit: "contain" }}
+              />
             </Group>
           </Link>
           {/* visibleFrom/hiddenFrom geram as media queries via MantineProvider —

@@ -232,7 +232,7 @@ if (response.data["loginToken"]) {
           >
             {/* Substitui o texto "Bem-vindo de volta" dentro do cartão. */}
             <img
-              src="/img/SIGAV_logo_login.png"
+              src="/img/sigav_sem_fundo.png"
               alt="Logotipo SIGAV"
               style={{
                 display: "block",
