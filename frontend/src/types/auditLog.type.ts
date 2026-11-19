@@ -18,8 +18,6 @@ export const AUDIT_EVENTS = [
   "ADMIN_SESSION_REVOKED",
 ] as const;
 
-export type AuditEventType = (typeof AUDIT_EVENTS)[number];
-
 export interface AuditLog {
   id: string;
   createdAt: string;

@@ -33,7 +33,6 @@ import { ShareArchiveService } from "./share-archive.service";
 import { FileStorageService } from "./file-storage.service";
 import { ShareValidationService } from "./domain/share-validation.service";
 import { ShareTokenService } from "./domain/share-token.service";
-import { ShareLimitService } from "./domain/share-limit.service";
 import { MetricsService } from "../metrics/metrics.service";
 import {
   CertificateService,
@@ -57,7 +56,6 @@ export class ShareService {
     private storageService: FileStorageService,
     private validationService: ShareValidationService,
     private tokenService: ShareTokenService,
-    private limitService: ShareLimitService,
     private config: ConfigService,
     private certificateService: CertificateService,
     @Optional() private metrics?: MetricsService,

@@ -36,7 +36,6 @@ export const BACKEND_ENV = {
   ...process.env,
   DATABASE_URL,
   DATA_DIRECTORY: E2E_DATA_DIR,
-  SHARE_DIRECTORY: path.join(E2E_DATA_DIR, "shares"),
   CONFIG_FILE: path.join(E2E_DATA_DIR, "no-config.yaml"),
   NODE_ENV: "test",
   BACKEND_PORT: String(BACKEND_PORT),

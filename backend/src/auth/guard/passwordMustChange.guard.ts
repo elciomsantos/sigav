@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
 import { I18nService } from "nestjs-i18n";
 
 @Injectable()
@@ -11,10 +10,7 @@ export class PasswordMustChangeGuard implements CanActivate {
     "/api/auth/token",
   ];
 
-  constructor(
-    private reflector: Reflector,
-    private i18n: I18nService,
-  ) {}
+  constructor(private i18n: I18nService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();

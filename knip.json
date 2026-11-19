@@ -12,7 +12,6 @@
     "backend/src/**/*.spec.ts",
     "frontend/src/**/*.spec.tsx",
     "backend/prisma/**/*",
-    "backend/scripts/**/*",
     "frontend/src/pages/**/*.tsx"
   ],
   "ignoreDependencies": [

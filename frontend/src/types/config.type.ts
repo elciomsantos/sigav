@@ -96,18 +96,6 @@ export type AdminConfig = Config & {
   allowEdit: boolean;
 };
 
-export type AdminConfigGroupedByCategory = {
-  [key: string]: [
-    Config & {
-      updatedAt: Date;
-      secret: boolean;
-      description: string;
-      obscured: boolean;
-      category: string;
-    },
-  ];
-};
-
 export type ConfigHook = {
   configVariables: Config[];
   refresh: () => void;

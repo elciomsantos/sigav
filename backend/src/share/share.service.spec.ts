@@ -12,7 +12,6 @@ import { FileStorageService } from "./file-storage.service";
 import { ShareArchiveService } from "./share-archive.service";
 import { ShareValidationService } from "./domain/share-validation.service";
 import { ShareTokenService } from "./domain/share-token.service";
-import { ShareLimitService } from "./domain/share-limit.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { ConfigService } from "../config/config.service";
 import { SystemService } from "../system/system.service";
@@ -346,7 +345,6 @@ describe("ShareService", () => {
       verifyShareToken: jest.Mock;
       revokeAllForShare: jest.Mock;
     };
-    limitService: { checkShareSizeLimit: jest.Mock };
     config: { getBoolean: jest.Mock; getNumber: jest.Mock };
     certificateService: {
       generateCertificate: jest.Mock;
@@ -394,7 +392,6 @@ describe("ShareService", () => {
         verifyShareToken: jest.fn(),
         revokeAllForShare: jest.fn(),
       },
-      limitService: { checkShareSizeLimit: jest.fn() },
       config: { getBoolean: jest.fn(), getNumber: jest.fn() },
       certificateService: {
         generateCertificate: jest.fn().mockResolvedValue({
@@ -418,7 +415,6 @@ describe("ShareService", () => {
       mocks.storageService as unknown as FileStorageService,
       mocks.validationService as unknown as ShareValidationService,
       mocks.tokenService as unknown as ShareTokenService,
-      mocks.limitService as unknown as ShareLimitService,
       mocks.config as unknown as ConfigService,
       mocks.certificateService as unknown as CertificateService,
       mocks.metrics as unknown as MetricsService,

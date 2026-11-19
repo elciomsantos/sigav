@@ -51,7 +51,7 @@ const sanitize = (raw: string): string =>
         ALLOW_DATA_ATTR: false,
       });
 
-export const MarkdownRenderer = ({
+const MarkdownRenderer = ({
   children,
   forceBlock,
 }: {

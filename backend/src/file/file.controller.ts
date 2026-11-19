@@ -370,7 +370,6 @@ export class FileController {
   @Public()
   @SharePublicAccess()
   async getCertificate(
-    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Param("shareId") shareId: string,
     @Param("fileId") fileId: string,
