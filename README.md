@@ -9,8 +9,6 @@
   </p>
 </div>
 
-# SIGAV
-
 **SIGAV — Sistema de Gestão e Compartilhamento de Vídeos**: compartilhamento seguro de arquivos para uso interno restrito, em PT-BR. Fork independente do Pingvin Share X v1.21.1, adaptado para upload exclusivamente pelo dono autenticado e armazenamento apenas local (servidor Debian 13).
 
 > **Documentação:** ver `docs/VISAO-GERAL.md` (visão arquitetural),
