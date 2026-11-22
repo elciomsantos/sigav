@@ -13,12 +13,20 @@ updates:
     directory: /backend
     schedule:
       interval: weekly
+    # TypeScript 7 quebra a base de código; manter apenas 6.x por enquanto.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # Frontend Next.js
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
+    # TypeScript 7 quebra a base de código; manter apenas 6.x por enquanto.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # Pacote compartilhado
   - package-ecosystem: npm
