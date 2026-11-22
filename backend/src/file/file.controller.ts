@@ -12,7 +12,7 @@ import {
   StreamableFile,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
-import contentDisposition from "content-disposition";
+import { create as contentDisposition } from "content-disposition";
 import { Request, Response } from "express";
 import { DownloadLogService } from "../download-log/download-log.service";
 import { User } from "../../prisma/generated/prisma/client";
@@ -216,8 +216,8 @@ export class FileController {
 
     if (chunkIndex === totalChunks - 1) {
       const startedAt = Date.now();
-      let fileSize: string | null = null;
-      let mimeType: string | null = null;
+      let fileSize: string | null;
+      let mimeType: string | null;
       try {
         const meta = await this.fileService.getFileMetaData(
           shareId,
@@ -227,6 +227,7 @@ export class FileController {
         mimeType = mime.lookup(name) || null;
       } catch {
         fileSize = null;
+        mimeType = null;
       }
       const context = await buildAuditContext(
         this.prisma,
@@ -659,8 +660,8 @@ export class FileController {
     @Req() req: Request,
     @GetUser() user: User,
   ) {
-    let fileName: string | null = null;
-    let fileSize: string | null = null;
+    let fileName: string | null;
+    let fileSize: string | null;
     try {
       const meta = await this.fileService.getFileMetaData(shareId, fileId);
       fileName = meta?.name ?? null;
