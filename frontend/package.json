@@ -38,10 +38,10 @@
     "@mantine/hooks": "^9.8.0",
     "@mantine/modals": "^9.8.1",
     "@mantine/notifications": "^9.8.1",
-    "@uiw/react-md-editor": "^4.1.6",
+    "@uiw/react-md-editor": "^4.2.4",
     "axios": "^1.17.1",
     "cookies-next": "^6.1.1",
-    "dompurify": "^3.4.14",
+    "dompurify": "^3.4.18",
     "markdown-to-jsx": "^9.10.6",
     "mime-types": "^2.1.35",
     "next": "^16.2.12",
@@ -58,7 +58,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@serwist/next": "^9.5.12",
+    "@serwist/next": "^9.5.15",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^26.1.1",
     "@types/qrcode": "^1.5.5",
