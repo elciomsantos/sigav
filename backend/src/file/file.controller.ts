@@ -12,7 +12,7 @@ import {
   StreamableFile,
 } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
-import contentDisposition from "content-disposition";
+import { create as contentDisposition } from "content-disposition";
 import { Request, Response } from "express";
 import { DownloadLogService } from "../download-log/download-log.service";
 import { User } from "../../prisma/generated/prisma/client";
