@@ -125,7 +125,9 @@ export class JobsService {
   async deleteTemporaryFiles() {
     let filesDeleted = 0;
 
-    let shareDirectories = [];
+    let shareDirectories: Awaited<
+      ReturnType<typeof this.repository.listShareDirectories>
+    >;
     try {
       shareDirectories = (await this.repository.listShareDirectories()).filter(
         (dirent) => dirent.isDirectory,
