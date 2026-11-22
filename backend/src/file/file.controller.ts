@@ -26,7 +26,7 @@ import { FileService } from "./file.service";
 import { UploadQueryDTO } from "./dto/uploadQuery.dto";
 import { DownloadLimitGuard } from "./guard/downloadLimit.guard";
 import mime from "mime-types";
-import range from "range-parser";
+import { combineRanges, parse as parseRange } from "range-parser";
 import { HttpStatus } from "@nestjs/common";
 import { getRequestIp, getRequestUserAgent } from "../utils/request.util";
 import { GetUser } from "../auth/decorator/getUser.decorator";
@@ -564,12 +564,18 @@ export class FileController {
       const meta = await this.fileService.getFileMetaData(shareId, fileId);
       const fullSize = Number(meta.size);
 
-      const ranges = range(fullSize, rangeHeader, { combine: true });
-      if (ranges === -1) {
+      // range-parser v2 retorna um objeto { code, type, ranges } (bitmask:
+      // code & 1 = malformado/inválido, code & 2 = insatisfeito). Mantém o
+      // comportamento anterior: malformado => 416, insatisfeito => resposta completa.
+      const parsed = Number.isSafeInteger(fullSize)
+        ? parseRange(fullSize, rangeHeader)
+        : null;
+      if (parsed && (parsed.type !== "bytes" || parsed.code & 1)) {
         res.set({ "Content-Range": `bytes */${fullSize}` });
         return res.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).end();
       }
-      if (ranges !== -2 && ranges.length > 0) {
+      const ranges = parsed ? combineRanges(parsed.ranges) : [];
+      if (ranges.length > 0) {
         const { start, end } = ranges[0];
         const rangedFile = await this.fileService.get(shareId, fileId, {
           start,
