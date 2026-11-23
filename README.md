@@ -3,8 +3,7 @@
 
   <h1>SIGAV — Sistema de Gestão e Compartilhamento de Vídeos</h1>
 
-  <p align="center">
-
+  <p align="center"
 
   </p>
 </div>
