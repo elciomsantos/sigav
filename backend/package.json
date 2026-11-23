@@ -24,6 +24,7 @@
     "postinstall": "prisma generate"
   },
   "overrides": {
+    "effect": "^3.22.5",
     "deepmerge-ts": "^8.0.0",
     "handlebars": "^4.7.9",
     "path-to-regexp": "^8.4.0",
