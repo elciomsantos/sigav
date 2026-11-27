@@ -103,7 +103,9 @@ WORKDIR /opt/app/frontend
 COPY --from=frontend-builder /opt/app/frontend/public ./public
 COPY --from=frontend-builder /opt/app/frontend/.next/standalone ./
 COPY --from=frontend-builder /opt/app/frontend/.next/static ./.next/static
-COPY --from=frontend-builder /opt/app/frontend/public/img /tmp/img
+# Default images are kept outside /tmp because production composes mount a
+# tmpfs on /tmp (read_only rootfs hardening), which would hide the baked copy.
+COPY --from=frontend-builder /opt/app/frontend/public/img /opt/app/default-img
 
 # Remove npm/npx: not needed to run the standalone Next.js server, and the
 # npm bundle ships vulnerable transitive deps (undici/tar/ip-address/...)
@@ -164,11 +166,11 @@ WORKDIR /opt/app
 
 # Copy frontend (standalone Next.js)
 COPY --from=frontend-runner --chown=controle-user:controle-group /opt/app/frontend ./frontend
-COPY --from=frontend-runner --chown=controle-user:controle-group /tmp/img ./frontend/public/img
+COPY --from=frontend-runner --chown=controle-user:controle-group /opt/app/default-img ./frontend/public/img
 
-# Keep a copy of the default images in the image so the entrypoint can restore
-# them into the frontend-images volume (which shadows /opt/app/frontend/public/img)
-COPY --from=frontend-runner --chown=controle-user:controle-group /tmp/img /tmp/img
+# Keep a copy of the default images outside /tmp so the entrypoint can restore
+# them into the frontend-images volume, even when /tmp is a tmpfs (prod compose).
+COPY --from=frontend-runner --chown=controle-user:controle-group /opt/app/default-img /opt/app/default-img
 
 # Copy backend
 COPY --from=backend-runner --chown=controle-user:controle-group /opt/app/backend ./backend

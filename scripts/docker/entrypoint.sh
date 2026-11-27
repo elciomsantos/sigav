@@ -10,7 +10,7 @@
 # empty — leaving the public/img folder empty and causing 404s for every asset
 # (and bad-precaching-response failures in the service worker). Using `-a`
 # (archive mode) reliably copies the contents into the mounted directory.
-cp -a /tmp/img/. /opt/app/frontend/public/img 2>/dev/null || true
+cp -a /opt/app/default-img/. /opt/app/frontend/public/img 2>/dev/null || true
 
 if [ "$CADDY_DISABLED" != "true" ]; then
   # Start Caddy

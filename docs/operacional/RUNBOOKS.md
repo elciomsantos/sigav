@@ -98,6 +98,38 @@ docker compose up -d --build
 docker exec controle-share-videos-backend curl -fs http://127.0.0.1:8080/api/health
 ```
 
+### 2.1. Imagens da interface (`/img/*`) com 404 após deploy
+
+**Sintoma:** logos, brasão e ícones quebrados; `curl -I https://$DOMAIN/img/brasao.png`
+retorna `404`.
+
+**Causa:** o `docker-compose.prod.yml` monta `/opt/app/data/images` sobre
+`/opt/app/frontend/public/img`, escondendo as imagens que vêm dentro da imagem
+Docker. Se o diretório do host estiver vazio, não há arquivo para servir. Nas
+versões anteriores a cópia de recuperação usava `/tmp/img`, mas o compose de
+produção monta um `tmpfs` em `/tmp`, que apaga essa cópia.
+
+**Correção imediata no host (sem rebuild):**
+
+```bash
+cd /opt/controle-share-videos-v1.0
+cp -a frontend/public/img/. /opt/app/data/images/
+chown -R 1002:1002 /opt/app/data/images
+docker compose -f docker-compose.prod.yml restart frontend
+```
+
+**Correção definitiva:** atualizar para uma versão com o seed em
+`/opt/app/default-img` e rebuild:
+
+```bash
+docker compose -f docker-compose.prod.yml build backend frontend
+docker compose -f docker-compose.prod.yml up -d --remove-orphans
+```
+
+Se o navegador continuar exibindo imagens antigas/quebradas após o 404 ser
+resolvido, fazer um hard reload (Ctrl+Shift+R) ou limpar o service worker:
+as imagens estáticas são precacheadas pelo Serwist.
+
 ---
 
 ## 3. Job de limpeza falhou (`deleteExpiredShares` / `deleteTemporaryFiles`)

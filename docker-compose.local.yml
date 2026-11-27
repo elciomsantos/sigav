@@ -112,12 +112,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
-    # O stage frontend-runner guarda as imagens default em /tmp/img (o mesmo
+    # O stage frontend-runner guarda as imagens default em /opt/app/default-img (o mesmo
     # comportamento do entrypoint.sh de produção); copiamos para o diretório
     # servido (que é o volume montado) antes de subir o server.
     command: >
       sh -c "
-        cp -a /tmp/img/. /opt/app/frontend/public/img 2>/dev/null || true &&
+        cp -a /opt/app/default-img/. /opt/app/frontend/public/img 2>/dev/null || true &&
         cd /opt/app/frontend && PORT=3333 HOSTNAME=0.0.0.0 node server.js
       "
     environment:

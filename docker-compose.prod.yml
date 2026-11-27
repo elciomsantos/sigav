@@ -94,7 +94,9 @@ services:
     networks:
       - backend-net
     # Start the Next.js standalone server (runtime stage does not define a CMD)
-    command: ["sh", "-c", "cd /opt/app/frontend && PORT=3333 HOSTNAME=0.0.0.0 node server.js"]
+    # Restaura as imagens padrão no bind mount antes de servir: o mount de
+    # /opt/app/data/images cobre /opt/app/frontend/public/img da imagem.
+    command: ["sh", "-c", "cp -a /opt/app/default-img/. /opt/app/frontend/public/img 2>/dev/null || true; cd /opt/app/frontend && PORT=3333 HOSTNAME=0.0.0.0 node server.js"]
     healthcheck:
       test: ["CMD", "curl", "-fs", "http://127.0.0.1:3333"]
       interval: 10s
